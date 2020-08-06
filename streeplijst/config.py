@@ -64,11 +64,7 @@ FOLDERS = {
 }
 """Folders which contain streeplijst items in Congressus. This format is used to make JSON calls directly to the API."""
 
-
-# FUNCTIONS
-
-def base_header():
-    value = {
-            "Authorization": "Bearer:" + TOKEN
-    }
-    return value
+BASE_HEADER = {
+        "Authorization": "Bearer:" + TOKEN
+}
+"""Base authorization header using the secret API token."""
