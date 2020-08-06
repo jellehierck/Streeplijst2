@@ -1,5 +1,8 @@
 # Initial template based on: https://gist.github.com/GhostofGoes/94580e76cd251972b15b4821c8a06f59
 
+# Credentials
+credentials.py
+
 # Editors
 .idea/
 
