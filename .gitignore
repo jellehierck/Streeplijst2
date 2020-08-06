@@ -3,6 +3,9 @@
 # Credentials
 credentials.py
 
+# Foldes to exclude
+data/
+
 # Editors
 .idea/
 
