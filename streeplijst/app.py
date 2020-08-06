@@ -21,7 +21,10 @@ class User:
 
 
 if __name__ == "__main__":
-    # items.get_folder_from_config("Speciaal")
+    folder_speciaal = items.get_folder_from_config("Speciaal")
     # folders = items.get_all_folders_from_config()
-
     user = User("s9999999")
+
+    item = folder_speciaal.items[13591]
+    sale = items.Sale(user, item, 1)
+    sale.submit_sale()

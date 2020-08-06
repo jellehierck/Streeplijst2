@@ -11,7 +11,7 @@ from credentials import TOKEN  # Import the secure credentials from credentials.
 TIMEOUT = 10
 """Default timeout time for server responses."""
 
-BASE_URL = "https://api.congressus.nl/v20/"
+BASE_URL = "https://api.congressus.nl/v20"
 """"Base url for Congressus API calls."""
 
 FOLDERS = {

@@ -53,31 +53,17 @@ class Folder:
         items_list = api.get_products_in_folder(self.id)  # Make the API call to get items in the folder
         result = dict()  # Empty dict to store items in
         for item_dict in items_list:  # Iterate all items in the response
-            result[item_dict["id"]] = GetItem(item_dict["name"], item_dict["id"], item_dict["price"],
-                                              item_dict["folder"], item_dict["folder_id"], item_dict["published"],
-                                              item_dict["media"])  # Create GetItem object
+            result[item_dict["id"]] = Item(item_dict["name"], item_dict["id"], item_dict["price"],
+                                           item_dict["folder"], item_dict["folder_id"], item_dict["published"],
+                                           item_dict["media"])  # Create GetItem object
         self.last_updated = datetime.datetime.now().isoformat()  # Set the last updated time to now
         return result
 
 
-class BaseItem:
-    def __init__(self, name, id, price):
-        """
-        Instantiate a BaseItem object. This Item contains the very basic information of items.
-
-        :param name: Item name
-        :param id: Item id
-        :param price: Item price
-        """
-        self.name = name
-        self.id = id
-        self.price = price
-
-
-class GetItem(BaseItem):
+class Item:
     def __init__(self, name, id, price, folder, folder_id, published, media=""):
         """
-        Instantiate a GetItem object. This Item contains all relevant information provided by the API response.
+        Instantiate an Item object. This Item contains all relevant information provided by the API response.
 
         :param name: Item name
         :param id: Item id
@@ -87,21 +73,29 @@ class GetItem(BaseItem):
         :param published: True if the item is published, false otherwise
         :param media: (optional) Image URL
         """
-        super().__init__(name, id, price)
+        self.name = name
+        self.id = id
+        self.price = price
         self.folder = folder
         self.folder_id = folder_id
         self.published = published
         self.media = media
 
 
-class PostItem(BaseItem):
-    def __init__(self, name, id, price, quantity):
+class Sale:
+    def __init__(self, user, item, quantity):
         """
-        Instantiate a PostItem object. This Item contains all relevant information to POST a sale to the API
-        :param name: Item name
-        :param id: Item id
-        :param price: Item price
-        :param quantity: Amount of this item to buy
+        Instantiates a Sale object.
+        :param user: User object
+        :param item: Item object
+        :param quantity: Amount of the item to buy
         """
-        super().__init__(name, id, price)
+        self.user = user
+        self.item = item
         self.quantity = quantity
+
+        self.user_id = user.user_id  # Store the user id for API call
+        self.product_id = item.id  # Store the product ID for API call
+
+    def submit_sale(self):
+        api.post_sale(self.user_id, self.product_id, self.quantity)
