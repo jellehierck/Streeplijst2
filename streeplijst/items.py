@@ -6,14 +6,27 @@ import streeplijst.api as api
 
 def get_folder_from_config(folder_name):
     """
-    Reads the config.py file and returns the Folder object with that name.
+    Reads config.py and returns the Folder object with the specified name.
 
     :param folder_name: The folder name to read.
     :return: The Folder object
     """
-    folder_dict = FOLDERS[folder_name]  # Load the folder configuration
-    folder = Folder(folder_dict["name"], folder_dict["id"], folder_dict["media"])  # Create Folder object
+    folder_config = FOLDERS[folder_name]  # Load the folder configuration
+    folder = Folder(folder_config["name"], folder_config["id"], folder_config["media"])  # Create Folder object
     return folder
+
+
+def get_all_folders_from_config():
+    """
+    Reads all folders in config.py and returns a dict of Folder objects
+
+    :return: A dict with (key: value) (folder_id: Folder)
+    """
+    result = dict()
+    for folder_name in FOLDERS:  # Iterate all items in folder configuration
+        folder = get_folder_from_config(folder_name)  # Create Folder object
+        result[folder.id] = folder  # Store folder object
+    return result
 
 
 class Folder:
@@ -35,7 +48,7 @@ class Folder:
         """
         GET all items from API.
 
-        :return: A dict with (key: value) (item id: GetItem object)
+        :return: A dict with (key: value) (item_id: GetItem)
         """
         items_list = api.get_products_in_folder(self.id)  # Make the API call to get items in the folder
         result = dict()  # Empty dict to store items in

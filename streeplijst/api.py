@@ -15,5 +15,5 @@ def get_products_in_folder(folder_id):
     headers = base_header()  # Create the base header which contains the API token
     res = requests.get(url=url, headers=headers)  # Send the request
     res.json()  # Convert response to JSON
-    return_list = json.loads(res.text)  # Select the relevant data and convert to a list of dicts
-    return return_list
+    result = json.loads(res.text)  # Select the relevant data and convert to a list of dicts
+    return result
