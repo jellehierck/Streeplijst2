@@ -12,9 +12,10 @@ from credentials import DEV_KEY, SECRET_KEY
 
 
 def create_app(test_config=None):
-    app = Flask(__name__)
+    app = Flask(__name__)  # Create the app
+
     app.config.from_mapping(
-            SECRET_KEY=DEV_KEY,
+            SECRET_KEY=DEV_KEY,  # Secret key required by Flask to make POST requests.
     )
 
     # Landing page
@@ -29,16 +30,10 @@ def create_app(test_config=None):
             return render_template('login.html')
 
         elif request.method == 'POST':  # Attempt to login the user
-            s_number = request.form['student-number']
-            user = streeplijst.User(s_number)
-            flash(user.first_name)
-            return redirect(url_for('login'))
-
-
-
-    @app.route('/time')
-    def get_current_time():
-        return {'time': datetime.datetime.now().isoformat()}
+            s_number = request.form['student-number']  # Load the student number from the push form
+            user = streeplijst.User(s_number)  # Create a User
+            flash(user.first_name)  # Display the name as temporary measure
+            return redirect(url_for('login'))  # Redirect to the same page as temporary measure
 
     return app
 
