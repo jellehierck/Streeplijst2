@@ -4,7 +4,7 @@ app.py
 Contains all Flask logic to connect this Python backend to the HTML frontend.
 """
 import datetime
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template
 
 import streeplijst2.streeplijst as streeplijst
 import streeplijst2.api as api
@@ -13,15 +13,13 @@ import streeplijst2.api as api
 def create_app(test_config=None):
     app = Flask(__name__)
 
-    # Initial page loaded on startup
     @app.route('/')
     def index():
-        return redirect(url_for('login_page'))  # Redirects to the login page by default
+        return render_template("login.html")
 
-    # Login page
-    @app.route('/login_page')
-    def login():
-        return render_template("login_page.html")  # Render the Jinja HTML template for login
+    @app.route('/time')
+    def get_current_time():
+        return {'time': datetime.datetime.now().isoformat()}
 
     return app
 
