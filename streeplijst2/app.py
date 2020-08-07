@@ -1,10 +1,10 @@
 """
 app.py
 
-Contains all Flask logic to connect this Python backend to the ReactJS frontend.
+Contains all Flask logic to connect this Python backend to the HTML frontend.
 """
 import datetime
-from flask import Flask
+from flask import Flask, render_template
 
 import streeplijst2.streeplijst as streeplijst
 import streeplijst2.api as api
@@ -15,7 +15,7 @@ def create_app(test_config=None):
 
     @app.route('/')
     def index():
-        return "<h1>Streeplijst</h1>"
+        return render_template("login.html")
 
     @app.route('/time')
     def get_current_time():
