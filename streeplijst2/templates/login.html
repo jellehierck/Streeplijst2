@@ -3,20 +3,21 @@
 {% block title %}Login{% endblock %}
 
 {% block main_center %}
-<div class="numpad-container">
+<form class="numpad-container" method="POST">
     <p id="numpad-display" class="numpad-display">s</p>
-    <button class="numpad-submit-button" draggable="false">Submit</button>
+    <button class="numpad-submit-button" draggable="false" type="submit">Submit</button>
+
     {% set sequence = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "m", "0", "backspace"] %}
     {% for nr in sequence %}
     {% if nr == "m" or nr == "s" %}
-    <button id="letter-button" onclick="toggleLetter()" draggable="false" >{{ nr }}</button>
+    <button id="letter-button" onclick="toggleLetter()" draggable="false" type="button">{{ nr }}</button>
     {% elif nr == "backspace" %}
-    <button onclick="removeDigit()" draggable="false">{{ nr }}</button>
+    <button onclick="removeDigit()" draggable="false" type="button">{{ nr }}</button>
     {% else %}
-    <button onclick="addDigit({{ nr }})" draggable="false">{{ nr }}</button>
+    <button onclick="addDigit({{ nr }})" draggable="false" type="button">{{ nr }}</button>
     {% endif %}
     {% endfor %}
-</div>
+</form>
 {% endblock main_center %}
 
 {% block script %}
@@ -51,6 +52,7 @@
         }
         $('#letter-button').text(currentLetter); // Add the previous letter to the button display
     }
+
 
 </script>
 {% endblock script %}
