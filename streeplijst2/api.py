@@ -1,7 +1,7 @@
 import requests
 import json
 
-from streeplijst.config import BASE_URL, BASE_HEADER, TIMEOUT
+from streeplijst2.config import BASE_URL, BASE_HEADER, TIMEOUT
 
 
 def get_products_in_folder(folder_id):

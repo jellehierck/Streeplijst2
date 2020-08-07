@@ -1,3 +1,3 @@
-FLASK_APP=streeplijst.app.py
+FLASK_APP=streeplijst2.app.py
 FLASK_ENV=development
 FLASK_RUN_PORT=4040

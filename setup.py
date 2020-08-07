@@ -8,8 +8,5 @@ setup(
         author='Jelle Hierck',
         author_email='jelle.hierck@gmail.com',
         description='Paradoks Streeplijst',
-        packages=find_packages(include=['streeplijst', 'streeplijst.*']),
-        install_requires=[
-                'requests'
-        ],
+        packages=find_packages(include=['streeplijst2', 'streeplijst2.*']),
 )
