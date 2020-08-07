@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- This template is created using Jinja tempalates: https://jinja.palletsprojects.com/en/2.11.x/templates/ -->
+
+<head>
+    {% block head %}
+    <title>{% block title %}{% endblock title %} - Streeplijst </title> <!-- Title block placeholder -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% endblock head %}
+</head>
+
+<body>
+    <div id="content" class="fullscreen">{% block content %}{% endblock content %}</div> <!-- Main content block placeholder -->
+    <div id="footer" class="footer">
+        {% block footer %}
+        <p>&copy; Copyright 2020 by Jelle Hierck</p>
+        {% endblock footer %}
+    </div>
+
+    <script>
+        {% block script %}{% endblock script %}
+    </script>
+
+</body>
+
+</html>
