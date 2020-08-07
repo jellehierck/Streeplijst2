@@ -1,5 +1,22 @@
+import datetime
+from flask import Flask
+
 import streeplijst.items as items
 import streeplijst.api as api
+
+
+def create_app(test_config=None):
+    app = Flask(__name__)
+
+    @app.route('/')
+    def index():
+        return "<h1>Streeplijst</h1>"
+
+    @app.route('/time')
+    def get_current_time():
+        return {'time': datetime.datetime.now().isoformat()}
+
+    return app
 
 
 class User:
@@ -7,17 +24,17 @@ class User:
         self.s_number = s_number
 
         user_details = api.get_user(s_number)  # GET all user details from the API and store relevant details
-        self.user_id = user_details["id"]
-        self.first_name = user_details["first_name"]
-        self.last_name_prefix = user_details["primary_last_name_prefix"]
-        self.last_name = user_details["primary_last_name_main"]
-        self.date_of_birth = user_details["date_of_birth"]
-        self.has_sdd_mandate = user_details["has_sdd_mandate"]
+        self.user_id = user_details['id']
+        self.first_name = user_details['first_name']
+        self.last_name_prefix = user_details['primary_last_name_prefix']
+        self.last_name = user_details['primary_last_name_main']
+        self.date_of_birth = user_details['date_of_birth']
+        self.has_sdd_mandate = user_details['has_sdd_mandate']
 
-        if user_details["profile_picture"] is None:  # Store a profile picture URL if the user has one.
+        if user_details['profile_picture'] is None:  # Store a profile picture URL if the user has one.
             self.profile_picture = ""
         else:
-            self.profile_picture = user_details["profile_picture"]["url_md"]
+            self.profile_picture = user_details['profile_picture']['url_md']
 
 
 if __name__ == "__main__":
