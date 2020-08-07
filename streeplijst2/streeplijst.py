@@ -1,7 +1,7 @@
 import datetime
 
-from streeplijst.config import FOLDERS
-import streeplijst.api as api
+from streeplijst2.config import FOLDERS
+import streeplijst2.api as api
 
 
 def get_folder_from_config(folder_name):
@@ -99,3 +99,21 @@ class Sale:
 
     def submit_sale(self):
         api.post_sale(self.user_id, self.product_id, self.quantity)
+
+
+class User:
+    def __init__(self, s_number):
+        self.s_number = s_number
+
+        user_details = api.get_user(s_number)  # GET all user details from the API and store relevant details
+        self.user_id = user_details['id']
+        self.first_name = user_details['first_name']
+        self.last_name_prefix = user_details['primary_last_name_prefix']
+        self.last_name = user_details['primary_last_name_main']
+        self.date_of_birth = user_details['date_of_birth']
+        self.has_sdd_mandate = user_details['has_sdd_mandate']
+
+        if user_details['profile_picture'] is None:  # Store a profile picture URL if the user has one.
+            self.profile_picture = ""
+        else:
+            self.profile_picture = user_details['profile_picture']['url_md']
