@@ -43,7 +43,10 @@
     </div>
     <div id="main-south">
         {% block bottom %}
-        <!-- Not assigned yet. Could be used for information regarding connection and other technical stuff -->
+        <!-- Used for errors/warnings. Could also be used for information about other technical stuff (connection) -->
+        {% for message in get_flashed_messages() %}
+            <div class="flash">{{ message }}</div>
+        {% endfor %}
         {% endblock bottom %}
     </div>
     <div id="main-southeast" class="main-corner">
