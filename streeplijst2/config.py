@@ -1,7 +1,7 @@
 """
 Config.py
 
-Contains all non-secure information for the app.py file. This includes certain configurations for the Congressus API.
+Contains all non-secure information for the flask_app.py file. This includes certain configurations for the Congressus API.
 """
 
 from credentials import TOKEN  # Import the secure credentials from credentials.py
