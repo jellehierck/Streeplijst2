@@ -1,4 +1,4 @@
-import requests
+import requests  # library used for making calls to Congressus API
 import json
 
 from streeplijst2.config import BASE_URL, BASE_HEADER, TIMEOUT
@@ -29,6 +29,7 @@ def get_user(s_number):
     url = BASE_URL + "/members?username=" + s_number  # Set the URL to connect to the API
     headers = BASE_HEADER  # Create the base header which contains the secret API token
     res = requests.get(url=url, headers=headers, timeout=TIMEOUT)  # Send the request with the default timeout
+    res.raise_for_status()
     res.json()  # Convert response to JSON
     result = json.loads(res.text)  # Convert response to a list of dicts. # Congressus always sends a list of objects.
     return result[0]  # We return the first dict in the list since there is only one object in the list.

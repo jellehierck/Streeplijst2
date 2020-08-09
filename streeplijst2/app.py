@@ -37,7 +37,8 @@ def create_app(test_config=None):
 
     return app
 
-
+# TODO: Remove the below section as it is only used for development testing.
+# Tests various API calls and streeplijst.py module interactions.
 if __name__ == "__main__":
     folder_speciaal = streeplijst.get_folder_from_config("Speciaal")
     # folders = items.get_all_folders_from_config()
