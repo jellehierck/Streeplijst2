@@ -3,7 +3,7 @@ flask_app.py
 
 Contains all Flask logic to connect this Python backend to the HTML frontend.
 """
-import datetime
+import os
 from flask import Flask, render_template, redirect, url_for, request, flash
 
 import streeplijst2.streeplijst as streeplijst
@@ -16,6 +16,22 @@ def create_app(test_config=None):
     app.config.from_mapping(
             SECRET_KEY=DEV_KEY,  # Secret key required by Flask to make POST requests.
     )
+
+    if test_config is None:  # load the instance config, if it exists, when not testing
+        app.config.from_pyfile("config.py", silent=True)
+    else:  # load the test config if passed in
+        app.config.update(test_config)
+
+    # ensure the instance folder exists
+    try:
+        os.makedirs(app.instance_path)
+    except OSError:
+        pass
+
+    # Hello world response
+    @app.route("/hello")
+    def hello():
+        return "Hello, World!"
 
     # Landing page
     @app.route('/')
@@ -35,6 +51,7 @@ def create_app(test_config=None):
             return redirect(url_for('login'))  # Redirect to the same page as temporary measure
 
     return app
+
 
 # TODO: Remove the below section as it is only used for development testing.
 # Tests various API calls and streeplijst.py module interactions.

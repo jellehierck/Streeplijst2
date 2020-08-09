@@ -5,6 +5,7 @@ credentials.py
 
 # Foldes to exclude
 data/
+instance/
 
 # Dependencies
 node_modules/
