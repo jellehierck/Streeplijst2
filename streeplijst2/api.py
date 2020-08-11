@@ -19,20 +19,26 @@ def get_products_in_folder(folder_id):
     return result
 
 
-def get_user(s_number):
+def get_user(s_number, timeout=TIMEOUT):
     """
     GET a single user from Congressus API. This is a blocking call.
 
     :param s_number: Student number to retrieve the user for.
+    :param timeout: Timeout to
     :return: A dict with containing the server response converted from a JSON string.
     """
     url = BASE_URL + "/members?username=" + s_number  # Set the URL to connect to the API
     headers = BASE_HEADER  # Create the base header which contains the secret API token
-    res = requests.get(url=url, headers=headers, timeout=TIMEOUT)  # Send the request with the default timeout
-    res.raise_for_status()
-    res.json()  # Convert response to JSON
+    res = requests.get(url=url, headers=headers, timeout=timeout)  # Send the request with the default timeout
+
+    res.raise_for_status()  # Raise any HTTP errors which occurred when making the request
+    if not res.json():  # The server sent an empty response
+        error_msg = u'%s Client Error: Request %s, but user %s is not found for URL %s' % \
+                    (res.status_code, res.reason, s_number, res.url)
+        raise requests.HTTPError(error_msg, response=res)  # Raise an HTTP error
+
     result = json.loads(res.text)  # Convert response to a list of dicts. # Congressus always sends a list of objects.
-    return result[0]  # We return the first dict in the list since there is only one object in the list.
+    return result[0]  # We return the first dict in the list since there should be only one object in the list.
 
 
 def post_sale(user_id, product_id, quantity):
@@ -54,3 +60,12 @@ def post_sale(user_id, product_id, quantity):
                         timeout=TIMEOUT)  # Send request with payload and default timeout
     result = res.json()  # Convert the entire response to a python object
     return result
+
+
+if __name__ == "__main__":
+    correct_user = "s9999999"
+    wrong_user = "s8888888"
+
+    res = get_user(correct_user)
+
+    # res = get_user(wrong_user)
