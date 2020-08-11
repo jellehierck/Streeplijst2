@@ -41,7 +41,7 @@ def get_user(s_number, timeout=TIMEOUT):
     return result[0]  # We return the first dict in the list since there should be only one object in the list.
 
 
-def post_sale(user_id, product_id, quantity):
+def post_sale(user_id, product_id, quantity, timeout=TIMEOUT):
     payload = {  # Store the sales parameters in the format required by Congressus
             "user_id": user_id,  # User id
             "items": [{
@@ -49,23 +49,16 @@ def post_sale(user_id, product_id, quantity):
                     "quantity": quantity  # Amount of items
             }],
             "payments": [{
-                    "type": "direct_debit"  # Type of payment.
+                    "type": "direct_debit"  # Type of payment
                     # TODO: Direct debit is hard coded right now. This may be changed later, although the streeplijst
-                    #  is intended to work with direct debit at all times.
+                    #  is intended to only work with direct debit for now. See
+                    #  http://docs.congressus.nl/#!/default/post_sales for more info.
             }]
     }
     url = BASE_URL + "/sales"
     headers = BASE_HEADER
     res = requests.post(url=url, headers=headers, json=payload,
-                        timeout=TIMEOUT)  # Send request with payload and default timeout
+                        timeout=timeout)  # Send request with payload and default timeout
+    res.raise_for_status()  # Raise any HTTP errors which occurred when making the request
     result = res.json()  # Convert the entire response to a python object
     return result
-
-
-if __name__ == "__main__":
-    correct_user = "s9999999"
-    wrong_user = "s8888888"
-
-    res = get_user(correct_user)
-
-    # res = get_user(wrong_user)
