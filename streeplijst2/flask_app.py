@@ -18,7 +18,7 @@ def create_app(test_config=None):
     )
 
     if test_config is None:  # load the instance config, if it exists, when not testing
-        app.config.from_pyfile("config.py", silent=True)
+        app.config.from_pyfile("config.py", silent=True)  # TODO: Add lines to config.py
     else:  # load the test config if passed in
         app.config.update(test_config)
 
@@ -29,7 +29,7 @@ def create_app(test_config=None):
         pass
 
     # Hello world response
-    @app.route("/hello")
+    @app.route('/hello')
     def hello():
         return "Hello, World!"
 
@@ -48,7 +48,20 @@ def create_app(test_config=None):
             s_number = request.form['student-number']  # Load the student number from the push form
             user = streeplijst.User(s_number)  # Create a User
             flash(user.first_name)  # Display the name as temporary measure
-            return redirect(url_for('login'))  # Redirect to the same page as temporary measure
+            return redirect(url_for('folders_home'))  # Redirect to the same page as temporary measure
+
+    # Folders home page. Displays all folders to choose products from.
+    @app.route('/folders')
+    @app.route('/folders/home')
+    def folders_home():
+        folders = streeplijst.get_all_folders_from_config()  # Load all folders
+        # TODO: Do not call this method on endpoint loading but periodically (saves loading time).
+        return render_template('folders_home.html', folders=folders)
+
+    # Specific folder pages. Displays all products in the specified folder.
+    @app.route('/folders/<int:folder_id>')
+    def folder(folder_id):
+        return render_template('folder.html', items=None)
 
     return app
 
