@@ -4,7 +4,7 @@ import json
 from streeplijst2.config import BASE_URL, BASE_HEADER, TIMEOUT
 
 
-def get_products_in_folder(folder_id):
+def get_products_in_folder(folder_id, timeout=TIMEOUT):
     """
     GET all products inside a single folder from Congressus API. This is a blocking call.
 
@@ -13,8 +13,14 @@ def get_products_in_folder(folder_id):
     """
     url = BASE_URL + "/products?folder_id=" + str(folder_id)  # Set the URL to connect to the API
     headers = BASE_HEADER  # Create the base header which contains the secret API token
-    res = requests.get(url=url, headers=headers, timeout=TIMEOUT)  # Send the request with the default timeout
-    res.json()  # Convert response to JSON
+    res = requests.get(url=url, headers=headers, timeout=timeout)  # Send the request with the default timeout
+
+    res.raise_for_status()  # Raise any HTTP errors which occurred when making the request
+    if not res.json():  # The server sent an empty response
+        error_msg = u'%s Server Error: Request %s, but folder_id %s is not found for URL %s' % \
+                    (res.status_code, res.reason, folder_id, res.url)
+        raise requests.HTTPError(error_msg, response=res)  # Raise an HTTP error
+
     result = json.loads(res.text)  # Select the relevant data and convert to a list of dicts
     return result
 
@@ -33,7 +39,7 @@ def get_user(s_number, timeout=TIMEOUT):
 
     res.raise_for_status()  # Raise any HTTP errors which occurred when making the request
     if not res.json():  # The server sent an empty response
-        error_msg = u'%s Client Error: Request %s, but user %s is not found for URL %s' % \
+        error_msg = u'%s Server Error: Request %s, but user %s is not found for URL %s' % \
                     (res.status_code, res.reason, s_number, res.url)
         raise requests.HTTPError(error_msg, response=res)  # Raise an HTTP error
 
