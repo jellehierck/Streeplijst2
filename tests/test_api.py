@@ -22,6 +22,8 @@ correct_user = dict({'username': 's9999999', 'first_name': 'Test', 'user_id': 34
 correct_item = dict({'id': 13591})
 correct_folder = dict({'folder_id': 1998})
 
+no_sdd_user = dict({'username': 's9999998', 'first_name': 'TestTwee', 'user_id': 485567})
+
 incorrect_user = dict({'username': 's8888888', 'user_id': 0})
 incorrect_item = dict({'id': 1})
 incorrect_folder = dict({'folder_id': 1})
@@ -41,8 +43,7 @@ def test_get_products_in_folder_correct():
 def test_get_products_in_folder_incorrect():
     with pytest.raises(HTTPError) as error:
         res = api.get_products_in_folder(incorrect_folder['folder_id'])
-    assert "200 Server Error: Request OK, but folder_id " + str(incorrect_folder['folder_id']) + \
-           " is not found" in str(error.value)
+    assert "404 Server Error: folder_id " + str(incorrect_folder['folder_id']) + " is not found" in str(error.value)
 
     # Test if the timeout exception is raised
     with pytest.raises(Timeout) as error:
@@ -54,12 +55,15 @@ def test_get_user_correct():
     res = api.get_user(correct_user['username'])
     assert 'first_name' in res and correct_user['first_name'] == res['first_name']
 
+    res = api.get_user(no_sdd_user['username'])
+    assert 'first_name' in res and no_sdd_user['first_name'] == res['first_name']
+
 
 # Test if an invalid username raises the correct exception
 def test_get_user_incorrect():
-    with pytest.raises(HTTPError) as error:
+    with pytest.raises(api.UserNotFoundException) as error:
         res = api.get_user(incorrect_user['username'])
-    assert "200 Server Error: Request OK, but user " + incorrect_user['username'] + " is not found" in str(error.value)
+    assert "404 Server Error: User " + incorrect_user['username'] + " is not found" in str(error.value)
 
     # Test if the timeout exception is raised
     with pytest.raises(Timeout) as error:
@@ -86,3 +90,8 @@ def test_post_sale_incorrect():
     # Timeout
     with pytest.raises(Timeout) as error:
         res = api.post_sale(correct_user['user_id'], correct_item['id'], 1, 0.001)
+
+    # No SDD sign on user
+    with pytest.raises(api.UserNotSignedException) as error:
+        res = api.post_sale(no_sdd_user['user_id'], correct_item['id'], 1)
+    assert str(403) in str(error.value) and "mandate" in str(error.value)
