@@ -23,6 +23,7 @@
 {% block script %}
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script> ##
 <script type="text/javascript">
+    // Adds a digit to the display
     function addDigit(inputDigit) {
         var currentSNumber = $('#numpad-display').val();
         if (currentSNumber.length < 8) { // Only if there are less than 7 numerical digits (not including the first letter)
@@ -30,14 +31,24 @@
         }
     }
 
+    // Removes the last digit from the display
     function removeDigit() {
         var currentSNumber = $('#numpad-display').val();
         if (currentSNumber.length > 1) { // Always leaves the first letter
-            currentSNumber = currentSNumber.slice(0, -1)
-            $('#numpad-display').val(currentSNumber); // Remove the last digit and update the display
+            currentSNumber = currentSNumber.slice(0, -1); // Remove the last digit
+            $('#numpad-display').val(currentSNumber); // Update the display
         }
     }
 
+    // Removes all digits from the display
+    function removeAllDigits() {
+        var currentSNumber = $('#numpad-display').val()
+        var currentLetter = currentSNumber.charAt(0); // Store the current letter
+        $('#numpad-display').val(currentLetter); // Only store the letter (removes all digits)
+    }
+
+
+    // Toggles the letter between s and m
     function toggleLetter() {
         var currentSNumber = $('#numpad-display').val()
         var currentLetter = currentSNumber.charAt(0); // Store the current letter
