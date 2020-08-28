@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Index{% endblock title %}
+
+{% block content %}
+<div class="main-grid">
+    <!-- Main grid container -->
+    <div id="main-northwest">
+        {% block logo %}
+        <!-- Paradoks logo -->
+        {% endblock logo %}
+    </div>
+    <div id="main-north">
+        {% block page_title %}
+        <!-- Page title -->
+        {% endblock page_title %}
+    </div>
+    <div id="main-northeast">
+        {% block back_button %}
+        <!-- Back button -->
+        {% endblock back_button %}
+    </div>
+    <div id="main-west">
+        {% block side_left %}
+        <!-- Display current selection -->
+        {% endblock side_left %}
+    </div>
+    <div id="main-center">
+        {% block main_center %}
+        <!-- Main content -->
+        {% endblock main_center %}
+    </div>
+    <div id="main-east">
+        {% block side_right %}
+        <!-- Not assigned yet. Could be used for quick menu (selecting often-bought items), information about previous
+        sales for a user, etc. -->
+        {% endblock side_right %}
+    </div>
+    <div id="main-southwest">
+        {% block corner_bottomleft %}
+        <!-- Not assigned yet. Could be used for random fun stuff such as quotes, pictures, soundboard, etc. -->
+        {% endblock corner_bottomleft %}
+    </div>
+    <div id="main-south">
+        {% block bottom %}
+        <!-- Used for errors/warnings. Could also be used for information about other technical stuff (connection) -->
+        {% for message in get_flashed_messages() %}
+            <div class="flash">{{ message }}</div>
+        {% endfor %}
+        {% endblock bottom %}
+    </div>
+    <div id="main-southeast" class="main-corner">
+        {% block update_button %}
+        <!-- Update button to force item update from Congressus -->
+        {% endblock update_button %}
+    </div>
+</div>
+{% endblock content %}

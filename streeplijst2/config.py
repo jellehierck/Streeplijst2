@@ -1,7 +1,7 @@
 """
 Config.py
 
-Contains all non-secure information for the app.py file. This includes certain configurations for the Congressus API.
+Contains all non-secure information for the flask_app.py file. This includes certain configurations for the Congressus API.
 """
 
 from credentials import TOKEN  # Import the secure credentials from credentials.py
@@ -68,3 +68,20 @@ BASE_HEADER = {
         "Authorization": "Bearer:" + TOKEN
 }
 """Base authorization header using the secret API token."""
+
+TEST_USER = {
+        "s_number": "s9999999", 
+        "first_name": "Test", 
+        "id": 347980
+}
+"""Test user specification. Note: not all attributes are listed as they are not all needed."""
+
+TEST_FOLDER_NAME = "Speciaal"
+"""Test folder name. This folder contains the test item."""
+
+TEST_ITEM = {
+        "id": 13591, 
+        "folder": TEST_FOLDER_NAME, 
+        "name": "Testproduct"
+}
+"""Test item specification. Note: not all attributes are listed as they are not all needed."""

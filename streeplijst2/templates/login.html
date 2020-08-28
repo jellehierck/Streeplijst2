@@ -1,0 +1,66 @@
+{% extends "main_grid.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block main_center %}
+<form class="numpad-container" method="POST">
+    <input id="numpad-display" name="student-number" class="numpad-display" value="s" readonly>
+    <button class="numpad-submit-button" draggable="false" type="submit">Submit</button>
+
+    {% set sequence = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "m", "0", "backspace"] %}
+    {% for nr in sequence %}
+    {% if nr == "m" or nr == "s" %}
+    <button id="letter-button" onclick="toggleLetter()" draggable="false" type="button">{{ nr }}</button>
+    {% elif nr == "backspace" %}
+    <button onclick="removeDigit()" draggable="false" type="button">{{ nr }}</button>
+    {% else %}
+    <button onclick="addDigit({{ nr }})" draggable="false" type="button">{{ nr }}</button>
+    {% endif %}
+    {% endfor %}
+</form>
+{% endblock main_center %}
+
+{% block script %}
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script> ##
+<script type="text/javascript">
+    // Adds a digit to the display
+    function addDigit(inputDigit) {
+        var currentSNumber = $('#numpad-display').val();
+        if (currentSNumber.length < 8) { // Only if there are less than 7 numerical digits (not including the first letter)
+            $('#numpad-display').val(currentSNumber + inputDigit); // Add new digit and update display
+        }
+    }
+
+    // Removes the last digit from the display
+    function removeDigit() {
+        var currentSNumber = $('#numpad-display').val();
+        if (currentSNumber.length > 1) { // Always leaves the first letter
+            currentSNumber = currentSNumber.slice(0, -1); // Remove the last digit
+            $('#numpad-display').val(currentSNumber); // Update the display
+        }
+    }
+
+    // Removes all digits from the display
+    function removeAllDigits() {
+        var currentSNumber = $('#numpad-display').val()
+        var currentLetter = currentSNumber.charAt(0); // Store the current letter
+        $('#numpad-display').val(currentLetter); // Only store the letter (removes all digits)
+    }
+
+
+    // Toggles the letter between s and m
+    function toggleLetter() {
+        var currentSNumber = $('#numpad-display').val()
+        var currentLetter = currentSNumber.charAt(0); // Store the current letter
+        currentSNumber = currentSNumber.slice(1); // Return everything beyond the letter
+        if (currentLetter == 's') {
+            $('#numpad-display').val('m' + currentSNumber); // Add other letter and update the display
+        } else {
+            $('#numpad-display').val('s' + currentSNumber); // Add other letter and update the display
+        }
+        $('#letter-button').val(currentLetter); // Add the previous letter to the button display
+    }
+
+
+</script>
+{% endblock script %}
