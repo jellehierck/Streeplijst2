@@ -46,7 +46,7 @@ def create_app(test_config=None):
 
         elif request.method == 'POST':  # Attempt to login the user
             s_number = request.form['student-number']  # Load the student number from the push form
-            user = streeplijst.User(s_number)  # Create a User
+            user = streeplijst.User.from_api(s_number)  # Create a User
             flash(user.first_name)  # Display the name as temporary measure
             return redirect(url_for('folders_home'))  # Redirect to the same page as temporary measure
 
@@ -54,7 +54,7 @@ def create_app(test_config=None):
     @app.route('/folders')
     @app.route('/folders/home')
     def folders_home():
-        folders = streeplijst.get_all_folders_from_config()  # Load all folders
+        folders = streeplijst.Folder.all_folders_from_config()  # Load all folders
         # TODO: Do not call this method on endpoint loading but periodically (saves loading time).
         return render_template('folders_home.html', folders=folders)
 
@@ -64,15 +64,3 @@ def create_app(test_config=None):
         return render_template('folder.html', items=None)
 
     return app
-
-
-# TODO: Remove the below section as it is only used for development testing.
-# Tests various API calls and streeplijst.py module interactions.
-if __name__ == "__main__":
-    folder_speciaal = streeplijst.get_folder_from_config("Speciaal")
-    # folders = items.get_all_folders_from_config()
-    user = streeplijst.User("s9999999")
-
-    item = folder_speciaal.items[13591]
-    sale = streeplijst.Sale(user, item, 1)
-    sale.post_sale()
