@@ -96,20 +96,20 @@ class User:
         :param s_number: Student or Employee number (Congressus user name)
         """
         user_details = api.get_user(s_number)  # GET all user details from the API and store relevant details
-        user = cls(s_number, user_id=user_details['id'], date_of_birth=user_details['date_of_birth'],
+        user = cls(s_number, id=user_details['id'], date_of_birth=user_details['date_of_birth'],
                    first_name=user_details['first_name'], last_name=user_details['primary_last_name_main'],
                    last_name_prefix=user_details['primary_last_name_prefix'],
                    has_sdd_mandate=user_details['has_sdd_mandate'], profile_picture=user_details['profile_picture'])
         return user
 
-    def __init__(self, s_number: str, user_id: int, date_of_birth: str, first_name: str, last_name: str,
+    def __init__(self, s_number: str, id: int, date_of_birth: str, first_name: str, last_name: str,
                  last_name_prefix: str = "",
                  has_sdd_mandate: bool = False, profile_picture: dict = ""):
         """
         Create a new User object.
 
         :param s_number: Student or Employee number (Congressus user name)
-        :param user_id: Congressus user id
+        :param id: Congressus user id
         :param date_of_birth: Date of Birth
         :param first_name: First Name
         :param last_name: Last Name
@@ -118,7 +118,7 @@ class User:
         :param profile_picture: Dict with URL strings to profile pictures
         """
         self.s_number = s_number
-        self.user_id = user_id
+        self.id = id
         self.first_name = first_name
         self.last_name_prefix = last_name_prefix
         self.last_name = last_name
@@ -148,6 +148,6 @@ class Sale:
         """
         POST the sale to Congressus.
         """
-        user_id = self.user.user_id
+        user_id = self.user.id
         product_id = self.item.id
         api.post_sale(user_id, product_id, self.quantity)

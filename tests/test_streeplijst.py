@@ -1,12 +1,12 @@
 import pytest
 
 from streeplijst2.config import FOLDERS
-from streeplijst2.streeplijst import Folder
+from streeplijst2.streeplijst import Folder, User
 
 test_folder_name = "Speciaal"
 test_folder = FOLDERS[test_folder_name]
 test_item = dict({'id': 13591, 'folder': test_folder_name, 'name': "Testproduct"})
-
+test_user = dict({'s_number': 's9999999', 'first_name': 'Test', 'id': 347980})
 
 def test_folder_init():
     """
@@ -45,3 +45,10 @@ def test_folder_all_folders_from_config():
     all_folders = Folder.all_folders_from_config()
     assert all_folders is not None  # Test if there are folders in the resulting dict
     assert any(test_folder['id'] == folder.id for folder in all_folders.values())  # Test if the test folder exists
+
+
+def test_user_from_api():
+    user = User.from_api(test_user['s_number'])
+    assert test_user['id'] == user.id
+    assert test_user['first_name'] == user.first_name
+    assert test_user['s_number'] == user.s_number
