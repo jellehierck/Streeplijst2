@@ -4,33 +4,35 @@ from streeplijst2.config import FOLDERS
 import streeplijst2.api as api
 
 
-def get_folder_from_config(folder_name):
-    """
-    Reads config.py and returns the Folder object with the specified name.
-
-    :param folder_name: The folder name to read.
-    :return: The Folder object
-    """
-    folder_config = FOLDERS[folder_name]  # Load the folder configuration
-    folder = Folder(folder_config["name"], folder_config["id"], folder_config["media"])  # Create Folder object
-    return folder
-
-
-def get_all_folders_from_config():
-    """
-    Reads all folders in config.py and returns a dict of Folder objects
-
-    :return: A dict with (key: value) (folder_id: Folder)
-    """
-    result = dict()
-    for folder_name in FOLDERS:  # Iterate all items in folder configuration
-        folder = get_folder_from_config(folder_name)  # Create Folder object
-        result[folder.id] = folder  # Store folder object
-    return result
-
-
 class Folder:
-    def __init__(self, name, id, media=""):
+
+    @classmethod
+    def all_folders_from_config(cls):
+        """
+        Reads all folders in config.py and returns a dict of Folder objects
+
+        :return: A dict with keys as folder_id and value as Folder
+        """
+        result = dict()
+        for folder_name in FOLDERS:  # Iterate all items in folder configuration
+            folder = cls.from_config(folder_name)  # Create Folder object
+            result[folder.id] = folder  # Store folder object
+        return result
+
+    @classmethod
+    def from_config(cls, folder_name: str):
+        """
+        Reads config.py and returns a single Folder object with the specified name.
+
+        :param folder_name: The folder name to read.
+        :return: The Folder object
+        """
+        folder_config = FOLDERS[folder_name]  # Load the folder configuration
+        folder = Folder(folder_config["name"], folder_config["id"], folder_config["media"])  # Create Folder object
+        folder.update_items()  # Load all items from the API
+        return folder
+
+    def __init__(self, name: str, id: int, media: str = "", items: dict = None):
         """
         Instantiates a Folder object.
 
@@ -41,14 +43,14 @@ class Folder:
         self.name = name
         self.id = id
         self.media = media
+        self.items = items
         self.last_updated = datetime.datetime.now().isoformat()  # Set the last updated time to now
-        self.items = self.get_items()
 
-    def get_items(self):
+    def update_items(self) -> dict:
         """
-        GET all items from API.
+        GET all items from Congressus, update the self.items list and return a dict of all items.
 
-        :return: A dict with (key: value) (item_id: GetItem)
+        :return: A dict with keys as item_id and values as Item
         """
         items_list = api.get_products_in_folder(self.id)  # Make the API call to get items in the folder
         result = dict()  # Empty dict to store items in
@@ -56,11 +58,13 @@ class Folder:
             result[item_dict["id"]] = Item(item_dict["name"], item_dict["id"], item_dict["price"],
                                            item_dict["folder"], item_dict["folder_id"], item_dict["published"],
                                            item_dict["media"])  # Create GetItem object
+        self.items = result  # Store the items in this folder instance
         self.last_updated = datetime.datetime.now().isoformat()  # Set the last updated time to now
         return result
 
 
 class Item:
+
     def __init__(self, name, id, price, folder, folder_id, published, media=""):
         """
         Instantiate an Item object. This Item contains all relevant information provided by the API response.
@@ -85,7 +89,7 @@ class Item:
 class User:
 
     @classmethod
-    def from_api(cls, s_number: str) -> object:
+    def from_api(cls, s_number: str):
         """
         Create a user from an API call.
 
