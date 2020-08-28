@@ -1,7 +1,7 @@
 import pytest
 
 from streeplijst2.config import FOLDERS, TEST_ITEM, TEST_USER, TEST_FOLDER_NAME
-from streeplijst2.streeplijst import Folder, User
+from streeplijst2.streeplijst import Folder, User, Sale
 
 test_folder = FOLDERS[TEST_FOLDER_NAME]
 
@@ -50,3 +50,14 @@ def test_user_from_api():
     assert TEST_USER['id'] == user.id
     assert TEST_USER['first_name'] == user.first_name
     assert TEST_USER['s_number'] == user.s_number
+
+
+def test_sale_post_sale():
+    folder = Folder.from_config(TEST_FOLDER_NAME)  # Load the test folder (needed for test item)
+    item = folder.items[TEST_ITEM["id"]]  # Load the test item
+    user = User.from_api(TEST_USER["s_number"])  # Load the test user
+
+    sale = Sale(user, item, 1)  # Create a single sale of the test item
+    response = sale.post_sale()
+
+    assert response is not None

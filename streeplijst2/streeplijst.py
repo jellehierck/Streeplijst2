@@ -150,4 +150,5 @@ class Sale:
         """
         user_id = self.user.id
         product_id = self.item.id
-        api.post_sale(user_id, product_id, self.quantity)
+        response = api.post_sale(user_id, product_id, self.quantity)
+        return response
