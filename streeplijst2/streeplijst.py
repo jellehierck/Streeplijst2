@@ -4,6 +4,29 @@ from streeplijst2.config import FOLDERS
 import streeplijst2.api as api
 
 
+class Item:
+
+    def __init__(self, name, id, price, folder, folder_id, published, media=""):
+        """
+        Instantiate an Item object. This Item contains all relevant information provided by the API response.
+
+        :param name: Item name
+        :param id: Item id
+        :param price: Item price
+        :param folder: Folder
+        :param folder_id: Folder id
+        :param published: True if the item is published, false otherwise
+        :param media: (optional) Image URL
+        """
+        self.name = name
+        self.id = id
+        self.price = price
+        self.folder = folder
+        self.folder_id = folder_id
+        self.published = published
+        self.media = media
+
+
 class Folder:
 
     @classmethod
@@ -44,7 +67,7 @@ class Folder:
         self.id = id
         self.media = media
         self.items = items
-        self.last_updated = datetime.datetime.now().isoformat()  # Set the last updated time to now
+        self.last_updated = None  # The folder has not been updated upon initialization
 
     def update_items(self) -> dict:
         """
@@ -61,29 +84,6 @@ class Folder:
         self.items = result  # Store the items in this folder instance
         self.last_updated = datetime.datetime.now().isoformat()  # Set the last updated time to now
         return result
-
-
-class Item:
-
-    def __init__(self, name, id, price, folder, folder_id, published, media=""):
-        """
-        Instantiate an Item object. This Item contains all relevant information provided by the API response.
-
-        :param name: Item name
-        :param id: Item id
-        :param price: Item price
-        :param folder: Folder
-        :param folder_id: Folder id
-        :param published: True if the item is published, false otherwise
-        :param media: (optional) Image URL
-        """
-        self.name = name
-        self.id = id
-        self.price = price
-        self.folder = folder
-        self.folder_id = folder_id
-        self.published = published
-        self.media = media
 
 
 class User:
