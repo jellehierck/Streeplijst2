@@ -75,4 +75,4 @@ if __name__ == "__main__":
 
     item = folder_speciaal.items[13591]
     sale = streeplijst.Sale(user, item, 1)
-    sale.submit_sale()
+    sale.post_sale()

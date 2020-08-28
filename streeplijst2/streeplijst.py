@@ -82,10 +82,56 @@ class Item:
         self.media = media
 
 
+class User:
+
+    @classmethod
+    def from_api(cls, s_number: str) -> object:
+        """
+        Create a user from an API call.
+
+        :param s_number: Student or Employee number (Congressus user name)
+        """
+        user_details = api.get_user(s_number)  # GET all user details from the API and store relevant details
+        user = cls(s_number, user_id=user_details['id'], date_of_birth=user_details['date_of_birth'],
+                   first_name=user_details['first_name'], last_name=user_details['primary_last_name_main'],
+                   last_name_prefix=user_details['primary_last_name_prefix'],
+                   has_sdd_mandate=user_details['has_sdd_mandate'], profile_picture=user_details['profile_picture'])
+        return user
+
+    def __init__(self, s_number: str, user_id: int, date_of_birth: str, first_name: str, last_name: str,
+                 last_name_prefix: str = "",
+                 has_sdd_mandate: bool = False, profile_picture: dict = ""):
+        """
+        Create a new User object.
+
+        :param s_number: Student or Employee number (Congressus user name)
+        :param user_id: Congressus user id
+        :param date_of_birth: Date of Birth
+        :param first_name: First Name
+        :param last_name: Last Name
+        :param last_name_prefix: Last Name Prefix
+        :param has_sdd_mandate: Has this user signed their SDD mandate
+        :param profile_picture: Dict with URL strings to profile pictures
+        """
+        self.s_number = s_number
+        self.user_id = user_id
+        self.first_name = first_name
+        self.last_name_prefix = last_name_prefix
+        self.last_name = last_name
+        self.date_of_birth = date_of_birth
+        self.has_sdd_mandate = has_sdd_mandate
+
+        if profile_picture is None:  # Store a profile picture URL if the user has one.
+            self.profile_picture = ""
+        else:
+            self.profile_picture = profile_picture['url_md']
+
+
 class Sale:
-    def __init__(self, user, item, quantity):
+    def __init__(self, user: User, item: Item, quantity: int):
         """
         Instantiates a Sale object.
+
         :param user: User object
         :param item: Item object
         :param quantity: Amount of the item to buy
@@ -94,26 +140,10 @@ class Sale:
         self.item = item
         self.quantity = quantity
 
-        self.user_id = user.user_id  # Store the user id for API call
-        self.product_id = item.id  # Store the product ID for API call
-
-    def submit_sale(self):
-        api.post_sale(self.user_id, self.product_id, self.quantity)
-
-
-class User:
-    def __init__(self, s_number):
-        self.s_number = s_number
-
-        user_details = api.get_user(s_number)  # GET all user details from the API and store relevant details
-        self.user_id = user_details['id']
-        self.first_name = user_details['first_name']
-        self.last_name_prefix = user_details['primary_last_name_prefix']
-        self.last_name = user_details['primary_last_name_main']
-        self.date_of_birth = user_details['date_of_birth']
-        self.has_sdd_mandate = user_details['has_sdd_mandate']
-
-        if user_details['profile_picture'] is None:  # Store a profile picture URL if the user has one.
-            self.profile_picture = ""
-        else:
-            self.profile_picture = user_details['profile_picture']['url_md']
+    def post_sale(self):
+        """
+        POST the sale to Congressus.
+        """
+        user_id = self.user.user_id
+        product_id = self.item.id
+        api.post_sale(user_id, product_id, self.quantity)
