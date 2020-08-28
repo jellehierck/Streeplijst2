@@ -5,6 +5,7 @@ from streeplijst2.streeplijst import Folder, User
 
 test_folder = FOLDERS[TEST_FOLDER_NAME]
 
+
 def test_folder_init():
     """
     Test that the folder correctly initializes.
