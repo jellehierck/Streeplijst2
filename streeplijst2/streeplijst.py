@@ -1,5 +1,5 @@
 import datetime
-from sqlalchemy import Column, String, Integer, ForeignKey
+from sqlalchemy import Column, String, Integer, Float, DateTime, Boolean, ForeignKey
 from sqlalchemy.orm import relationship, backref
 
 from streeplijst2.database import Base
@@ -12,6 +12,8 @@ class Folder(Base):
     __tablename__ = 'folder'
     id = Column(Integer, primary_key=True)
     name = Column(String)
+    media = Column(String)
+    last_updated = Column(DateTime)  # The folder has not been updated upon initialization
 
     @classmethod
     def all_folders_from_config(cls):
@@ -62,30 +64,42 @@ class Folder(Base):
         items_list = api.get_products_in_folder(self.id)  # Make the API call to get items in the folder
         result = dict()  # Empty dict to store items in
         for item_dict in items_list:  # Iterate all items in the response
-            result[item_dict["id"]] = Item(item_dict["name"], item_dict["id"], item_dict["price"],
-                                           item_dict["folder"], item_dict["folder_id"], item_dict["published"],
-                                           item_dict["media"])  # Create GetItem object
+            # result[item_dict["id"]] = Item(item_dict["name"], item_dict["id"], item_dict["price"],
+            #                                item_dict["folder"], item_dict["folder_id"], item_dict["published"],
+            #                                item_dict["media"])  # Create Item object
+            result[item_dict["id"]] = Item(name=item_dict["name"], id=item_dict["id"], price=item_dict["price"],
+                                           folder=self, folder_id=item_dict["folder_id"],
+                                           published=item_dict["published"], media=item_dict["media"])
         self.items = result  # Store the items in this folder instance
         self.last_updated = datetime.datetime.now().isoformat()  # Set the last updated time to now
         return result
 
 
-class Item:
+class Item(Base):
     # Class attributes for SQLAlchemy
     __tablename__ = 'item'
-    id = Column(Integer, primary_key=True)
-    first_name = Column(String)
-    folder_id = Column(Integer, ForeignKey(Folder.__tablename__ + '.id'))  # Add a link to the folder id
-    folder = relationship(Folder, backref=backref(__tablename__, uselist=True))  # Add a link to the folder table
 
-    def __init__(self, name, id, price, folder, folder_id, published, media=""):
+    # Table columns
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    price = Column(Float)
+    published = Column(Boolean)
+    media = Column(String)
+    folder_id = Column(Integer, ForeignKey(Folder.__tablename__ + '.id'))  # Add a link to the folder id
+    folder = relationship(Folder,  # Add a column to the folder table which links to the items in that folder
+                          backref=backref(__tablename__,  # Link back to the items from the folders table
+                                          uselist=True,  # Load the items as a list in the folders table
+                                          cascade='delete,all'))  # If the folder is deleted, also delete items
+
+    def __init__(self, name: str, id: int, price: float, folder: Folder, folder_id: int, published: bool,
+                 media: str = ""):
         """
         Instantiate an Item object. This Item contains all relevant information provided by the API response.
 
         :param name: Item name
         :param id: Item id
         :param price: Item price
-        :param folder: Folder
+        :param folder: Folder instance
         :param folder_id: Folder id
         :param published: True if the item is published, false otherwise
         :param media: (optional) Image URL
@@ -100,6 +114,17 @@ class Item:
 
 
 class User(Base):
+    # Class attributes for SQLAlchemy
+    __tablename__ = 'user'
+
+    # Table columns
+    id = Column(Integer, primary_key=True)
+    s_number = Column(String)
+    first_name = Column(String)
+    last_name_prefix = Column(String)
+    last_name = Column(String)
+    date_of_birth = Column(DateTime)
+    has_sdd_mandate = Column(Boolean)
 
     @classmethod
     def from_api(cls, s_number: str):
@@ -116,8 +141,7 @@ class User(Base):
         return user
 
     def __init__(self, s_number: str, id: int, date_of_birth: str, first_name: str, last_name: str,
-                 last_name_prefix: str = "",
-                 has_sdd_mandate: bool = False, profile_picture: dict = ""):
+                 last_name_prefix: str = "", has_sdd_mandate: bool = False, profile_picture: dict = ""):
         """
         Create a new User object.
 
@@ -144,8 +168,19 @@ class User(Base):
             self.profile_picture = profile_picture['url_md']
 
 
-class Sale:
+class Sale(Base):
+    # Class attributes for SQLAlchemy
+    __tablename__ = 'sale'
+
+    # Table columns
+    id = Column(Integer, primary_key=True)
+    quantity = Column(Integer)
+    created = Column(DateTime)
+    # TODO: Add a link to the item table
+    # TODO: Add a link to the user table
+
     def __init__(self, user: User, item: Item, quantity: int):
+        # TODO: Structure this object more like the sale response from Congressus
         """
         Instantiates a Sale object.
 
@@ -156,6 +191,10 @@ class Sale:
         self.user = user
         self.item = item
         self.quantity = quantity
+        self.id = None  # The congressus id for this sale
+        self.created = None  # The datetime this sale was created and posted
+        # TODO: add self.response for an overview of whether the sale was sucessful or not
+        # TODO: add a payment type in the future
 
     def post_sale(self):
         """
@@ -164,4 +203,6 @@ class Sale:
         user_id = self.user.id
         product_id = self.item.id
         response = api.post_sale(user_id, product_id, self.quantity)
+        self.created = datetime.datetime.now().isoformat()  # TODO: Set this from the response object
+        # TODO: Set self.id from response object
         return response
