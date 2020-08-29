@@ -1,5 +1,8 @@
 import datetime
+from sqlalchemy import Column, String, Integer, ForeignKey
+from sqlalchemy.orm import relationship, backref
 
+from streeplijst2.database import Base
 from streeplijst2.config import FOLDERS
 import streeplijst2.api as api
 
@@ -27,7 +30,11 @@ class Item:
         self.media = media
 
 
-class Folder:
+class Folder(Base):
+    # Class attributes for SQLAlchemy
+    __tablename__ = 'folder'
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
 
     @classmethod
     def all_folders_from_config(cls):
@@ -86,7 +93,13 @@ class Folder:
         return result
 
 
-class User:
+class User(Base):
+    # Class attributes for SQLAlchemy
+    __tablename__ = 'item'
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    folder_id = Column(Integer, ForeignKey(Folder.__tablename__ + '.id'))  # Add a link to the folder id
+    folder = relationship(Folder, backref=backref(__tablename__, uselist=True))  # Add a link to the folder table
 
     @classmethod
     def from_api(cls, s_number: str):
