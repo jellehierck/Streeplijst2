@@ -1,5 +1,9 @@
-from streeplijst2.config import FOLDERS, TEST_ITEM, TEST_USER, TEST_FOLDER_NAME
+import pytest
+from requests.exceptions import HTTPError, Timeout
+
+from streeplijst2.config import FOLDERS, TEST_ITEM, TEST_USER, TEST_USER_NO_SDD, TEST_FOLDER_NAME
 from streeplijst2.streeplijst import Folder, User, Sale
+from streeplijst2.api import UserNotSignedException
 
 test_folder = FOLDERS[TEST_FOLDER_NAME]
 
@@ -52,15 +56,44 @@ def test_user_from_api():
 
 def test_sale_post_sale():
     folder = Folder.from_config(TEST_FOLDER_NAME)  # Load the test folder (needed for test item)
-    item = folder.items[TEST_ITEM["id"]]  # Load the test item
-    user = User.from_api(TEST_USER["s_number"])  # Load the test user
+    item = folder.items[TEST_ITEM['id']]  # Load the test item
+    user = User.from_api(TEST_USER['s_number'])  # Load the test user
 
     sale = Sale(user, item, 1)  # Create a single sale of the test item
     response = sale.post_sale()
 
     assert response is not None
 
+
 def test_sale_post_sale_errors():
     folder = Folder.from_config(TEST_FOLDER_NAME)  # Load the test folder (needed for test item)
-    item = folder.items[TEST_ITEM["id"]]  # Load the test item
-    user = User.from_api(TEST_USER["s_number"])  # Load the test user
+    item = folder.items[TEST_ITEM['id']]  # Load the test item
+    user = User.from_api(TEST_USER['s_number'])  # Load the test user
+    no_sdd_user = User.from_api(TEST_USER_NO_SDD['s_number'])  # Load the user without SDD mandate
+
+    # Incorrect user
+    with pytest.raises(HTTPError) as error:
+        user.id = 0  # Set the user ID to a false value
+        sale = Sale(user, item, 1)
+        res = sale.post_sale()
+    assert "404" in str(error.value)
+    user.id = TEST_USER['id']  # Set the user ID back to the correct value
+
+    # Incorrect item
+    with pytest.raises(HTTPError) as error:
+        item.id = 1  # Set the item ID to a false value
+        sale = Sale(user, item, 1)
+        res = sale.post_sale()
+    assert "404" in str(error.value)
+    item.id = TEST_ITEM['id']  # Set the item ID back to the correct value
+
+    # No SDD sign on user
+    with pytest.raises(UserNotSignedException) as error:
+        sale = Sale(no_sdd_user, item, 1)
+        res = sale.post_sale()
+    assert str(403) in str(error.value) and "mandate" in str(error.value)
+
+    # Timeout
+    with pytest.raises(Timeout) as error:
+        sale = Sale(user, item, 1)
+        res = sale.post_sale(timeout=0.001)

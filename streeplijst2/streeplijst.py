@@ -1,10 +1,10 @@
 from datetime import datetime
 from sqlalchemy import Column, String, Integer, Float, DateTime, Boolean, ForeignKey
 from sqlalchemy.orm import relationship, backref
-from requests.exceptions import HTTPError
+from requests.exceptions import HTTPError, Timeout
 
 from streeplijst2.database import Base
-from streeplijst2.config import FOLDERS
+from streeplijst2.config import FOLDERS, TIMEOUT
 import streeplijst2.api as api
 
 
@@ -105,8 +105,6 @@ class Item(Base):
         :param published: True if the item is published, false otherwise
         :param media: (optional) Image URL
         """
-        if media is None:
-            media = []
         self.name = name
         self.id = id
         self.price = price
@@ -180,8 +178,9 @@ class Sale(Base):
     __tablename__ = 'sale'
 
     # Table columns
-    internal_id = Column(Integer, primary_key=True, autoincrement=True)  # Store sales with an internal ID
+    local_id = Column(Integer, primary_key=True, autoincrement=True)  # Store sales with a local ID
     id = Column(Integer)  # Congressus ID
+    status = Column(String)
     created = Column(DateTime)  # Created date
     quantity = Column(Integer)  # Quantity of item purchased
     item_name = Column(String, ForeignKey(Item.__tablename__ + '.name'))  # Add a link to the item name
@@ -193,6 +192,8 @@ class Sale(Base):
     user = relationship(User,  # Add a column to the user table which links to the sales for that user
                         backref=backref(__tablename__,  # Link back to the sales from the user table
                                         uselist=True))  # Load the sales as a list in the user table
+
+    error_msg = Column(String)
 
     def __init__(self, user: User, item: Item, quantity: int):
         """
@@ -210,21 +211,31 @@ class Sale(Base):
         self.status = None  # The status of the API response
         # TODO: add a payment type in the future
 
-    def post_sale(self):
+    def post_sale(self, timeout: float = TIMEOUT):
         """
         POST the sale to Congressus.
+
+        :param timeout: Timeout for the post request. Defaults to config.py TIMEOUT.
         """
         user_id = self.user.id
         product_id = self.item.id
         try:
-            response = api.post_sale(user_id, product_id, self.quantity)
+            response = api.post_sale(user_id, product_id, self.quantity, timeout=timeout)
             self.id = response['id']
             self.created = datetime.fromisoformat(response['created'])
             self.status = 'OK'
             return response
 
-        except HTTPError as e:  # If an HTTPError occurred, the request was bad
-            self.id = 0  # Set the congressus ID to 0 to indicate a bad sale
-            self.status = e.response.reason  # Store the reason the request failed
+        except Timeout as err:  # If an Timeout error occurred
+            self.id = 0  # Set the congressus ID to 0 to indicate a failed sale
+            self.status = 'TIMEOUT'  # Store the reason the request failed
             self.created = datetime.now()  # Store the current time
+            self.error_msg = str(err)  # Save the entire error message
+            raise
+
+        except HTTPError as err:  # If an HTTPError occurred, the request was bad
+            self.id = 0  # Set the congressus ID to 0 to indicate a bad sale
+            self.status = err.response.reason  # Store the reason the request failed
+            self.created = datetime.now()  # Store the current time
+            self.error_msg = str(err)  # Save the entire error message
             raise
