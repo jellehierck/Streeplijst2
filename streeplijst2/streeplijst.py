@@ -17,32 +17,56 @@ class Folder(Base):
     last_updated = Column(DateTime)  # The folder has not been updated upon initialization
 
     @classmethod
-    def all_folders_from_config(cls):
+    def from_mapping(cls, mapping: dict = None, timeout: float = TIMEOUT):
         """
-        Reads all folders in config.py and returns a dict of Folder objects
+        Create a folder from passing in a custom mapping.
+        :param mapping: dict with keys 'name', 'id' and 'media'
+        :param timeout: Timeout for the post request. Defaults to config.py TIMEOUT.
+        :return: The Folder object
+        """
+        folder_config = {  # Set a default dict for the folder configuration passed in
+                'name': '',
+                'id': 1,
+                'media': '',
+        }
+        folder_config.update(mapping)  # Replace the default dict values with the passed in kwargs
 
+        folder = Folder(folder_config['name'], folder_config['id'], folder_config['media'])  # Create Folder object
+        folder.update_items(timeout=timeout)  # Load all items from the API
+        return folder
+
+    @classmethod
+    def all_folders_from_config(cls, timeout: float = TIMEOUT):
+        """
+        Reads all folders in config.py and returns a dict of Folder objects. This call might take several seconds to
+        complete.
+
+        :param timeout: Timeout for the post request. Defaults to config.py TIMEOUT. Note: this timeout is considered
+        per folder requested. Calling two folders could result in a maximum waiting time of two times timeout seconds.
+        per
         :return: A dict with keys as folder_id and value as Folder
         """
         result = dict()
         for folder_name in FOLDERS:  # Iterate all items in folder configuration
-            folder = cls.from_config(folder_name)  # Create Folder object
+            folder = cls.from_config(folder_name, timeout=timeout)  # Create Folder object
             result[folder.id] = folder  # Store folder object
         return result
 
     @classmethod
-    def from_config(cls, folder_name: str):
+    def from_config(cls, folder_name: str, timeout: float = TIMEOUT):
         """
         Reads config.py and returns a single Folder object with the specified name.
 
         :param folder_name: The folder name to read.
+        :param timeout: Timeout for the post request. Defaults to config.py TIMEOUT.
         :return: The Folder object
         """
         folder_config = FOLDERS[folder_name]  # Load the folder configuration
-        folder = Folder(folder_config["name"], folder_config["id"], folder_config["media"])  # Create Folder object
-        folder.update_items()  # Load all items from the API
+        folder = Folder(folder_config['name'], folder_config['id'], folder_config['media'])  # Create Folder object
+        folder.update_items(timeout=timeout)  # Load all items from the API
         return folder
 
-    def __init__(self, name: str, id: int, media: str = "", items: dict = None):
+    def __init__(self, name: str, id: int, media: str = '', items: dict = None):
         """
         Instantiates a Folder object.
 
@@ -56,21 +80,22 @@ class Folder(Base):
         self.items = items
         self.last_updated = None  # The folder has not been updated upon initialization
 
-    def update_items(self) -> dict:
+    def update_items(self, timeout: float = TIMEOUT) -> dict:
         """
         GET all items from Congressus, update the self.items list and return a dict of all items.
 
+        :param timeout: Timeout for the get request. Defaults to config.py TIMEOUT.
         :return: A dict with keys as item_id and values as Item
         """
-        items_list = api.get_products_in_folder(self.id)  # Make the API call to get items in the folder
+        items_list = api.get_products_in_folder(self.id, timeout=timeout)  # get items in the folder from API
         result = dict()  # Empty dict to store items in
         for item_dict in items_list:  # Iterate all items in the response
             # result[item_dict["id"]] = Item(item_dict["name"], item_dict["id"], item_dict["price"],
             #                                item_dict["folder"], item_dict["folder_id"], item_dict["published"],
             #                                item_dict["media"])  # Create Item object
-            result[item_dict["id"]] = Item(name=item_dict["name"], id=item_dict["id"], price=item_dict["price"],
-                                           folder=self, folder_id=item_dict["folder_id"],
-                                           published=item_dict["published"], media=item_dict["media"])
+            result[item_dict['id']] = Item(name=item_dict['name'], id=item_dict['id'], price=item_dict['price'],
+                                           folder=self, folder_id=item_dict['folder_id'],
+                                           published=item_dict['published'], media=item_dict['media'])
         self.items = result  # Store the items in this folder instance
         self.last_updated = datetime.now()  # Set the last updated time to now
         return result
@@ -112,7 +137,7 @@ class Item(Base):
         self.folder_id = folder_id
         self.published = published
         if not media:  # Store an image URL if the item has one.
-            self.media = ""
+            self.media = ''
         else:
             self.media = media[0]['url']
 
@@ -132,13 +157,14 @@ class User(Base):
     profile_picture = Column(String)
 
     @classmethod
-    def from_api(cls, s_number: str):
+    def from_api(cls, s_number: str, timeout: float = TIMEOUT):
         """
         Create a user from an API call.
 
+        :param timeout: Timeout for the post request. Defaults to config.py TIMEOUT.
         :param s_number: Student or Employee number (Congressus user name)
         """
-        user_details = api.get_user(s_number)  # GET all user details from the API and store relevant details
+        user_details = api.get_user(s_number, timeout=timeout)  # GET all user details from the API
         user = cls(s_number, id=user_details['id'], date_of_birth=user_details['date_of_birth'],
                    first_name=user_details['first_name'], last_name=user_details['primary_last_name_main'],
                    last_name_prefix=user_details['primary_last_name_prefix'],
@@ -146,7 +172,7 @@ class User(Base):
         return user
 
     def __init__(self, s_number: str, id: int, date_of_birth: str, first_name: str, last_name: str,
-                 last_name_prefix: str = "", has_sdd_mandate: bool = False, profile_picture: dict = ""):
+                 last_name_prefix: str = '', has_sdd_mandate: bool = False, profile_picture: dict = ''):
         """
         Create a new User object.
 
@@ -168,7 +194,7 @@ class User(Base):
         self.has_sdd_mandate = has_sdd_mandate
 
         if not profile_picture:  # Store a profile picture URL if the user has one.
-            self.profile_picture = ""
+            self.profile_picture = ''
         else:
             self.profile_picture = profile_picture['url']
 

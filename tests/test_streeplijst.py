@@ -3,7 +3,7 @@ from requests.exceptions import HTTPError, Timeout
 
 from streeplijst2.config import FOLDERS, TEST_ITEM, TEST_USER, TEST_USER_NO_SDD, TEST_FOLDER_NAME
 from streeplijst2.streeplijst import Folder, User, Sale
-from streeplijst2.api import UserNotSignedException
+from streeplijst2.api import UserNotSignedException, UserNotFoundException, FolderNotFoundException
 
 test_folder = FOLDERS[TEST_FOLDER_NAME]
 
@@ -47,11 +47,38 @@ def test_folder_all_folders_from_config():
     assert any(test_folder['id'] == folder.id for folder in all_folders.values())  # Test if the test folder exists
 
 
+def test_folder_from_mapping():
+    test_folder_id = FOLDERS[TEST_FOLDER_NAME]['id']
+    test_folder_media = FOLDERS[TEST_FOLDER_NAME]['media']
+
+    folder = Folder.from_mapping({'name': TEST_FOLDER_NAME, 'id': test_folder_id, 'media': test_folder_media})
+    assert folder.items is not None  # Test if there are items in the folder
+    assert any(TEST_ITEM['id'] == item.id for item in folder.items.values())  # Test if the test item exists in folder
+
+
+def test_folder_instantiation_errors():
+    with pytest.raises(FolderNotFoundException) as err:
+        folder = Folder.from_mapping({'name': 'nonexistent', 'id': 1, 'media': ''})
+    assert '404 Server Error: folder_id 1 is not found for URL' in str(err.value)
+
+
 def test_user_from_api():
     user = User.from_api(TEST_USER['s_number'])
     assert TEST_USER['id'] == user.id
     assert TEST_USER['first_name'] == user.first_name
     assert TEST_USER['s_number'] == user.s_number
+
+
+def test_user_from_api_errors():
+    # Non-existent user
+    incorrect_s_number = 's8888888'
+    with pytest.raises(UserNotFoundException) as err:
+        user = User.from_api(incorrect_s_number)
+    assert '404 Server Error: User ' + incorrect_s_number + ' is not found' in str(err.value)
+
+    # Timeout error
+    with pytest.raises(Timeout) as err:
+        user = User.from_api(TEST_USER['s_number'], timeout=0.001)
 
 
 def test_sale_post_sale():
@@ -72,28 +99,28 @@ def test_sale_post_sale_errors():
     no_sdd_user = User.from_api(TEST_USER_NO_SDD['s_number'])  # Load the user without SDD mandate
 
     # Incorrect user
-    with pytest.raises(HTTPError) as error:
+    with pytest.raises(HTTPError) as err:
         user.id = 0  # Set the user ID to a false value
         sale = Sale(user, item, 1)
         res = sale.post_sale()
-    assert "404" in str(error.value)
+    assert '404' in str(err.value)
     user.id = TEST_USER['id']  # Set the user ID back to the correct value
 
     # Incorrect item
-    with pytest.raises(HTTPError) as error:
+    with pytest.raises(HTTPError) as err:
         item.id = 1  # Set the item ID to a false value
         sale = Sale(user, item, 1)
         res = sale.post_sale()
-    assert "404" in str(error.value)
+    assert '404' in str(err.value)
     item.id = TEST_ITEM['id']  # Set the item ID back to the correct value
 
     # No SDD sign on user
-    with pytest.raises(UserNotSignedException) as error:
+    with pytest.raises(UserNotSignedException) as err:
         sale = Sale(no_sdd_user, item, 1)
         res = sale.post_sale()
-    assert str(403) in str(error.value) and "mandate" in str(error.value)
+    assert str(403) in str(err.value) and 'mandate' in str(err.value)
 
     # Timeout
-    with pytest.raises(Timeout) as error:
+    with pytest.raises(Timeout) as err:
         sale = Sale(user, item, 1)
         res = sale.post_sale(timeout=0.001)
