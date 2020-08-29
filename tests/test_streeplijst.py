@@ -1,5 +1,3 @@
-import pytest
-
 from streeplijst2.config import FOLDERS, TEST_ITEM, TEST_USER, TEST_FOLDER_NAME
 from streeplijst2.streeplijst import Folder, User, Sale
 
@@ -61,3 +59,8 @@ def test_sale_post_sale():
     response = sale.post_sale()
 
     assert response is not None
+
+def test_sale_post_sale_errors():
+    folder = Folder.from_config(TEST_FOLDER_NAME)  # Load the test folder (needed for test item)
+    item = folder.items[TEST_ITEM["id"]]  # Load the test item
+    user = User.from_api(TEST_USER["s_number"])  # Load the test user

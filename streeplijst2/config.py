@@ -76,6 +76,13 @@ TEST_USER = {
 }
 """Test user specification. Note: not all attributes are listed as they are not all needed."""
 
+TEST_USER_NO_SDD = {
+        "s_number": "s9999998",
+        "first_name": "TestTwee",
+        "id": 485567
+}
+"""Test user with no SDD mandate specification. Note: not all attributes are listed as they are not all needed."""
+
 TEST_FOLDER_NAME = "Speciaal"
 """Test folder name. This folder contains the test item."""
 

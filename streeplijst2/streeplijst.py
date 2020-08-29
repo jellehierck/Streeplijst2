@@ -1,6 +1,7 @@
-import datetime
+from datetime import datetime
 from sqlalchemy import Column, String, Integer, Float, DateTime, Boolean, ForeignKey
 from sqlalchemy.orm import relationship, backref
+from requests.exceptions import HTTPError
 
 from streeplijst2.database import Base
 from streeplijst2.config import FOLDERS
@@ -13,8 +14,7 @@ class Folder(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
     media = Column(String)
-
-    # last_updated = Column(DateTime)  # The folder has not been updated upon initialization
+    last_updated = Column(DateTime)  # The folder has not been updated upon initialization
 
     @classmethod
     def all_folders_from_config(cls):
@@ -72,7 +72,7 @@ class Folder(Base):
                                            folder=self, folder_id=item_dict["folder_id"],
                                            published=item_dict["published"], media=item_dict["media"])
         self.items = result  # Store the items in this folder instance
-        self.last_updated = datetime.datetime.now().isoformat()  # Set the last updated time to now
+        self.last_updated = datetime.now()  # Set the last updated time to now
         return result
 
 
@@ -129,7 +129,7 @@ class User(Base):
     first_name = Column(String)
     last_name_prefix = Column(String)
     last_name = Column(String)
-    # date_of_birth = Column(DateTime)
+    date_of_birth = Column(DateTime)
     has_sdd_mandate = Column(Boolean)
     profile_picture = Column(String)
 
@@ -154,7 +154,7 @@ class User(Base):
 
         :param s_number: Student or Employee number (Congressus user name)
         :param id: Congressus user id
-        :param date_of_birth: Date of Birth
+        :param date_of_birth: Date of Birth (ISO formatted datetime string)
         :param first_name: First Name
         :param last_name: Last Name
         :param last_name_prefix: Last Name Prefix
@@ -166,7 +166,7 @@ class User(Base):
         self.first_name = first_name
         self.last_name_prefix = last_name_prefix
         self.last_name = last_name
-        self.date_of_birth = date_of_birth
+        self.date_of_birth = datetime.fromisoformat(date_of_birth)
         self.has_sdd_mandate = has_sdd_mandate
 
         if not profile_picture:  # Store a profile picture URL if the user has one.
@@ -180,20 +180,21 @@ class Sale(Base):
     __tablename__ = 'sale'
 
     # Table columns
-    id = Column(Integer, primary_key=True)
-    # created = Column(DateTime)
-    quantity = Column(Integer)
+    internal_id = Column(Integer, primary_key=True, autoincrement=True)  # Store sales with an internal ID
+    id = Column(Integer)  # Congressus ID
+    created = Column(DateTime)  # Created date
+    quantity = Column(Integer)  # Quantity of item purchased
     item_name = Column(String, ForeignKey(Item.__tablename__ + '.name'))  # Add a link to the item name
     item = relationship(Item,  # Add a column to the item table which links to the sales for that item
                         backref=backref(__tablename__,  # Link back to the sales from the item table
                                         uselist=True))  # Load the sales as a list in the item table
+
     user_s_number = Column(String, ForeignKey(User.__tablename__ + '.s_number'))  # Add a link to the folder id
     user = relationship(User,  # Add a column to the user table which links to the sales for that user
                         backref=backref(__tablename__,  # Link back to the sales from the user table
                                         uselist=True))  # Load the sales as a list in the user table
 
     def __init__(self, user: User, item: Item, quantity: int):
-        # TODO: Structure this object more like the sale response from Congressus
         """
         Instantiates a Sale object.
 
@@ -206,7 +207,7 @@ class Sale(Base):
         self.quantity = quantity
         self.id = None  # The congressus id for this sale
         self.created = None  # The datetime this sale was created and posted
-        # TODO: add self.response for an overview of whether the sale was sucessful or not
+        self.status = None  # The status of the API response
         # TODO: add a payment type in the future
 
     def post_sale(self):
@@ -215,7 +216,15 @@ class Sale(Base):
         """
         user_id = self.user.id
         product_id = self.item.id
-        response = api.post_sale(user_id, product_id, self.quantity)
-        self.created = datetime.datetime.now().isoformat()  # TODO: Set this from the response object
-        # TODO: Set self.id from response object
-        return response
+        try:
+            response = api.post_sale(user_id, product_id, self.quantity)
+            self.id = response['id']
+            self.created = datetime.fromisoformat(response['created'])
+            self.status = 'OK'
+            return response
+
+        except HTTPError as e:  # If an HTTPError occurred, the request was bad
+            self.id = 0  # Set the congressus ID to 0 to indicate a bad sale
+            self.status = e.response.reason  # Store the reason the request failed
+            self.created = datetime.now()  # Store the current time
+            raise

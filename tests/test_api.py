@@ -2,7 +2,7 @@ import pytest
 from requests.exceptions import HTTPError, Timeout
 
 import streeplijst2.api as api
-from streeplijst2.config import FOLDERS, TEST_FOLDER_NAME, TEST_USER, TEST_ITEM
+from streeplijst2.config import FOLDERS, TEST_FOLDER_NAME, TEST_USER, TEST_USER_NO_SDD, TEST_ITEM
 
 """"
 Unit tests for API module.
@@ -24,7 +24,7 @@ correct_user = TEST_USER
 correct_item = TEST_ITEM
 correct_folder = FOLDERS[TEST_FOLDER_NAME]
 
-no_sdd_user = dict({"s_number": "s9999998", "first_name": "TestTwee", "id": 485567})
+no_sdd_user = TEST_USER_NO_SDD
 
 incorrect_user = dict({"s_number": "s8888888", "id": 0})
 incorrect_item = dict({"id": 1})
