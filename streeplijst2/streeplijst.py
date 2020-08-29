@@ -7,29 +7,6 @@ from streeplijst2.config import FOLDERS
 import streeplijst2.api as api
 
 
-class Item:
-
-    def __init__(self, name, id, price, folder, folder_id, published, media=""):
-        """
-        Instantiate an Item object. This Item contains all relevant information provided by the API response.
-
-        :param name: Item name
-        :param id: Item id
-        :param price: Item price
-        :param folder: Folder
-        :param folder_id: Folder id
-        :param published: True if the item is published, false otherwise
-        :param media: (optional) Image URL
-        """
-        self.name = name
-        self.id = id
-        self.price = price
-        self.folder = folder
-        self.folder_id = folder_id
-        self.published = published
-        self.media = media
-
-
 class Folder(Base):
     # Class attributes for SQLAlchemy
     __tablename__ = 'folder'
@@ -93,13 +70,36 @@ class Folder(Base):
         return result
 
 
-class User(Base):
+class Item:
     # Class attributes for SQLAlchemy
     __tablename__ = 'item'
     id = Column(Integer, primary_key=True)
-    name = Column(String)
+    first_name = Column(String)
     folder_id = Column(Integer, ForeignKey(Folder.__tablename__ + '.id'))  # Add a link to the folder id
     folder = relationship(Folder, backref=backref(__tablename__, uselist=True))  # Add a link to the folder table
+
+    def __init__(self, name, id, price, folder, folder_id, published, media=""):
+        """
+        Instantiate an Item object. This Item contains all relevant information provided by the API response.
+
+        :param name: Item name
+        :param id: Item id
+        :param price: Item price
+        :param folder: Folder
+        :param folder_id: Folder id
+        :param published: True if the item is published, false otherwise
+        :param media: (optional) Image URL
+        """
+        self.name = name
+        self.id = id
+        self.price = price
+        self.folder = folder
+        self.folder_id = folder_id
+        self.published = published
+        self.media = media
+
+
+class User(Base):
 
     @classmethod
     def from_api(cls, s_number: str):
