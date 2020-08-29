@@ -37,13 +37,13 @@ def create_app(config=None):
         pass
 
     # Set up the database
-    # from streeplijst2.database import init_db, db_session  # Import the database module
-    # init_db()  # Define the database tables and models
+    from streeplijst2.database import init_db, db_session  # Import the database module
+    init_db()  # Define the database tables and models
 
     # Close and remove database sessions at the end of a request or when the application shuts down
-    # @app.teardown_appcontext
-    # def shutdown_session(exception=None):
-    #     db_session.remove()
+    @app.teardown_appcontext
+    def shutdown_session(exception=None):
+        db_session.remove()
 
     # Hello world response
     @app.route('/hello')

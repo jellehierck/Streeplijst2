@@ -13,7 +13,8 @@ class Folder(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
     media = Column(String)
-    last_updated = Column(DateTime)  # The folder has not been updated upon initialization
+
+    # last_updated = Column(DateTime)  # The folder has not been updated upon initialization
 
     @classmethod
     def all_folders_from_config(cls):
@@ -92,7 +93,7 @@ class Item(Base):
                                           cascade='delete,all'))  # If the folder is deleted, also delete items
 
     def __init__(self, name: str, id: int, price: float, folder: Folder, folder_id: int, published: bool,
-                 media: str = ""):
+                 media: list = None):
         """
         Instantiate an Item object. This Item contains all relevant information provided by the API response.
 
@@ -104,13 +105,18 @@ class Item(Base):
         :param published: True if the item is published, false otherwise
         :param media: (optional) Image URL
         """
+        if media is None:
+            media = []
         self.name = name
         self.id = id
         self.price = price
         self.folder = folder
         self.folder_id = folder_id
         self.published = published
-        self.media = media
+        if not media:  # Store an image URL if the item has one.
+            self.media = ""
+        else:
+            self.media = media[0]['url']
 
 
 class User(Base):
@@ -123,8 +129,9 @@ class User(Base):
     first_name = Column(String)
     last_name_prefix = Column(String)
     last_name = Column(String)
-    date_of_birth = Column(DateTime)
+    # date_of_birth = Column(DateTime)
     has_sdd_mandate = Column(Boolean)
+    profile_picture = Column(String)
 
     @classmethod
     def from_api(cls, s_number: str):
@@ -162,10 +169,10 @@ class User(Base):
         self.date_of_birth = date_of_birth
         self.has_sdd_mandate = has_sdd_mandate
 
-        if profile_picture is None:  # Store a profile picture URL if the user has one.
+        if not profile_picture:  # Store a profile picture URL if the user has one.
             self.profile_picture = ""
         else:
-            self.profile_picture = profile_picture['url_md']
+            self.profile_picture = profile_picture['url']
 
 
 class Sale(Base):
@@ -174,10 +181,16 @@ class Sale(Base):
 
     # Table columns
     id = Column(Integer, primary_key=True)
+    # created = Column(DateTime)
     quantity = Column(Integer)
-    created = Column(DateTime)
-    # TODO: Add a link to the item table
-    # TODO: Add a link to the user table
+    item_name = Column(String, ForeignKey(Item.__tablename__ + '.name'))  # Add a link to the item name
+    item = relationship(Item,  # Add a column to the item table which links to the sales for that item
+                        backref=backref(__tablename__,  # Link back to the sales from the item table
+                                        uselist=True))  # Load the sales as a list in the item table
+    user_s_number = Column(String, ForeignKey(User.__tablename__ + '.s_number'))  # Add a link to the folder id
+    user = relationship(User,  # Add a column to the user table which links to the sales for that user
+                        backref=backref(__tablename__,  # Link back to the sales from the user table
+                                        uselist=True))  # Load the sales as a list in the user table
 
     def __init__(self, user: User, item: Item, quantity: int):
         # TODO: Structure this object more like the sale response from Congressus
