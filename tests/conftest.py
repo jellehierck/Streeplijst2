@@ -1,6 +1,6 @@
 import pytest
 
-from streeplijst2.flask_app import create_app
+from streeplijst2 import create_app
 
 
 @pytest.fixture
