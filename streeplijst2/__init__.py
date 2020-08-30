@@ -49,7 +49,7 @@ def create_app(config=None):
         db_session.remove()
 
     # Register all routes
-    from streeplijst2.routes import bp
-    app.register_blueprint(bp)
+    from streeplijst2.routes import register_routes
+    register_routes(app)
 
     return app
