@@ -4,6 +4,12 @@ from streeplijst2.streeplijst import User, Folder
 bp = Blueprint('streeplijst', __name__)
 
 
+# Hello world response as test message
+@bp.route('/hello')
+def hello():
+    return "Hello, World!"
+
+
 # Landing page
 @bp.route('/')
 def index():

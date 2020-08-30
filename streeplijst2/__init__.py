@@ -48,11 +48,8 @@ def create_app(config=None):
     def shutdown_session(exception=None):
         db_session.remove()
 
-    # Hello world response as test message
-    @app.route('/hello')
-    def hello():
-        return "Hello, World!"
-
-    #
+    # Register all routes
+    from streeplijst2.routes import bp
+    app.register_blueprint(bp)
 
     return app
