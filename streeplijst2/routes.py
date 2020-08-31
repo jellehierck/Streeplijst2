@@ -1,10 +1,18 @@
 from flask import redirect, url_for, render_template, request, flash, session
-from streeplijst2.streeplijst import User, Folder
-from streeplijst2.api import UserNotFoundException
+
 from requests.exceptions import HTTPError, Timeout
 
+from streeplijst2.streeplijst import User, Folder
+from streeplijst2.api import UserNotFoundException
 
-def register_routes(app):
+
+def register_routes(app, cache):
+    """
+    Register all routes for this application.
+    :param app: The flask app instance
+    :param cache: The flask-caching Cache instance for caching certain routes (e.g. /folders/main)
+    :return:
+    """
     # Hello world response as test message
     @app.route('/hello')
     def hello():
@@ -38,6 +46,7 @@ def register_routes(app):
 
     # Folders home page. Displays all folders to choose products from.
     @app.route('/folders/main')
+    @cache.cached(timeout=60)  # Set the timeout for folders at 60 seconds. TODO: Do not hardcode this value
     def folders_main():
         folders = Folder.all_folders_from_config()  # Load all folders
         # TODO: Do not call this method on endpoint loading but periodically (saves loading time).
