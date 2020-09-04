@@ -43,12 +43,8 @@ def create_app(config=None):
         pass
 
     # Set up the database
-    from streeplijst2.database import init_db, db_session  # Import the database module
-    init_db()  # Define the database tables and models
-
-    @app.teardown_appcontext  # Close and remove database sessions when the application shuts down
-    def shutdown_session(exception=None):
-        db_session.remove()
+    from streeplijst2.database import db  # Import the database module
+    db.init_app(app)  # Define the database tables and models
 
     # Set up caching
     cache = Cache(app)

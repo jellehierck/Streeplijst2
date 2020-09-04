@@ -13,6 +13,7 @@ def register_routes(app, cache):
     :param cache: The flask-caching Cache instance for caching certain routes (e.g. /folders/main)
     :return:
     """
+
     # Hello world response as test message
     @app.route('/hello')
     def hello():
@@ -33,24 +34,37 @@ def register_routes(app, cache):
             s_number = request.form['student-number']  # Load the student number from the push form
             try:
                 user = User.from_api(s_number)  # Create a User
-                # session['user'] = user
-                flash(user.first_name)  # Display the name as temporary measure
-                return redirect(url_for('folders_main'))  # Redirect to the same page as temporary measure
-            except UserNotFoundException as err:
+                session['user'] = user.id
+                flash(user.first_name)  # Display the name as temporary measure TODO: replace this line
+                return redirect(url_for('folders_main'))  # Redirect to the folders page
+
+            except UserNotFoundException as err:  # The user was not found
                 flash(str(err))  # TODO: Properly handle this exception
                 return render_template('login.html')
                 pass
-            except (HTTPError, Timeout) as err:
+
+            except (HTTPError, Timeout) as err:  # There was a connection error
                 flash(str(err))  # TODO: Properly handle this exception
                 return render_template('login.html')
+
+    @app.route('/logout')
+    def logout():
+        for key in list(session.keys()):
+            session.pop(key, None)  # Remove all items from the session
+        flash('Logged out.')
+        return redirect(url_for('login'))
 
     # Folders home page. Displays all folders to choose products from.
     @app.route('/folders/main')
     @cache.cached(timeout=60)  # Set the timeout for folders at 60 seconds. TODO: Do not hardcode this value
     def folders_main():
-        folders = Folder.all_folders_from_config()  # Load all folders
-        # TODO: Do not call this method on endpoint loading but periodically (saves loading time).
-        return render_template('folders_main.html', folders=folders)
+        if 'user' in session:
+            folders = Folder.all_folders_from_config()  # Load all folders
+            # TODO: Do not call this method on endpoint loading but periodically (saves loading time).
+            return render_template('folders_main.html', folders=folders)
+        else:
+            flash('Log in to see folders')  # Remove this temporary placeholder message
+            return redirect(url_for('login'))
 
     # Specific folder pages. Displays all products in the specified folder.
     @app.route('/folders/<int:folder_id>')

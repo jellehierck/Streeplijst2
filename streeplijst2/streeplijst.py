@@ -1,20 +1,18 @@
 from datetime import datetime
-from sqlalchemy import Column, String, Integer, Float, DateTime, Boolean, ForeignKey
-from sqlalchemy.orm import relationship, backref
 from requests.exceptions import HTTPError, Timeout
 
-from streeplijst2.database import Base
+from streeplijst2.database import db
 from streeplijst2.config import FOLDERS, TIMEOUT
 import streeplijst2.api as api
 
 
-class Folder(Base):
+class Folder(db.Model):
     # Class attributes for SQLAlchemy
     __tablename__ = 'folder'
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
-    media = Column(String)
-    last_updated = Column(DateTime)  # The folder has not been updated upon initialization
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String)
+    media = db.Column(db.String)
+    last_updated = db.Column(db.DateTime)  # The folder has not been updated upon initialization
 
     @classmethod
     def from_mapping(cls, mapping: dict = None, timeout: float = TIMEOUT):
@@ -101,21 +99,20 @@ class Folder(Base):
         return result
 
 
-class Item(Base):
+class Item(db.Model):
     # Class attributes for SQLAlchemy
     __tablename__ = 'item'
 
     # Table columns
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
-    price = Column(Float)
-    published = Column(Boolean)
-    media = Column(String)
-    folder_id = Column(Integer, ForeignKey(Folder.__tablename__ + '.id'))  # Add a link to the folder id
-    folder = relationship(Folder,  # Add a column to the folder table which links to the items in that folder
-                          backref=backref(__tablename__,  # Link back to the items from the folders table
-                                          uselist=True,  # Load the items as a list in the folders table
-                                          cascade='delete,all'))  # If the folder is deleted, also delete items
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String)
+    price = db.Column(db.Float)
+    published = db.Column(db.Boolean)
+    media = db.Column(db.String)
+    folder_id = db.Column(db.Integer, db.ForeignKey(Folder.__tablename__ + '.id'))  # Add a link to the folder id
+    folder = db.relationship(Folder,  # Add a column to the folder table which links to the items in that folder
+                             backref=__tablename__,  # Link back to the items from the folders table
+                             lazy=True)  # Data is only loaded as necessary
 
     def __init__(self, name: str, id: int, price: float, folder: Folder, folder_id: int, published: bool,
                  media: list = None):
@@ -142,19 +139,19 @@ class Item(Base):
             self.media = media[0]['url']
 
 
-class User(Base):
+class User(db.Model):
     # Class attributes for SQLAlchemy
     __tablename__ = 'user'
 
     # Table columns
-    id = Column(Integer, primary_key=True)
-    s_number = Column(String)
-    first_name = Column(String)
-    last_name_prefix = Column(String)
-    last_name = Column(String)
-    date_of_birth = Column(DateTime)
-    has_sdd_mandate = Column(Boolean)
-    profile_picture = Column(String)
+    id = db.Column(db.Integer, primary_key=True)
+    s_number = db.Column(db.String)
+    first_name = db.Column(db.String)
+    last_name_prefix = db.Column(db.String)
+    last_name = db.Column(db.String)
+    date_of_birth = db.Column(db.DateTime)
+    has_sdd_mandate = db.Column(db.Boolean)
+    profile_picture = db.Column(db.String)
 
     @classmethod
     def from_api(cls, s_number: str, timeout: float = TIMEOUT):
@@ -199,27 +196,27 @@ class User(Base):
             self.profile_picture = profile_picture['url']
 
 
-class Sale(Base):
+class Sale(db.Model):
     # Class attributes for SQLAlchemy
     __tablename__ = 'sale'
 
     # Table columns
-    local_id = Column(Integer, primary_key=True, autoincrement=True)  # Store sales with a local ID
-    id = Column(Integer)  # Congressus ID
-    status = Column(String)
-    created = Column(DateTime)  # Created date
-    quantity = Column(Integer)  # Quantity of item purchased
-    item_name = Column(String, ForeignKey(Item.__tablename__ + '.name'))  # Add a link to the item name
-    item = relationship(Item,  # Add a column to the item table which links to the sales for that item
-                        backref=backref(__tablename__,  # Link back to the sales from the item table
-                                        uselist=True))  # Load the sales as a list in the item table
+    local_id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # Store sales with a local ID
+    id = db.Column(db.Integer)  # Congressus ID
+    status = db.Column(db.String)
+    created = db.Column(db.DateTime)  # Created date
+    quantity = db.Column(db.Integer)  # Quantity of item purchased
+    item_name = db.Column(db.String, db.ForeignKey(Item.__tablename__ + '.name'))  # Add a link to the item name
+    item = db.relationship(Item,  # Add a column to the item table which links to the sales for that item
+                           backref=__tablename__,  # Link back to the sales from the item table
+                           lazy=True)  # Data is only loaded as necessary
 
-    user_s_number = Column(String, ForeignKey(User.__tablename__ + '.s_number'))  # Add a link to the folder id
-    user = relationship(User,  # Add a column to the user table which links to the sales for that user
-                        backref=backref(__tablename__,  # Link back to the sales from the user table
-                                        uselist=True))  # Load the sales as a list in the user table
+    user_s_number = db.Column(db.String, db.ForeignKey(User.__tablename__ + '.s_number'))  # Add a link to the folder id
+    user = db.relationship(User,  # Add a column to the user table which links to the sales for that user
+                           backref=__tablename__,  # Link back to the sales from the user table
+                           lazy=True)  # Data is only loaded as necessary
 
-    error_msg = Column(String)
+    error_msg = db.Column(db.String)
 
     def __init__(self, user: User, item: Item, quantity: int):
         """
