@@ -168,6 +168,21 @@ class User(db.Model):
                    has_sdd_mandate=user_details['has_sdd_mandate'], profile_picture=user_details['profile_picture'])
         return user
 
+    @classmethod
+    def add_or_update_user(cls, user):
+        """
+        Add a user to the connected database. If a user with that congressus ID (user.id) already exists, update their
+        information.
+
+        :param user: The user to add to or update in the database
+        """
+        existing_user = cls.query.filter_by(id=user.id).first()  # Get the user as stored in the local db
+        if existing_user:  # If the user was found in the local database
+            existing_user._update(user)  # Set the local database user to the new user, updating any outdated fields
+        else:  # If the user ws not found in the local database, create the user
+            db.session.add(user)  # Add the user to the local database
+        db.session.commit()  # Commit the changes to the database
+
     def __init__(self, s_number: str, id: int, date_of_birth: str, first_name: str, last_name: str,
                  last_name_prefix: str = '', has_sdd_mandate: bool = False, profile_picture: dict = ''):
         """
@@ -194,6 +209,20 @@ class User(db.Model):
             self.profile_picture = ''
         else:
             self.profile_picture = profile_picture['url']
+
+    def _update(self, user):
+        """
+        Update this user's data fields using the fields from another user.
+        :param user: a User object with the up-to-date data.
+        """
+        self.s_number = user.s_number
+        self.id = user.id
+        self.first_name = user.first_name
+        self.last_name_prefix = user.last_name_prefix
+        self.last_name = user.last_name
+        self.date_of_birth = user.date_of_birth
+        self.has_sdd_mandate = user.has_sdd_mandate
+        self.profile_picture = user.profile_picture
 
 
 class Sale(db.Model):

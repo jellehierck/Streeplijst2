@@ -4,6 +4,7 @@ from requests.exceptions import HTTPError, Timeout
 
 from streeplijst2.streeplijst import User, Folder
 from streeplijst2.api import UserNotFoundException
+from streeplijst2.database import db
 
 
 def register_routes(app, cache):
@@ -32,20 +33,20 @@ def register_routes(app, cache):
 
         elif request.method == 'POST':  # Attempt to login the user
             s_number = request.form['student-number']  # Load the student number from the push form
-            try:
+            try:  # Attempt to find the user from Congressus
                 user = User.from_api(s_number)  # Create a User
-                session['user'] = user.id
-                flash(user.first_name)  # Display the name as temporary measure TODO: replace this line
-                return redirect(url_for('folders_main'))  # Redirect to the folders page
-
             except UserNotFoundException as err:  # The user was not found
                 flash(str(err))  # TODO: Properly handle this exception
                 return render_template('login.html')
-                pass
-
             except (HTTPError, Timeout) as err:  # There was a connection error
                 flash(str(err))  # TODO: Properly handle this exception
                 return render_template('login.html')
+
+            session['user'] = user.id
+
+
+            flash(user.first_name)  # Display the name as temporary measure TODO: replace this line
+            return redirect(url_for('folders_main'))  # Redirect to the folders page
 
     @app.route('/logout')
     def logout():
