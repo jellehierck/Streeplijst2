@@ -4,7 +4,7 @@ from requests.exceptions import HTTPError, Timeout
 
 from streeplijst2.streeplijst import User, Folder
 from streeplijst2.api import UserNotFoundException
-from streeplijst2.database import db
+from streeplijst2.streeplijst import db
 
 
 def register_routes(app, cache):

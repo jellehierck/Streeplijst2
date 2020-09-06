@@ -20,10 +20,15 @@ def create_app(config=None):
     """
     app = Flask(__name__, instance_relative_config=True)  # Create the app
 
-    from streeplijst2.database import SQLALCHEMY_DATABASE_URI
+    # ensure the instance folder exists
+    try:
+        os.makedirs(app.instance_path)
+    except OSError:
+        pass
+
     app.config.from_mapping(  # TODO: Change this so that it imports from a config file
             SECRET_KEY=DEV_KEY,  # TODO: change this key
-            SQLALCHEMY_DATABASE_URI=SQLALCHEMY_DATABASE_URI,
+            SQLALCHEMY_DATABASE_URI='sqlite:///' + app.instance_path + '/database.sqlite',  # Database in instance folder
             CACHE_TYPE='simple'  # Caching for temporarily storing results of time-consuming requests (e.g. get folders)
     )
 
@@ -36,14 +41,8 @@ def create_app(config=None):
         # load the test config if passed in
         app.config.from_mapping(config)
 
-    # ensure the instance folder exists
-    try:
-        os.makedirs(app.instance_path)
-    except OSError:
-        pass
-
     # Set up the database
-    from streeplijst2.database import db  # Import the database module
+    from streeplijst2.streeplijst import db  # Import the database module
     db.init_app(app)  # Define the database tables and models
     with app.app_context():
         db.create_all()

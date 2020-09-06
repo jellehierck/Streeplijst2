@@ -1,9 +1,13 @@
 from datetime import datetime
 from requests.exceptions import HTTPError, Timeout
+from flask_sqlalchemy import SQLAlchemy
 
-from streeplijst2.database import db
 from streeplijst2.config import FOLDERS, TIMEOUT
 import streeplijst2.api as api
+
+SQLALCHEMY_DATABASE_URI = 'sqlite:///instance/database.sqlite'
+
+db = SQLAlchemy()
 
 
 class Folder(db.Model):
