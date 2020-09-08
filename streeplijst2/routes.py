@@ -42,9 +42,7 @@ def register_routes(app, cache):
                 flash(str(err))  # TODO: Properly handle this exception
                 return render_template('login.html')
 
-            session['user'] = user.id
-
-
+            session['user_id'] = user.id
             flash(user.first_name)  # Display the name as temporary measure TODO: replace this line
             return redirect(url_for('folders_main'))  # Redirect to the folders page
 
@@ -57,7 +55,7 @@ def register_routes(app, cache):
 
     # Folders home page. Displays all folders to choose products from.
     @app.route('/folders/main')
-    @cache.cached(timeout=60)  # Set the timeout for folders at 60 seconds. TODO: Do not hardcode this value
+    @cache.cached(timeout=60)  # Set the timeout for folders at 60 seconds. TODO: Do not hard code this value
     def folders_main():
         if 'user' in session:
             folders = Folder.all_folders_from_config()  # Load all folders
