@@ -2,9 +2,9 @@
 
 {% block title %}Home{% endblock title %}
 
-{% block content_top_section %}
+{% block regular_content_top %}
 <div id="folder-card-deck" class="row"> <!-- Folder overview -->
-    <div class="col-lg-3 mb-4 FILTER_DRINKS">
+    <div class="col-lg-3 col-md-4">
         <a style="color:inherit; text-decoration:none;" href="#drinks">
             <div class="card bg-hover bg-danger-hover text-white shadow">
                 <div class="card-body">
@@ -19,7 +19,7 @@
     </div>
 </div> <!-- /#folder-card-deck -->
 
-{% endblock content_top_section %}
+{% endblock regular_content_top %}
 
 {% block regular_content %}<!-- Item card holder -->
 <div id="item-card-deck" class="row">

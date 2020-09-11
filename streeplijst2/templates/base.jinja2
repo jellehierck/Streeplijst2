@@ -46,7 +46,8 @@
     <ul id="accordion-sidebar" class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion toggled">
         <!-- Sidebar - Brand -->
         <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/">
-            <img class="img rounded" src="/media/icons/ICON_paradoks.jpg" style="width:60px;">
+            <img class="img rounded" src="{{ url_for('static', filename='media/icons/ICON_paradoks.jpg') }}"
+                 style="width:60px;">
             <div class="sidebar-brand-text mx-3">Streeplijst <sup>V2.0</sup></div>
         </a>
 
@@ -88,7 +89,7 @@
         <!-- Begin Page Content -->
         <div id="regular-content" class="container-fluid">
 
-            {% block regular_content_top %} {# content in the top section of the main section #}\
+            {% block regular_content_top %} {# content in the top section of the main section #}
             <!-- Content in the top section goes here -->
             {% endblock regular_content_top %}
 
