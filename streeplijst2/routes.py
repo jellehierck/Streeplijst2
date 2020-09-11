@@ -1,10 +1,9 @@
-from flask import redirect, url_for, render_template, request, flash, session
+from flask import redirect, url_for, render_template, request, flash, session, jsonify
 
 from requests.exceptions import HTTPError, Timeout
 
-from streeplijst2.streeplijst import User, Folder
+from streeplijst2.streeplijst import User, Folder, Item
 from streeplijst2.api import UserNotFoundException
-from streeplijst2.streeplijst import db
 
 
 def register_routes(app, cache):
@@ -23,7 +22,17 @@ def register_routes(app, cache):
     # Landing page
     @app.route('/')
     def index():
-        return redirect(url_for('login'))
+        folder = Folder.from_config(folder_name="Koek")
+        print(folder.items)
+        # test_item = Item('Testproduct', 13591, 0, None, None, True)
+        return render_template('items.jinja2', folder_items=folder.items)  # TODO: Remove this temporary testing route
+        # return redirect(url_for('login'))
+
+    @app.route('/sale', methods=['POST'])
+    def sale():
+        print(request.form['item-id'])
+        print(request.form['quantity'])
+        return jsonify({'response': 'success'})
 
     # Login page. When called with GET, this loads the login screen. When called with POST, attempts to login user.
     @app.route('/login', methods=('GET', 'POST'))

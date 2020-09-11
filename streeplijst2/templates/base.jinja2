@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- This template is created using Jinja tempalates: https://jinja.palletsprojects.com/en/2.11.x/templates/ -->
+
+<head>
+    {% block head %}
+    <!-- Title block placeholder -->
+    <title>{% block title %}BASE{% endblock title %} - Streeplijst </title>
+
+    <!-- Meta data -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="">
+    <meta name="author" content="Tom B">
+
+    <!-- Bootstrap stylesheets -->
+
+    <!-- Custom stylesheets -->
+    <!-- OLD FILE <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> -->
+    <link rel="stylesheet" id="custom-css" href="{{ url_for('static', filename='css/custom-style.css') }}"
+          type="text/css" media="all">
+
+    <!-- Custom fonts for this template-->
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+          rel="stylesheet">
+
+    <!-- Template scripts -->
+    <script type="text/javascript" src="{{ url_for('static', filename='/vendor/jquery/jquery.min.js') }}"></script>
+    <script type="text/javascript"
+            src="{{ url_for('static', filename='/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script type="text/javascript"
+            src="{{ url_for('static', filename='/vendor/jquery-easing/jquery.easing.min.js') }}"></script>
+
+    <script type="text/javascript" src="{{ url_for('static', filename='/js/sb-admin-2.js') }}"></script>
+
+    {% endblock head %}
+</head>
+
+<body>
+
+<!-- Main content block wrapper -->
+<div id="wrapper">
+
+    <!-- Sidebar -->
+    {% block sidebar %}
+    <ul id="accordion-sidebar" class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion toggled">
+        <!-- Sidebar - Brand -->
+        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/">
+            <img class="img rounded" src="/media/icons/ICON_paradoks.jpg" style="width:60px;">
+            <div class="sidebar-brand-text mx-3">Streeplijst <sup>V2.0</sup></div>
+        </a>
+
+        <!-- Nav Item - Dashboard -->
+        <li class="nav-item active">
+            <a class="nav-link" href="/">
+                <i class="fas fa-fw fa-tachometer-alt"></i>
+                <span>Streeplijst</span></a>
+        </li>
+
+        <!-- Divider -->
+        <hr class="sidebar-divider">
+
+        <!-- Heading -->
+        <div class="sidebar-heading">
+            Evenementen
+        </div>
+
+        <!-- Nav Item - Pages Collapse Menu -->
+        <li class="nav-item">
+            <a class="nav-link" href="/evenementen">
+                <i class="fas fa-fw fa-dice"></i>
+                <span class="font-weight-bold">Inschrijven</span>
+            </a>
+        </li>
+
+        <!-- Divider -->
+        <hr class="sidebar-divider">
+
+        <!-- Sidebar Toggler (Sidebar) -->
+        <div class="text-center d-none d-md-inline">
+            <button class="rounded-circle border-0" id="sidebarToggle"></button>
+        </div>
+    </ul> <!-- #accordion-sidebar -->
+
+    {% endblock sidebar %}
+    <!-- Content Wrapper -->
+    <div id="regular-content-wrapper" class="d-flex flex-column">
+        <!-- Begin Page Content -->
+        <div id="regular-content" class="container-fluid">
+
+            {% block regular_content_top %} {# content in the top section of the main section #}\
+            <!-- Content in the top section goes here -->
+            {% endblock regular_content_top %}
+
+            {% block regular_content %} {# regular content in the main section goes here #}
+            <!-- Content in the main section hoes here -->
+            <h1>This is the base template.</h1>
+            {% endblock regular_content %}
+
+        </div> <!-- /#regular-content -->
+    </div> <!-- /#regular-content-wrapper -->
+</div> <!-- /#wrapper -->
+
+<div id="footer" class="footer">
+
+    {% block footer %}
+    <footer class="sticky-footer bg-white">
+        <div class="container my-auto">
+            <div class="copyright text-center my-auto">
+                <span>&copy; Copyright 2020 by Jelle Hierck and Tom Busink</span>
+            </div>
+        </div>
+    </footer>
+    {% endblock footer %}
+</div> <!-- #footer -->
+
+{% block script %} {# Any extra scripts go here #}
+
+<!-- SCRIPT TO OPEN AND CLOSE SIDEBAR -->
+<script type="text/javascript">
+    // Toggle the side navigation
+    $("#sidebarToggle, #sidebarToggleTop").on("click", function(e) {
+        $("body").toggleClass("sidebar-toggled");
+        $(".sidebar").toggleClass("toggled");
+        if ($(".sidebar").hasClass("toggled")) {
+            $(".sidebar .collapse").collapse("hide");
+        };
+    });
+</script>
+{% endblock script %}
+
+</body>
+
+</html>

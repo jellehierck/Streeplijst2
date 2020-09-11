@@ -1,6 +1,4 @@
 """
-flask_app.py
-
 Contains all Flask logic to connect this Python backend to the HTML frontend.
 """
 import os

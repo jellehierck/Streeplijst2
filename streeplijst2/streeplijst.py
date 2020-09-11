@@ -133,7 +133,7 @@ class Item(db.Model):
         """
         self.name = name
         self.id = id
-        self.price = price
+        self.price = float(price)
         self.folder = folder
         self.folder_id = folder_id
         self.published = published
