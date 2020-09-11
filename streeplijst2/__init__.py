@@ -49,7 +49,7 @@ def create_app(config=None):
     cache.init_app(app)
 
     # Register all routes
-    from streeplijst2.routes import register_routes
-    register_routes(app, cache)
+    from streeplijst2.routes import bp
+    app.register_blueprint(bp)
 
     return app

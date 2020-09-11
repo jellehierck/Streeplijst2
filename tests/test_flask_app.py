@@ -10,5 +10,5 @@ def test_config(test_app, db_uri_string):
 
 
 def test_hello(client):
-    response = client.get("/hello")
+    response = client.get("/streeplijst/hello")
     assert response.data == b"Hello, World!"
