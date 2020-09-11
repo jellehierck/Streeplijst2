@@ -25,9 +25,10 @@ def create_app(config=None):
         pass
 
     app.config.from_mapping(  # TODO: Change this so that it imports from a config file
-            SECRET_KEY=DEV_KEY,  # TODO: change this key
-            SQLALCHEMY_DATABASE_URI='sqlite:///' + app.instance_path + '/database.sqlite',  # Database in instance folder
-            CACHE_TYPE='simple'  # Caching for temporarily storing results of time-consuming requests (e.g. get folders)
+        SECRET_KEY=DEV_KEY,  # TODO: change this key
+        SQLALCHEMY_DATABASE_URI='sqlite:///' + app.instance_path + '/database.sqlite',  # Database in instance folder
+        SQLALCHEMY_TRACK_MODIFICATIONS=False,
+        CACHE_TYPE='simple'  # Caching for temporarily storing results of time-consuming requests (e.g. get folders)
     )
 
     # Load configuration
