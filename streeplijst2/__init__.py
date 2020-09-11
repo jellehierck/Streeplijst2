@@ -3,7 +3,6 @@ Contains all Flask logic to connect this Python backend to the HTML frontend.
 """
 import os
 from flask import Flask
-from flask_caching import Cache
 
 from streeplijst2.streeplijst import User, Folder
 from credentials import DEV_KEY  # TODO: Remove this line and replace with decent call to config file
@@ -27,8 +26,7 @@ def create_app(config=None):
     app.config.from_mapping(  # TODO: Change this so that it imports from a config file
         SECRET_KEY=DEV_KEY,  # TODO: change this key
         SQLALCHEMY_DATABASE_URI='sqlite:///' + app.instance_path + '/database.sqlite',  # Database in instance folder
-        SQLALCHEMY_TRACK_MODIFICATIONS=False,
-        CACHE_TYPE='simple'  # Caching for temporarily storing results of time-consuming requests (e.g. get folders)
+        SQLALCHEMY_TRACK_MODIFICATIONS=False  # Reduces the overhead of track_modifications
     )
 
     # Load configuration
@@ -47,7 +45,8 @@ def create_app(config=None):
         db.create_all()
 
     # Set up caching
-    cache = Cache(app)
+    from streeplijst2.cache import cache
+    cache.init_app(app)
 
     # Register all routes
     from streeplijst2.routes import register_routes
