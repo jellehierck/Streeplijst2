@@ -49,7 +49,8 @@ def create_app(config=None):
     cache.init_app(app)
 
     # Register all routes
-    from streeplijst2.routes import bp
-    app.register_blueprint(bp)
+    from streeplijst2.routes import home, streeplijst
+    app.register_blueprint(home)
+    app.register_blueprint(streeplijst)
 
     return app
