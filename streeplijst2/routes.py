@@ -79,7 +79,7 @@ def sale():
 
 # Folders home page. Displays all folders to choose products from.
 @streeplijst.route('/folders/main')
-@cache.cached(timeout=60)  # Set the timeout for folders at 60 seconds. TODO: Do not hard code this value
+# @cache.cached(timeout=60)  # Set the timeout for folders at 60 seconds. TODO: Do not hard code this value
 def folders_main():
     folder = Folder.from_config(folder_name="Koek")
     return render_template('items.jinja2', folder_items=folder.items)  # TODO: Remove this temporary testing route
