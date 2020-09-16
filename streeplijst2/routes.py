@@ -43,7 +43,7 @@ def login():
 
         session['user_id'] = user.id
         flash(user.first_name)  # Display the name as temporary measure TODO: replace this line
-        return redirect(url_for('streeplijst'))  # Redirect to the streeplijst
+        return redirect(url_for('streeplijst.folder', folder_id=1996))  # Redirect to the streeplijst
 
 
 @home.route('/logout')
@@ -95,6 +95,7 @@ def folders_main():
 
 
 # Specific folder pages. Displays all products in the specified folder.
-@streeplijst.route('/folders/<int:folder_id>')
+@streeplijst.route('/folder/<int:folder_id>')
 def folder(folder_id):
-    return render_template('folder.html', items=None)
+    folder = db_controller.get_or_create_folder(folder_id=folder_id, sync=True, force_sync=True, auto_commit=True)
+    return render_template('items.jinja2', folder_items=folder.items)  # TODO: Remove this temporary testing route
