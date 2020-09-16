@@ -31,7 +31,7 @@ def login():
         return render_template('login.jinja2')
 
     elif request.method == 'POST':  # Attempt to login the user
-        s_number = request.form['student-number']  # Load the student number from the push form
+        s_number = request.form['s-number']  # Load the student number from the push form
         try:  # Attempt to find the user from Congressus
             user = db_controller.get_or_create_user(s_number=s_number)  # Create a User
         except UserNotFoundException as err:  # The user was not found

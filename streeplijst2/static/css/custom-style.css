@@ -11277,8 +11277,17 @@ body.sidebar-toggled footer.sticky-footer {
   opacity:1!important;
 }
 
-.square:before{
-    content: "";
-    display: block;
-    padding-top: 100%;  /* initial ratio of 1:1*/
+.btn-sq {
+  width: 15vh !important;
+  height: 15vh !important;
+  font-size: 6vh;
+}
+
+.login-display {
+  width: calc(45vh + 1rem) !important; /* This value is determined by 3 * .btn-sq width + 1rem for margin */
+  height: 10vh !important;
+}
+
+.login-display * {
+font-size: 4vh;
 }

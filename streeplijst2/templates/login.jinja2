@@ -4,46 +4,104 @@
 
 {% block regular_content %}
 
-<!-- Login Modal -->
-<div class="modal-body text-center">
-    Selecteer je s-nummer
-    <br><br>
-    <div class="input-group mb-3 input-group-lg">
-        <button class="btn btn-outline-secondary dropdown-toggle px-4" type="button" id="BUT_SM" data-toggle="dropdown"
-                aria-haspopup="true" aria-expanded="false"
-                style="border-top-right-radius:0px;border-bottom-right-radius:0px; ">S
-        </button>
-        <div class="dropdown-menu">
-            <button class="dropdown-item IN_S">S</button>
-            <button class="dropdown-item IN_M">M</button>
+<!-- Login Card -->
+<div class="card m-2">
+    <div class="text-center p-2 w-100">
+
+        <!-- Student number display top bar -->
+        <form class="input-group m-1 login-display" action="{{ url_for('home.login') }}" method="post" >
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="s-number-prefix">s</span>
+            </div>
+            <input name="s-number-display" id="s-number-display" type="text" class="form-control h-100">
+            <input name="s-number" id="s-number" value="s" type="hidden">
+            <div class="input-group-append">
+                <button type="submit" class="btn btn-primary">Login</button>
+            </div>
+        </form>
+
+        <!-- Buttons -->
+        <div class="btn-group" role="group">
+            <button onclick="addDigit(1)" class="btn btn-outline-primary btn-sq m-1">1</button>
+            <button onclick="addDigit(2)" class="btn btn-outline-primary btn-sq m-1">2</button>
+            <button onclick="addDigit(3)" class="btn btn-outline-primary btn-sq m-1">3</button>
         </div>
-        <input type="text" class="form-control" id="INPUT_SNUMMER">
-        <button class="btn btn-lg btn-primary mx-2"><i class="fas fa-arrow-circle-right"></i>
-        </button>
-    </div>
-
-    <div class="container">
-        <div class="row">
-            <button class="btn btn-lg btn-outline-primary m-1 col-sm square align-self-center">1</button>
-
-            <button class="btn btn-lg btn-outline-primary m-1 col-sm square">2</button>
-            <button class="btn btn-lg btn-outline-primary m-1 col-sm square">3</button>
+        <br>
+        <div class="btn-group" role="group">
+            <button onclick="addDigit(4)" class="btn btn-outline-primary btn-sq m-1">4</button>
+            <button onclick="addDigit(5)" class="btn btn-outline-primary btn-sq m-1">5</button>
+            <button onclick="addDigit(6)" class="btn btn-outline-primary btn-sq m-1">6</button>
         </div>
+        <br>
+        <div class="btn-group" role="group">
+            <button onclick="addDigit(7)" class="btn btn-outline-primary btn-sq m-1">7</button>
+            <button onclick="addDigit(8)" class="btn btn-outline-primary btn-sq m-1">8</button>
+            <button onclick="addDigit(9)" class="btn btn-outline-primary btn-sq m-1">9</button>
+        </div>
+        <br>
+        <div class="btn-group" role="group">
+            <button id="s-number-prefix-button" onclick="togglePrefix()" class="btn btn-outline-warning btn-sq m-1">m
+            </button>
+            <button onclick="addDigit(0)" class="btn btn-outline-primary btn-sq m-1">0</button>
+            <button onclick="removeDigit()" class="btn btn-outline-danger btn-sq m-1">&larr;</button>
+        </div>
+
     </div>
-
-
-    <br>
-    <button class="btn btn-lg btn-outline-primary m-1 IN_NR" style="width:50px;">4</button>
-    <button class="btn btn-lg btn-outline-primary m-1 IN_NR" style="width:50px;">5</button>
-    <button class="btn btn-lg btn-outline-primary m-1 IN_NR" style="width:50px;">6</button>
-    <br>
-    <button class="btn btn-lg btn-outline-primary m-1 IN_NR" style="width:50px;">7</button>
-    <button class="btn btn-lg btn-outline-primary m-1 IN_NR" style="width:50px;">8</button>
-    <button class="btn btn-lg btn-outline-primary m-1 IN_NR" style="width:50px;">9</button>
-    <br>
-    <button class="btn btn-lg btn-outline-primary m-1 IN_NR" style="width:10rem + $spacer * .25;height: 5rem">0</button>
-    <button class="btn btn-lg btn-outline-danger m-1 IN_DEL" style="width:50px;">&#9249;<i
-            class="fas fa-arrow-circle-left"></i></button>
 </div>
 
 {% endblock regular_content %}
+
+{% block script %}
+
+{{ super() }}
+
+<script type="text/javascript">
+
+    // Adds clicked digit to display
+    function addDigit(inputDigit) {
+        let currentSNumber = $('#s-number').val(); // Get the current student number string
+        if (currentSNumber.length <= 7) { // Only if there are less than 7 numerical digits (not including the 's')
+            currentSNumber += inputDigit; // Update the currentSNumber
+            let currentSNumberDigits = currentSNumber.substring(1); // Removes the letter from the SNumber so only digits remain
+            $('#s-number').val(currentSNumber); // Store the currentSNumber internally
+            $('#s-number-display').val(currentSNumberDigits);
+        }
+    }
+
+    // Removes last digit from the display
+    function removeDigit() {
+        let currentSNumber = $('#s-number').val(); // Get the current student number string
+        if (currentSNumber.length >= 2) { // Always leaves the prefixed letter 's' or 'm'
+            currentSNumber = currentSNumber.slice(0, -1); // Remove the last digit
+            let currentSNumberDigits = currentSNumber.substring(1); // Removes the letter from the SNumber so only digits remain
+            $('#s-number').val(currentSNumber); // Store the currentSNumber internally
+            $('#s-number-display').val(currentSNumberDigits);
+        }
+    }
+
+    // Toggle the prefix letter between 's' and 'm'
+    function togglePrefix() {
+        let currentSNumber = $('#s-number').val(); // Get the current student number string
+        let currentSNumberDigits = currentSNumber.substring(1); // Removes the letter from the SNumber so only digits remain
+        let oldPrefix = currentSNumber.charAt(0); // Get the prefix letter
+
+        let newPrefix; // Declare the new prefix
+
+        // toggle the prefix
+        if (oldPrefix === 's') {
+            newPrefix = 'm';
+        } else if (oldPrefix === 'm') {
+            newPrefix = 's';
+        } else { // The prefix was not recognized, throw an alert
+            alert('Oops! Something went wrong.');
+        }
+
+        currentSNumber = newPrefix + currentSNumberDigits  // Update the currentSNumber
+        $('#s-number').val(currentSNumber); // Store the currentSNumber internally
+        $('#s-number-prefix').text(newPrefix); // Display the new prefix
+        $('#s-number-prefix-button').text(oldPrefix); // Display the new prefix
+    }
+
+</script>
+
+{% endblock script %}
