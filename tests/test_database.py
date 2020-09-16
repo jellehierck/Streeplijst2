@@ -104,6 +104,22 @@ def test_get_folder_sync(test_app):
         assert last_synchronized != folder.last_synchronized
 
 
+def test_get_or_create_folder(test_app):
+    with test_app.app_context():
+        # Test that a folder is created
+        folder = db_controller.get_or_create_folder(folder_id=TEST_FOLDER_ID, auto_commit=True)
+        assert folder is not None
+
+        # Test that getting a folder returns a folder and does not create a new one
+        folder2 = db_controller.get_or_create_folder(folder_id=TEST_FOLDER_ID, auto_commit=True)
+        assert folder is folder2  # Ensure the folders returned are the same
+
+        # Test that syncing does not change the folder
+        folder3 = db_controller.get_or_create_folder(folder_id=TEST_FOLDER_ID, sync=True, force_sync=True,
+                                                     auto_commit=True)
+        assert folder is folder3  # Ensure the folders returned are the same
+
+
 def test_get_item(test_app):
     with test_app.app_context():
         item = db_controller.get_item(item_id=TEST_ITEM['id'])
@@ -112,6 +128,24 @@ def test_get_item(test_app):
         item = db_controller.create_item(item_id=TEST_ITEM['id'])
         assert item
         assert db_controller.get_item(item_id=TEST_ITEM['id'])  # Ensure the item exists in the database
+
+
+def test_sync_user(test_app):
+    with test_app.app_context():
+        user = db_controller.create_user(s_number=TEST_USER['s_number'])
+        db_controller.sync_user(s_number=TEST_USER['s_number'], auto_commit=True)
+
+
+def test_get_or_create_uer(test_app):
+    with test_app.app_context():
+        user = db_controller.get_or_create_user(s_number=TEST_USER['s_number'], auto_commit=True)
+        assert user is not None
+
+        user2 = db_controller.get_or_create_user(s_number=TEST_USER['s_number'], sync=False, auto_commit=True)
+        assert user is user2
+
+        user3 = db_controller.get_or_create_user(s_number=TEST_USER['s_number'], sync=True, auto_commit=True)
+        assert user is user3
 
 
 def test_get_user(test_app):

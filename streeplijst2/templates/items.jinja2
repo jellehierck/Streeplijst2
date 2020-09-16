@@ -61,7 +61,7 @@
         </form>
     </div> -->
 
-    {% for item in folder_items.values() %} {# populate the cards in this folder #}
+    {% for item in folder_items %} {# populate the cards in this folder #}
     <div class="col-lg-3 col-md-4">
         <form action="{{ url_for('streeplijst.sale') }}" method="post" class="card m-2">
             <img class="card-img-top" src="{{ item.media }}" alt="Card Image" style="max-height: 15rem">

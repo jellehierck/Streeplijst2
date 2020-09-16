@@ -33,7 +33,7 @@ def login():
     elif request.method == 'POST':  # Attempt to login the user
         s_number = request.form['student-number']  # Load the student number from the push form
         try:  # Attempt to find the user from Congressus
-            user = User.from_api(s_number)  # Create a User
+            user = db_controller.get_or_create_user(s_number=s_number)  # Create a User
         except UserNotFoundException as err:  # The user was not found
             flash(str(err))  # TODO: Properly handle this exception
             return render_template('login.html')
@@ -82,7 +82,8 @@ def sale():
 @streeplijst.route('/folders/main')
 # @cache.cached(timeout=60)  # Set the timeout for folders at 60 seconds. TODO: Do not hard code this value
 def folders_main():
-    folder = Folder.from_config(folder_name="Koek")
+    folder = db_controller.get_or_create_folder(folder_id=1996, sync=True, force_sync=True, auto_commit=True)
+    # folder = Folder.from_config(folder_name="Koek")
     return render_template('items.jinja2', folder_items=folder.items)  # TODO: Remove this temporary testing route
 
     if 'user' in session:

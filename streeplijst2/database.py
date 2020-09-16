@@ -150,6 +150,30 @@ class LocalDBController:
                                 auto_commit=auto_commit)
         return folder
 
+    @classmethod
+    def get_or_create_folder(cls, folder_id: int = None, sync: bool = False, force_sync: bool = True,
+                             update_interval=10, timeout: float = TIMEOUT, auto_commit: bool = False) -> Folder:
+        """
+        Get the folder from the database, or create it if it does not exist in the database.
+
+        :param folder_id: Folder ID to retrieve
+        :param sync: When set to True, the folder will be synced with the API before being returned.
+        :param force_sync: When set to True, the folder is synced with the API regardless of folder.last_synchronized.
+        :param update_interval: The time in minutes the folder should be out of sync before it is updated. If
+        datetime.now() - folder.last_synchronized > update_interval, the folder is synced with the API.
+        :param timeout: Timeout for the get request. Defaults to config.py TIMEOUT.
+        :param auto_commit: When set to True, commits the changes to the database at the end of the method call.
+        :return: The folder.
+        """
+        folder = cls.get_folder(folder_id=folder_id, sync=sync, force_sync=force_sync, update_interval=update_interval,
+                                timeout=timeout, auto_commit=False)
+        if not folder:
+            folder = cls.create_folder(folder_id=folder_id, timeout=timeout, auto_commit=False)
+
+        if auto_commit is True:
+            cls.commit()
+        return folder
+
     @staticmethod
     def get_sale(sale_id: int) -> Sale:
         """
@@ -162,53 +186,39 @@ class LocalDBController:
         return Sale.query.filter_by(id=sale_id).first()
 
     @classmethod
-    def get_or_create_user(cls, s_number: str, upsert: bool = True, timeout: float = TIMEOUT,
+    def get_or_create_user(cls, s_number: str, sync: bool = True, timeout: float = TIMEOUT,
                            auto_commit: bool = False) -> User:
         """
         Get the user from the database, or create it if it does not exist in the database yet.
 
         :param s_number: Student number
-        :param upsert: When set to True, this will also update the user if it existed already.
+        :param sync: When set to True, this will also synchronize the user with API.
         :param timeout: Timeout for the get request. Defaults to config.py TIMEOUT.
         :param auto_commit: When set to True, commits the changes to the database at the end of the method call.
         :return: The requested user.
         """
-        if upsert is True:  # Upsert the user
-            user = cls.upsert_user(s_number=s_number, timeout=timeout, auto_commit=False)
-        else:  # If the user should not be upserted, return the user as it currently exists in the database
-            user = cls.get_user(s_number=s_number)
-            if not user:  # If the user does not exist in the database, create it
-                user = cls.create_user(s_number=s_number, timeout=timeout, auto_commit=False)
+        user = cls.get_user(s_number=s_number)
+        if user:  # If the user exists already
+            if sync is True:  # Synchronize the user with the API if the flag is true
+                cls.sync_user(s_number=s_number, timeout=timeout, auto_commit=False)
+        else:  # The user did not exist already, so it needs to be created
+            user = cls.create_user(s_number=s_number, timeout=timeout, auto_commit=False)
 
         if auto_commit is True:
             cls.commit()
         return user
 
-
     @classmethod
-    def upsert_user(cls, s_number: str, mapping: dict = None, timeout: float = TIMEOUT,
-                    auto_commit: bool = False) -> User:
-        """
-        If the user is in the database, update their fields using mapping. If the user is not in the database yet,
-        create a new user.
-
-        :param s_number: Student number
-        :param mapping: Dict of fields for the user to update. These will overwrite any updates from the API.
-        :param timeout: Timeout for the get request. Defaults to config.py TIMEOUT.
-        :param auto_commit: When set to True, commits the changes to the database at the end of the method call.
-        :return: The upserted user
-        """
+    def sync_user(cls, s_number: str, timeout: float = TIMEOUT, auto_commit: bool = False):
         user = cls.get_user(s_number=s_number)
-        if user:  # The user exists already, update it
-            api_mapping = api.get_user(s_number, timeout=timeout)
-            user.update(**api_mapping)  # Update the user with mapping from the API
-            user.update(**mapping)  # Update the user with the mapping variable. This overwrites changes by the API
-        else:  # The user does not exist, create it
-            cls.create_user(s_number, timeout=timeout, auto_commit=False)  # Do not commit right after user is created
+        if user:  # If the user exists, update it from the API
+            api_mapping = api.get_user(s_number=s_number, timeout=timeout)  # Get a dict from the API
+            user.update(**api_mapping)  # Convert the dict to keyword arguments using ** and update
+        else:
+            pass  # TODO: Insert a proper exception here
 
-        if auto_commit is True:  # Only commit if the flag is true
+        if auto_commit is True:
             cls.commit()
-        return user
 
     @classmethod
     def upsert(cls, obj: db.Model, auto_commit=False):  # TODO: Replace db.Model with DBBase class

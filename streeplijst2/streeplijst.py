@@ -60,7 +60,7 @@ class Folder(db.Model):
         self.id = kwargs.get('id', self.id)
         self.name = kwargs.get('name', self.name)
         self.media = kwargs.get('media', self.media)
-        # self.items = kwargs.get('items', self.items)
+        # self.items = kwargs.get('items', self.items)  # The items cannot be updated, they need to be synced with API
         self.last_synchronized = kwargs.get('last_synchronized', self.last_synchronized)
 
 
@@ -131,7 +131,7 @@ class User(db.Model):
     has_sdd_mandate = db.Column(db.Boolean)
     profile_picture = db.Column(db.String)
 
-    def __init__(self, s_number: str, id: int, date_of_birth: str, first_name: str, last_name: str,
+    def __init__(self, s_number: str, id: int, date_of_birth: datetime, first_name: str, last_name: str,
                  last_name_prefix: str = '', has_sdd_mandate: bool = False, profile_picture: dict = ''):
         """
         Create a new User object.
@@ -150,7 +150,7 @@ class User(db.Model):
         self.first_name = first_name
         self.last_name_prefix = last_name_prefix
         self.last_name = last_name
-        self.date_of_birth = datetime.fromisoformat(date_of_birth)
+        self.date_of_birth = date_of_birth
         self.has_sdd_mandate = has_sdd_mandate
         self.profile_picture = profile_picture
 

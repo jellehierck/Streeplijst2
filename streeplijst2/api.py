@@ -1,5 +1,6 @@
 import requests  # library used for making calls to Congressus API
 import json
+from datetime import datetime
 
 from streeplijst2.config import BASE_URL, BASE_HEADER, TIMEOUT
 
@@ -112,9 +113,11 @@ def get_user(s_number: str, timeout: float = TIMEOUT):
         error_msg = u'%s Client Error: User %s is not found for URL %s' % (res.status_code, s_number, res.url)
         raise UserNotFoundException(error_msg, response=res)  # Raise an HTTP error
 
-    result = json.loads(res.text)  # Convert response to a list of dicts. # Congressus always sends a list of objects.
-    _normalize_profile_picture(result[0])
-    return result[0]  # We return the first dict in the list since there should be only one object in the list.
+    user_list = json.loads(res.text)  # Convert response to a list of dicts. Congressus always sends a list of objects
+    result = user_list[0]  # There will only be one user in this list, so we select the first user
+    result['date_of_birth'] = datetime.fromisoformat(result['date_of_birth'])
+    _normalize_profile_picture(result)
+    return result  # We return the first dict in the list since there should be only one object in the list.
 
 
 def post_sale(user_id: int, product_id: int, quantity: int, timeout: float = TIMEOUT):
