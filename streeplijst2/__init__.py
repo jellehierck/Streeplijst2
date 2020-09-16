@@ -39,13 +39,13 @@ def create_app(config=None):
         app.config.from_mapping(config)
 
     # Set up the database
-    from streeplijst2.streeplijst import db  # Import the database module
+    from streeplijst2.extensions import db  # Import the database module
     db.init_app(app)  # Define the database tables and models
     with app.app_context():
         db.create_all()
 
     # Set up caching
-    from streeplijst2.cache import cache
+    from streeplijst2.extensions import cache
     cache.init_app(app)
 
     # Register all routes

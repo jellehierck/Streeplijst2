@@ -3,8 +3,9 @@ from flask import redirect, url_for, render_template, request, flash, session, j
 from requests.exceptions import HTTPError, Timeout
 
 from streeplijst2.streeplijst import User, Folder, Item
+from streeplijst2.database import LocalDBController as db_controller
 from streeplijst2.api import UserNotFoundException
-from streeplijst2.cache import cache
+from streeplijst2.extensions import cache
 
 home = Blueprint('home', __name__)
 
