@@ -1,0 +1,49 @@
+{% extends "base.jinja2" %}
+
+{% block title %}Items{% endblock title %}
+
+{% block regular_content %}
+
+<!-- Login Modal -->
+<div class="modal-body text-center">
+    Selecteer je s-nummer
+    <br><br>
+    <div class="input-group mb-3 input-group-lg">
+        <button class="btn btn-outline-secondary dropdown-toggle px-4" type="button" id="BUT_SM" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false"
+                style="border-top-right-radius:0px;border-bottom-right-radius:0px; ">S
+        </button>
+        <div class="dropdown-menu">
+            <button class="dropdown-item IN_S">S</button>
+            <button class="dropdown-item IN_M">M</button>
+        </div>
+        <input type="text" class="form-control" id="INPUT_SNUMMER">
+        <button class="btn btn-lg btn-primary mx-2"><i class="fas fa-arrow-circle-right"></i>
+        </button>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <button class="btn btn-lg btn-outline-primary m-1 col-sm square align-self-center">1</button>
+
+            <button class="btn btn-lg btn-outline-primary m-1 col-sm square">2</button>
+            <button class="btn btn-lg btn-outline-primary m-1 col-sm square">3</button>
+        </div>
+    </div>
+
+
+    <br>
+    <button class="btn btn-lg btn-outline-primary m-1 IN_NR" style="width:50px;">4</button>
+    <button class="btn btn-lg btn-outline-primary m-1 IN_NR" style="width:50px;">5</button>
+    <button class="btn btn-lg btn-outline-primary m-1 IN_NR" style="width:50px;">6</button>
+    <br>
+    <button class="btn btn-lg btn-outline-primary m-1 IN_NR" style="width:50px;">7</button>
+    <button class="btn btn-lg btn-outline-primary m-1 IN_NR" style="width:50px;">8</button>
+    <button class="btn btn-lg btn-outline-primary m-1 IN_NR" style="width:50px;">9</button>
+    <br>
+    <button class="btn btn-lg btn-outline-primary m-1 IN_NR" style="width:10rem + $spacer * .25;height: 5rem">0</button>
+    <button class="btn btn-lg btn-outline-danger m-1 IN_DEL" style="width:50px;">&#9249;<i
+            class="fas fa-arrow-circle-left"></i></button>
+</div>
+
+{% endblock regular_content %}

@@ -20,15 +20,15 @@ def hello():
 @home.route('/')
 @home.route('/home')
 def index():
-    return redirect(url_for('streeplijst.streeplijst_home'))  # TODO: Remove this temporary testing route
-    # return redirect(url_for('default.login'))
+    # return redirect(url_for('streeplijst.streeplijst_home'))  # TODO: Remove this temporary testing route
+    return redirect(url_for('home.login'))
 
 
 # Login page. When called with GET, this loads the login screen. When called with POST, attempts to login user.
 @home.route('/login', methods=('GET', 'POST'))
 def login():
     if request.method == 'GET':  # Load the login page to let users enter their s-number
-        return render_template('login.html')
+        return render_template('login.jinja2')
 
     elif request.method == 'POST':  # Attempt to login the user
         s_number = request.form['student-number']  # Load the student number from the push form
