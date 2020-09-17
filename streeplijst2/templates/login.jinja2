@@ -5,18 +5,20 @@
 {% block regular_content %}
 
 <!-- Login Card -->
-<div class="card m-2">
+<div class="container-fluid m-2">
     <div class="text-center p-2 w-100">
 
         <!-- Student number display top bar -->
-        <form class="input-group m-1 login-display" action="{{ url_for('home.login') }}" method="post" >
-            <div class="input-group-prepend">
-                <span class="input-group-text" id="s-number-prefix">s</span>
-            </div>
-            <input name="s-number-display" id="s-number-display" type="text" class="form-control h-100">
-            <input name="s-number" id="s-number" value="s" type="hidden">
-            <div class="input-group-append">
-                <button type="submit" class="btn btn-primary">Login</button>
+        <form class="form-inline justify-content-center" action="{{ url_for('home.login') }}" method="post">
+            <div class="input-group m-1 login-display">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="s-number-prefix">s</span>
+                </div>
+                <input name="s-number-display" id="s-number-display" type="text" class="form-control h-100">
+                <input name="s-number" id="s-number" value="s" type="hidden">
+                <div class="input-group-append">
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </div>
             </div>
         </form>
 
