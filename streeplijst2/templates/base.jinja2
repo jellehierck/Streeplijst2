@@ -85,35 +85,91 @@
 
     {% endblock sidebar %}
     <!-- Content Wrapper -->
-    <div id="regular-content-wrapper" class="d-flex flex-column">
-        <!-- Begin Page Content -->
+    <div id="regular-content-wrapper" class="container-fluid d-flex flex-column">
+        <!-- Actual content -->
         <div id="regular-content" class="container-fluid">
+            <!-- Top bar -->
+            {% block top_bar %}
+            <nav id="top-bar" class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                <!-- Top bar items -->
+                <div class="navbar-collapse collapse justify-content-between align-items-center w-100">
+                    <!-- Left section -->
+                    <div class="navbar-nav">
+                        {% block top_bar_left_section %}
+                        <!-- Top bar text -->
+                        <div class="navbar-brand">
+                            {% block top_bar_text %}
+                            Streeplijst 2.0
+                            {% endblock top_bar_text %}
+                        </div>
+                        {% endblock top_bar_left_section %}
+                    </div>
 
-            {% block regular_content_top %} {# content in the top section of the main section #}
+                    <!-- Middle section is reserved for messages -->
+                    <ul class="navbar-nav align-items-center">
+                        {% with msgs = get_flashed_messages(category_filter=["message"]) %}
+                        {% if msgs %}
+                        {%- for msg in msgs %}
+                        <li class="nav-item mx-1">
+                            <div class="alert alert-dark my-lg-0" role="alert">
+                                {{ msg }}
+                            </div>
+                        </li>
+                        {% endfor -%}
+                        {% endif %}
+                        {% endwith %}
+                    </ul>
+
+                    <!-- Right section -->
+                    <div class="navbar-nav">
+                        {% block top_bar_right_section %}{% endblock top_bar_right_section %}
+                    </div>
+                </div>
+            </nav><!-- /#top-bar -->
+
+            {% endblock top_bar %}
+
+            <!-- Error messages -->
+            <!-- These will appear as an alert below the main navigation bar -->
+            {% with errors = get_flashed_messages(category_filter=["error"]) %}
+            {% if errors %}
+            {%- for msg in errors %}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <strong>Oh jeetje!</strong>
+                {{ msg }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {% endfor -%}
+            {% endif %}
+            {% endwith %}
+
+
+            {% block regular_content_top %}
             <!-- Content in the top section goes here -->
             {% endblock regular_content_top %}
 
-            {% block regular_content %} {# regular content in the main section goes here #}
-            <!-- Content in the main section hoes here -->
+            {% block regular_content %}
+            <!-- Content in the main section goes here -->
             <h1>This is the base template.</h1>
             {% endblock regular_content %}
 
+            <!-- Footer -->
+            <div id="footer" class="footer">
+                {% block footer %}
+                <footer class="sticky-footer bg-white">
+                    <div class="container my-auto">
+                        <div class="copyright text-center my-auto">
+                            <span>&copy; Copyright 2020 by Jelle Hierck and Tom Busink</span>
+                        </div>
+                    </div>
+                </footer>
+                {% endblock footer %}
+            </div> <!-- #footer -->
         </div> <!-- /#regular-content -->
     </div> <!-- /#regular-content-wrapper -->
 </div> <!-- /#wrapper -->
-
-<div id="footer" class="footer">
-
-    {% block footer %}
-    <footer class="sticky-footer bg-white">
-        <div class="container my-auto">
-            <div class="copyright text-center my-auto">
-                <span>&copy; Copyright 2020 by Jelle Hierck and Tom Busink</span>
-            </div>
-        </div>
-    </footer>
-    {% endblock footer %}
-</div> <!-- #footer -->
 
 {% block script %} {# Any extra scripts go here #}
 

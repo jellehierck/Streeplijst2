@@ -28,6 +28,9 @@ def index():
 @home.route('/login', methods=('GET', 'POST'))
 def login():
     if request.method == 'GET':  # Load the login page to let users enter their s-number
+        flash('Welkom')
+        flash('Leuk dat je er bent')
+        flash('404 Client Error: User was not found for URL www.url.com/really/really/long/url/with/lots/of/slashes', 'error')
         return render_template('login.jinja2')
 
     elif request.method == 'POST':  # Attempt to login the user
