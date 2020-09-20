@@ -1,33 +1,32 @@
 from flask import redirect, url_for, render_template, request, flash, session, jsonify, Blueprint
 
-from requests.exceptions import HTTPError, Timeout
+from requests.exceptions import HTTPError
 
-from streeplijst2.config import FOLDERS
-from streeplijst2.database import LocalDBController as db_controller
+from streeplijst2.database import DBController as db_controller
 from streeplijst2.api import UserNotFoundException
 
 ##################
 # Home blueprint #
 ##################
 
-home = Blueprint('home', __name__)
+bp_home = Blueprint('home', __name__)
 
 
 # Hello world response as test message
-@home.route('/hello')
+@bp_home.route('/hello')
 def hello():
     return "Hello, World!"
 
 
 # Landing page
-@home.route('/')
-@home.route('/home')
+@bp_home.route('/')
+@bp_home.route('/home')
 def index():
     return redirect(url_for('home.login'))
 
 
 # Login page. When called with GET, this loads the login screen. When called with POST, attempts to login user.
-@home.route('/login', methods=('GET', 'POST'))
+@bp_home.route('/login', methods=('GET', 'POST'))
 def login():
     if request.method == 'GET':  # Load the login page to let users enter their s-number
         return render_template('login.jinja2')
@@ -51,37 +50,9 @@ def login():
         return redirect(url_for('streeplijst.folder'))  # Redirect to the streeplijst
 
 
-@home.route('/logout')
+@bp_home.route('/logout')
 def logout():
     for key in list(session.keys()):
         session.pop(key, None)  # Remove all items from the session (user data)
     flash('Uitgelogd.')  # TODO: Add temporary messages which disappear after a time.
     return redirect(url_for('home.login'))
-
-
-##################################
-# Streeplijst specific blueprint #
-##################################
-
-streeplijst = Blueprint('streeplijst', __name__, url_prefix='/streeplijst')
-
-
-# Default page and folder contents
-@streeplijst.route('/')  # This is the default page of /streeplijst
-@streeplijst.route('/folder')  # If no folder_id is specified, the default folder is loaded
-@streeplijst.route('/folder/<int:folder_id>')  # When a folder is specified it is loaded
-def folder(folder_id=1998):  # TODO: Change default folder to a more useful folder.
-    if 'user_id' in session:
-        folder = db_controller.get_or_create_folder(folder_id=folder_id, sync=True, force_sync=False, auto_commit=True)
-        meta_folders = FOLDERS  # The folder metas for all folders are loaded to display at top of the screen
-        return render_template('folder.jinja2', meta_folders=meta_folders, folder_items=folder.items)
-    else:
-        flash('Log eerst in.', 'message')
-        return redirect(url_for('home.login'))
-
-
-@streeplijst.route('/sale', methods=['POST'])
-def sale():
-    print(request.form['item-id'])
-    print(request.form['quantity'])
-    return jsonify({'response': 'success, but sale is not posted because of testing.'})

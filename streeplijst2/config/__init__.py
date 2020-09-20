@@ -48,6 +48,3 @@ TEST_USER = cfg['TEST_USER']
 TEST_USER_NO_SDD = cfg['TEST_USER_NO_SDD']
 TEST_ITEM = cfg['TEST_ITEM']
 TEST_FOLDER_ID = cfg['TEST_FOLDER_ID']
-
-print('hello')
-
