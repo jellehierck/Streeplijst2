@@ -8,6 +8,10 @@ from streeplijst2.database import LocalDBController as db_controller
 from streeplijst2.api import UserNotFoundException
 from streeplijst2.extensions import cache
 
+##################
+# Home blueprint #
+##################
+
 home = Blueprint('home', __name__)
 
 
@@ -57,9 +61,9 @@ def logout():
     return redirect(url_for('home.login'))
 
 
-###################################
-# Streeplijst specific blueprints #
-###################################
+##################################
+# Streeplijst specific blueprint #
+##################################
 
 streeplijst = Blueprint('streeplijst', __name__, url_prefix='/streeplijst')
 
