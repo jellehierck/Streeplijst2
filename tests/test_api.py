@@ -2,7 +2,7 @@ import pytest
 from requests.exceptions import HTTPError, Timeout
 
 import streeplijst2.api as api
-from streeplijst2.config import FOLDERS, TEST_FOLDER_NAME, TEST_USER, TEST_ITEM
+from streeplijst2.config import FOLDERS, TEST_FOLDER_ID, TEST_USER, TEST_USER_NO_SDD, TEST_ITEM
 
 """"
 Unit tests for API module.
@@ -22,9 +22,9 @@ You can change the values in the global variables below.
 
 correct_user = TEST_USER
 correct_item = TEST_ITEM
-correct_folder = FOLDERS[TEST_FOLDER_NAME]
+correct_folder = FOLDERS[TEST_FOLDER_ID]
 
-no_sdd_user = dict({"s_number": "s9999998", "first_name": "TestTwee", "id": 485567})
+no_sdd_user = TEST_USER_NO_SDD
 
 incorrect_user = dict({"s_number": "s8888888", "id": 0})
 incorrect_item = dict({"id": 1})
@@ -45,7 +45,7 @@ def test_get_products_in_folder_correct():
 def test_get_products_in_folder_incorrect():
     with pytest.raises(HTTPError) as error:
         res = api.get_products_in_folder(incorrect_folder["id"])
-    assert "404 Server Error: folder_id " + str(incorrect_folder["id"]) + " is not found" in str(error.value)
+    assert "404 Client Error: folder_id " + str(incorrect_folder["id"]) + " is not found" in str(error.value)
 
     # Test if the timeout exception is raised
     with pytest.raises(Timeout) as error:
@@ -65,11 +65,28 @@ def test_get_user_correct():
 def test_get_user_incorrect():
     with pytest.raises(api.UserNotFoundException) as error:
         res = api.get_user(incorrect_user["s_number"])
-    assert "404 Server Error: User " + incorrect_user["s_number"] + " is not found" in str(error.value)
+    assert "404 Client Error: User " + incorrect_user["s_number"] + " is not found" in str(error.value)
 
     # Test if the timeout exception is raised
     with pytest.raises(Timeout) as error:
         api.get_user(correct_user["s_number"], 0.001)
+
+
+# Test if a valid item_id returns a response with correct data
+def test_get_item_correct():
+    res = api.get_product(correct_item["id"])
+    assert "name" in res and correct_item["name"] == res["name"]
+    assert 'folder_id' in res and correct_item['folder_id'] == res['folder_id']
+
+
+def test_get_item_incorrect():
+    with pytest.raises(api.ItemNotFoundException) as error:
+        res = api.get_product(incorrect_item["id"])
+    assert "404 Client Error: Item " + str(incorrect_item["id"]) + " is not found" in str(error.value)
+
+    # Test if the timeout exception is raised
+    with pytest.raises(Timeout) as error:
+        api.get_product(correct_item["id"], 0.001)
 
 
 # Test if a correct sale can be posted
@@ -97,3 +114,27 @@ def test_post_sale_incorrect():
     with pytest.raises(api.UserNotSignedException) as error:
         res = api.post_sale(no_sdd_user["id"], correct_item["id"], 1)
     assert str(403) in str(error.value) and "mandate" in str(error.value)
+
+
+def test_normalize_media():
+    item_dict_with_media = {'media': [
+        {'url': 'www.url.com'}
+    ]}
+    api._normalize_media(item_dict_with_media)
+    assert item_dict_with_media['media'] == 'www.url.com'
+
+    item_dict_without_media = {'media': []}
+    api._normalize_media(item_dict_without_media)
+    assert item_dict_without_media['media'] == ''
+
+
+def test_normalize_profile_picture():
+    user_with_profile_pic = {'profile_picture':
+                                 {'url': 'www.url.com'}
+                             }
+    api._normalize_profile_picture(user_with_profile_pic)
+    assert user_with_profile_pic['profile_picture'] == 'www.url.com'
+
+    user_without_profile_pic = {'profile_picture': None}
+    api._normalize_profile_picture(user_without_profile_pic)
+    assert user_without_profile_pic['profile_picture'] == ''

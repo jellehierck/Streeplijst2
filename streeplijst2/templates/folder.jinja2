@@ -1,0 +1,106 @@
+{% extends "base.jinja2" %}
+
+{% block title %}Items{% endblock title %}
+
+{% block regular_content_top %}<!-- Folder overview -->
+<div id="folder-overview" class="row">
+
+    {% for folder in meta_folders.values() %}
+    <!-- Single folder -->
+    <div class="col-lg-2 col-md-3 mb-3">
+        <a class="card bg-hover bg-dark text-white shadow"
+           href="{{ url_for('streeplijst.folder', folder_id = folder['id']) }}">
+            <div class="card-body text-center p-3">
+                <img class="bg-hover-img img-profile rounded-circle" style="height:4rem" src="{{ folder['media'] }}">
+                <h4 class="align-middle">{{ folder['name'] }}</h4>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+
+</div> <!-- /#folder-overview -->
+
+{% endblock regular_content_top %}
+
+
+{% block regular_content %}<!-- Item card holder -->
+<div id="item-card-deck" class="row">
+    <!-- TEST CARD
+    <div class="col-lg-3 col-md-4">
+        <form action="{{ url_for('streeplijst.sale') }}" method="post" class="card m-2">
+            <img class="card-img-top" src="/static/media/backgrounds/BG_Food_1.jpg" alt="Card Image"
+                 style="max-height: 10rem">
+            <div class="card-img-overlay text-center">
+                <h4><span class="badge badge-light opacity-75">Food Item #1</span></h4>
+            </div>
+            <input name="item-id" type="hidden" value="999">
+
+            <div class="text-center px-2">
+                <div class="btn-group btn-group-toggle d-flex my-2" data-toggle="buttons">
+                    <label class="btn btn-secondary active">
+                        <input type="radio" name="quantity" value="1" autocomplete="off" checked> 1
+                    </label>
+                    <label class="btn btn-secondary">
+                        <input type="radio" name="quantity" value="2" autocomplete="off"> 2
+                    </label>
+                    <label class="btn btn-secondary">
+                        <input type="radio" name="quantity" value="3" autocomplete="off"> 3
+                    </label>
+                    <label class="btn btn-secondary">
+                        <input type="radio" name="quantity" value="4" autocomplete="off"> 4
+                    </label>
+                </div>
+                <div class="input-group my-2">
+                    <div class="input-group-prepend w-50">
+                        <span class="input-group-text w-100">€0.69</span>
+                    </div>
+                    <div class="input-group-append w-50">
+                        <button type="submit" class="btn btn-primary w-100">Streep</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div> -->
+
+    {% for item in folder_items %} {# populate the cards in this folder #}
+    <div class="col-lg-3 col-md-4">
+        <form action="{{ url_for('streeplijst.sale') }}" method="post" class="card m-2">
+            <img class="card-img-top" src="{{ item.media }}" alt="Card Image" style="max-height: 15rem">
+            <!-- TODO: Change the max-height to have a more responsive image -->
+            <div class="card-img-overlay text-center">
+                <h4><span class="badge badge-light opacity-75">{{ item.name|e }}</span></h4>
+            </div>
+            <input name="item-id" id="item-id" type="hidden" value="{{ item.id|e }}">
+
+            <div class="text-center px-2">
+                <div class="btn-group btn-group-toggle d-flex my-2" data-toggle="buttons">
+                    <label class="btn btn-secondary active">
+                        <input type="radio" name="quantity" value="1" autocomplete="off" checked> 1
+                    </label>
+                    <label class="btn btn-secondary">
+                        <input type="radio" name="quantity" value="2" autocomplete="off"> 2
+                    </label>
+                    <label class="btn btn-secondary">
+                        <input type="radio" name="quantity" value="3" autocomplete="off"> 3
+                    </label>
+                    <label class="btn btn-secondary">
+                        <input type="radio" name="quantity" value="4" autocomplete="off"> 4
+                    </label>
+                </div>
+                <div class="input-group my-2">
+                    <div class="input-group-prepend w-50">
+                                    <span class="input-group-text w-100">
+                                        €{{ "%0.2f"|format(item.price|float / 100) }}
+                                    </span>
+                    </div>
+                    <div class="input-group-append w-50">
+                        <button type="submit" class="btn btn-primary w-100">Streep</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    {% endfor %}
+</div> <!-- /#item-card-deck -->
+
+{% endblock regular_content %}
