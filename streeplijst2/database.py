@@ -3,7 +3,7 @@ from datetime import timedelta, datetime
 from streeplijst2.streeplijst import Folder, User, Sale, Item
 from streeplijst2.extensions import db
 import streeplijst2.api as api
-from streeplijst2.config import FOLDERS, TIMEOUT
+from streeplijst2.config import TIMEOUT, FOLDERS
 
 
 class LocalDBController:

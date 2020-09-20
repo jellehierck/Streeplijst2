@@ -1,0 +1,4 @@
+TIMEOUT: 10  # Default timeout (in seconds) for server responses.
+BASE_URL: "https://api.congressus.nl/v20"
+BASE_HEADER: # Base authorization header. The secret API token should be included as a string using Python
+  Authorization: "Bearer:" # + Token

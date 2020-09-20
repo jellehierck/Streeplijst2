@@ -4,8 +4,7 @@ Contains all Flask logic to connect this Python backend to the HTML frontend.
 import os
 from flask import Flask
 
-from streeplijst2.streeplijst import User, Folder
-from credentials import DEV_KEY  # TODO: Remove this line and replace with decent call to config file
+from streeplijst2.config import DEV_KEY  # TODO: Remove this line and replace with decent call to config file
 
 
 def create_app(config=None):

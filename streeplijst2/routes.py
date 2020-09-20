@@ -2,11 +2,9 @@ from flask import redirect, url_for, render_template, request, flash, session, j
 
 from requests.exceptions import HTTPError, Timeout
 
-from streeplijst2.config import TEST_FOLDER_ID, FOLDERS
-from streeplijst2.streeplijst import User, Folder, Item
+from streeplijst2.config import FOLDERS
 from streeplijst2.database import LocalDBController as db_controller
 from streeplijst2.api import UserNotFoundException
-from streeplijst2.extensions import cache
 
 ##################
 # Home blueprint #
@@ -72,7 +70,7 @@ streeplijst = Blueprint('streeplijst', __name__, url_prefix='/streeplijst')
 @streeplijst.route('/')  # This is the default page of /streeplijst
 @streeplijst.route('/folder')  # If no folder_id is specified, the default folder is loaded
 @streeplijst.route('/folder/<int:folder_id>')  # When a folder is specified it is loaded
-def folder(folder_id=TEST_FOLDER_ID):  # TODO: Change default folder to a more useful folder.
+def folder(folder_id=1998):  # TODO: Change default folder to a more useful folder.
     if 'user_id' in session:
         folder = db_controller.get_or_create_folder(folder_id=folder_id, sync=True, force_sync=False, auto_commit=True)
         meta_folders = FOLDERS  # The folder metas for all folders are loaded to display at top of the screen

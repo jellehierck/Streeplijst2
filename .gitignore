@@ -1,13 +1,10 @@
 # Initial template based on: https://gist.github.com/GhostofGoes/94580e76cd251972b15b4821c8a06f59
 
-# Credentials
-credentials.py
-
 # Instance folder
 # This folder includes all configurations including senstitive information. Each file is ignored unless specifically excluded from the ignore
 instance/
-!instance/streeplijst_config.yaml  # This file includes important parameters for the streeplijst
-!instance/streeplijst_test_config.yaml  # This file includes important test parameters for the streeplijst
+!instance/flask_config.py  # This file includes important parameters for the flask app, but NO CREDENTIALS
+
 
 # Editor (PyCharm)
 .idea/

@@ -2,7 +2,6 @@ import pytest
 from requests.exceptions import Timeout
 
 from streeplijst2.api import FolderNotFoundException, UserNotFoundException
-from streeplijst2.streeplijst import User, Item, Folder
 from streeplijst2.database import LocalDBController as db_controller
 from streeplijst2.config import TEST_USER, FOLDERS, TEST_ITEM, TEST_FOLDER_ID
 
