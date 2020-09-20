@@ -3,7 +3,6 @@
 # Instance folder
 # This folder includes all configurations including senstitive information. Each file is ignored unless specifically excluded from the ignore
 instance/
-!instance/flask_config.py  # This file includes important parameters for the flask app, but NO CREDENTIALS
 
 
 # Editor (PyCharm)
