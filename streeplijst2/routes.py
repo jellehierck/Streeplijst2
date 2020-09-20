@@ -52,8 +52,8 @@ def login():
 @home.route('/logout')
 def logout():
     for key in list(session.keys()):
-        session.pop(key, None)  # Remove all items from the session
-    flash('Logged out.')
+        session.pop(key, None)  # Remove all items from the session (user data)
+    flash('Uitgelogd.')  # TODO: Add temporary messages which disappear after a time.
     return redirect(url_for('home.login'))
 
 
@@ -64,17 +64,18 @@ def logout():
 streeplijst = Blueprint('streeplijst', __name__, url_prefix='/streeplijst')
 
 
-@streeplijst.route('/')
-def streeplijst_home():
+# Default page anf folder contents
+@streeplijst.route('/')  # This is the default page of /streeplijst
+@streeplijst.route('/folder')  # If no folder_id is specified, the default folder is loaded
+@streeplijst.route('/folder/<int:folder_id>')  # When a folder is specified it is loaded
+def folder(folder_id=TEST_FOLDER_ID):  # TODO: Change default folder to a more useful folder.
     if 'user_id' in session:
-        return redirect(url_for('streeplijst.folders_main'))
+        folder = db_controller.get_or_create_folder(folder_id=folder_id, sync=True, force_sync=False, auto_commit=True)
+        meta_folders = FOLDERS  # The folder metas for all folders are loaded to display at top of the screen
+        return render_template('folder.jinja2', meta_folders=meta_folders, folder_items=folder.items)
     else:
-        pass
-
-    if 'user' in session and session['user']:  # If there is a user logged in
-        return redirect(url_for('streeplijst.folders_main'))  # TODO: Add a redirect to the home view for streeplijst
-    else:  # If no user is logged in
-        return redirect(url_for('home'))
+        flash('Log eerst in.', 'message')
+        return redirect(url_for('home.login'))
 
 
 @streeplijst.route('/sale', methods=['POST'])
@@ -82,12 +83,3 @@ def sale():
     print(request.form['item-id'])
     print(request.form['quantity'])
     return jsonify({'response': 'success, but sale is not posted because of testing.'})
-
-
-# Folder contents
-@streeplijst.route('/folder')
-@streeplijst.route('/folder/<int:folder_id>')
-def folder(folder_id=TEST_FOLDER_ID):  # TODO: Change default folder to a more useful folder.
-    if 'user_id' in session:
-        folder = db_controller.get_or_create_folder(folder_id=folder_id, sync=True, force_sync=False, auto_commit=True)
-        return render_template('folder.jinja2', meta_folders=FOLDERS, folder_items=folder.items)

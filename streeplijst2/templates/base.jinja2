@@ -122,7 +122,9 @@
 
                     <!-- Right section -->
                     <div class="navbar-nav">
-                        {% block top_bar_right_section %}{% endblock top_bar_right_section %}
+                        {% block top_bar_right_section %}
+                        <a class="btn btn-primary" href="{{ url_for('home.logout') }}">Log uit</a>
+                        {% endblock top_bar_right_section %}
                     </div>
                 </div>
             </nav><!-- /#top-bar -->
