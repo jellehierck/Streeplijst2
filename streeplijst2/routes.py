@@ -2,6 +2,7 @@ from flask import redirect, url_for, render_template, request, flash, session, j
 
 from requests.exceptions import HTTPError, Timeout
 
+from streeplijst2.config import TEST_FOLDER_ID, FOLDERS
 from streeplijst2.streeplijst import User, Folder, Item
 from streeplijst2.database import LocalDBController as db_controller
 from streeplijst2.api import UserNotFoundException
@@ -20,7 +21,6 @@ def hello():
 @home.route('/')
 @home.route('/home')
 def index():
-    # return redirect(url_for('streeplijst.streeplijst_home'))  # TODO: Remove this temporary testing route
     return redirect(url_for('home.login'))
 
 
@@ -28,9 +28,6 @@ def index():
 @home.route('/login', methods=('GET', 'POST'))
 def login():
     if request.method == 'GET':  # Load the login page to let users enter their s-number
-        flash('Welkom')
-        flash('Leuk dat je er bent')
-        flash('404 Client Error: User was not found for URL www.url.com/really/really/long/url/with/lots/of/slashes', 'error')
         return render_template('login.jinja2')
 
     elif request.method == 'POST':  # Attempt to login the user
@@ -38,15 +35,18 @@ def login():
         try:  # Attempt to find the user from Congressus
             user = db_controller.get_or_create_user(s_number=s_number)  # Create a User
         except UserNotFoundException as err:  # The user was not found
-            flash(str(err))  # TODO: Properly handle this exception
-            return render_template('login.html')
-        except (HTTPError, Timeout) as err:  # There was a connection error
-            flash(str(err))  # TODO: Properly handle this exception
-            return render_template('login.html')
+            flash('Gebruiker ' + s_number + ' is niet gevonden. Probeer het opnieuw.', 'error')
+            return render_template('login.jinja2')
+        except HTTPError as err:  # There was a connection error
+            flash(str(err), 'error')
+            return render_template('login.jinja2')
 
+        # Add session variables to identify the user
         session['user_id'] = user.id
-        flash(user.first_name)  # Display the name as temporary measure TODO: replace this line
-        return redirect(url_for('streeplijst.folder', folder_id=1996))  # Redirect to the streeplijst
+        session['user_first_name'] = user.first_name
+        session['user_s_number'] = user.s_number
+
+        return redirect(url_for('streeplijst.folder'))  # Redirect to the streeplijst
 
 
 @home.route('/logout')
@@ -66,7 +66,10 @@ streeplijst = Blueprint('streeplijst', __name__, url_prefix='/streeplijst')
 
 @streeplijst.route('/')
 def streeplijst_home():
-    return redirect(url_for('streeplijst.folders_main'))
+    if 'user_id' in session:
+        return redirect(url_for('streeplijst.folders_main'))
+    else:
+        pass
 
     if 'user' in session and session['user']:  # If there is a user logged in
         return redirect(url_for('streeplijst.folders_main'))  # TODO: Add a redirect to the home view for streeplijst
@@ -78,27 +81,13 @@ def streeplijst_home():
 def sale():
     print(request.form['item-id'])
     print(request.form['quantity'])
-    return jsonify({'response': 'success'})
+    return jsonify({'response': 'success, but sale is not posted because of testing.'})
 
 
-# Folders home page. Displays all folders to choose products from.
-@streeplijst.route('/folders/main')
-# @cache.cached(timeout=60)  # Set the timeout for folders at 60 seconds. TODO: Do not hard code this value
-def folders_main():
-    folder = db_controller.get_or_create_folder(folder_id=1996, sync=True, force_sync=True, auto_commit=True)
-    # folder = Folder.from_config(folder_name="Koek")
-    return render_template('items.jinja2', folder_items=folder.items)  # TODO: Remove this temporary testing route
-
-    if 'user' in session:
-        folder = Folder.from_config(folder_name="Koek")
-        return render_template('items.jinja2', folder_items=folder.items)
-    else:
-        flash('Log in to see folders')  # Remove this temporary placeholder message
-        return redirect(url_for('login'))
-
-
-# Specific folder pages. Displays all products in the specified folder.
+# Folder contents
+@streeplijst.route('/folder')
 @streeplijst.route('/folder/<int:folder_id>')
-def folder(folder_id):
-    folder = db_controller.get_or_create_folder(folder_id=folder_id, sync=True, force_sync=True, auto_commit=True)
-    return render_template('items.jinja2', folder_items=folder.items)  # TODO: Remove this temporary testing route
+def folder(folder_id=TEST_FOLDER_ID):  # TODO: Change default folder to a more useful folder.
+    if 'user_id' in session:
+        folder = db_controller.get_or_create_folder(folder_id=folder_id, sync=True, force_sync=False, auto_commit=True)
+        return render_template('folder.jinja2', meta_folders=FOLDERS, folder_items=folder.items)

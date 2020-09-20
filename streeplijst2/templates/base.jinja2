@@ -82,8 +82,8 @@
             <button class="rounded-circle border-0" id="sidebarToggle"></button>
         </div>
     </ul> <!-- #accordion-sidebar -->
-
     {% endblock sidebar %}
+
     <!-- Content Wrapper -->
     <div id="regular-content-wrapper" class="container-fluid d-flex flex-column">
         <!-- Actual content -->
@@ -135,8 +135,7 @@
             {% if errors %}
             {%- for msg in errors %}
             <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                <strong>Oh jeetje!</strong>
-                {{ msg }}
+                <h4><strong>Oh jeetje!</strong> {{ msg }}</h4>
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>

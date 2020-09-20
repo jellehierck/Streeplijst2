@@ -2,22 +2,23 @@
 
 {% block title %}Items{% endblock title %}
 
-{% block regular_content_top %}
-<div id="folder-card-deck" class="row"> <!-- Folder overview -->
+{% block regular_content_top %}<!-- Folder overview -->
+<div id="folder-overview" class="row">
 
+    {% for folder in meta_folders.values() %}
+    <!-- Single folder -->
     <div class="col-lg-2 col-md-3 mb-3">
-        <a class="card bg-hover bg-dark text-white shadow">
+        <a class="card bg-hover bg-dark text-white shadow"
+           href="{{ url_for('streeplijst.folder', folder_id = folder['id']) }}">
             <div class="card-body text-center p-3">
-                <img class="bg-hover-img img-profile rounded-circle" style="height:4rem"
-                     src="https://www.paradoks.utwente.nl/_media/889908/5bbaa93d68fb4886974309dd09e3920f/view">
-                <!-- OLD ICON <img class="bg-hover-img img-profile rounded-circle ml-4" style="height:4rem"
-                     src=" {{ url_for('static', filename='/media/icons/ICON_drinks.png') }}"> -->
-                <h4 class="align-middle">Koek</h4>
+                <img class="bg-hover-img img-profile rounded-circle" style="height:4rem" src="{{ folder['media'] }}">
+                <h4 class="align-middle">{{ folder['name'] }}</h4>
             </div>
         </a>
     </div>
+    {% endfor %}
 
-</div> <!-- /#folder-card-deck -->
+</div> <!-- /#folder-overview -->
 
 {% endblock regular_content_top %}
 
