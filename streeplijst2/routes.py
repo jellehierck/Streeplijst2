@@ -64,7 +64,7 @@ def logout():
 streeplijst = Blueprint('streeplijst', __name__, url_prefix='/streeplijst')
 
 
-# Default page anf folder contents
+# Default page and folder contents
 @streeplijst.route('/')  # This is the default page of /streeplijst
 @streeplijst.route('/folder')  # If no folder_id is specified, the default folder is loaded
 @streeplijst.route('/folder/<int:folder_id>')  # When a folder is specified it is loaded
