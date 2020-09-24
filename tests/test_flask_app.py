@@ -1,6 +1,4 @@
 from streeplijst2 import create_app
-from streeplijst2.streeplijst import User, Folder, Sale
-from streeplijst2.config import TEST_USER, TEST_ITEM, TEST_FOLDER_ID
 
 
 def test_config(test_app, db_uri_string):

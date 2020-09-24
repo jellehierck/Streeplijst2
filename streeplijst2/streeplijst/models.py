@@ -2,6 +2,7 @@ from datetime import datetime
 from requests.exceptions import HTTPError, Timeout
 
 from streeplijst2.config import TIMEOUT
+from streeplijst2.models import User
 from streeplijst2.extensions import db
 import streeplijst2.api as api
 
@@ -52,11 +53,11 @@ class Folder(db.Model):
 
     def update(self, **kwargs):
         """
-        Update this folder's data fields using the fields from another folder. NOTE: self.items cannot be updated with
-        this method, synchronize the folder with the API instead.
+        Update this folder's meta fields.
 
-        :param folder: A Folder object with the up-to-date data.
+        :param kwargs: The fields are updated with keyword arguments.
         """
+        # If no kwarg is given for an attribute, set it to the already stored attribute
         self.id = kwargs.get('id', self.id)
         self.name = kwargs.get('name', self.name)
         self.media = kwargs.get('media', self.media)
@@ -106,8 +107,7 @@ class Item(db.Model):
 
         :param kwargs: The fields are updated with keyword arguments.
         """
-        # If no item was given, update any new fields from the kwargs. If no kwarg is given for an attribute, set it
-        # to the already stored attribute
+        # If no kwarg is given for an attribute, set it to the already stored attribute
         self.name = kwargs.get('name', self.name)
         self.id = kwargs.get('id', self.id)
         self.price = kwargs.get('price', self.price)
@@ -117,73 +117,14 @@ class Item(db.Model):
         self.media = kwargs.get('media', self.media)
 
 
-class User(db.Model):
-    # Class attributes for SQLAlchemy
-    __tablename__ = 'user'
-
-    # Table columns
-    id = db.Column(db.Integer, primary_key=True)
-    s_number = db.Column(db.String)
-    first_name = db.Column(db.String)
-    last_name_prefix = db.Column(db.String)
-    last_name = db.Column(db.String)
-    date_of_birth = db.Column(db.DateTime)
-    has_sdd_mandate = db.Column(db.Boolean)
-    profile_picture = db.Column(db.String)
-
-    def __init__(self, s_number: str, id: int, date_of_birth: datetime, first_name: str, last_name: str,
-                 last_name_prefix: str = '', has_sdd_mandate: bool = False, profile_picture: dict = ''):
-        """
-        Create a new User object.
-
-        :param s_number: Student or Employee number (Congressus user name)
-        :param id: Congressus user id
-        :param date_of_birth: Date of Birth (ISO formatted datetime string)
-        :param first_name: First Name
-        :param last_name: Last Name
-        :param last_name_prefix: Last Name Prefix
-        :param has_sdd_mandate: Has this user signed their SDD mandate
-        :param profile_picture: Dict with URL strings to profile pictures
-        """
-        self.s_number = s_number
-        self.id = id
-        self.first_name = first_name
-        self.last_name_prefix = last_name_prefix
-        self.last_name = last_name
-        self.date_of_birth = date_of_birth
-        self.has_sdd_mandate = has_sdd_mandate
-        self.profile_picture = profile_picture
-
-    def update(self, **kwargs):
-        """
-        Update this user's data fields.
-
-        :param kwargs: The fields are updated with keyword arguments.
-        """
-        # If no item was given, update any new fields from the kwargs. If no kwarg is given for an attribute, set it
-        # to the already stored attribute
-        self.s_number = kwargs.get('s_number', self.s_number)
-        self.id = kwargs.get('id', self.id)
-        self.first_name = kwargs.get('first_name', self.first_name)
-        self.last_name_prefix = kwargs.get('last_name_prefix', self.last_name_prefix)
-        self.last_name = kwargs.get('last_name', self.last_name)
-        self.date_of_birth = kwargs.get('date_of_birth', self.date_of_birth)
-        self.has_sdd_mandate = kwargs.get('has_sdd_mandate', self.has_sdd_mandate)
-        self.profile_picture = kwargs.get('profile_picture', self.profile_picture)
-
-
 class Sale(db.Model):
     # Class attributes for SQLAlchemy
     __tablename__ = 'sale'
 
     # Table columns
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # Store sales with a local ID
-    api_id = db.Column(db.Integer)  # Congressus ID
-    # TODO: Change local_id and id to work with DBBase class (probably use self.id for both Congressus and internal id
-    #  and dropping self.local_id)
-    status = db.Column(db.String)
-    created = db.Column(db.DateTime)  # Created date
     quantity = db.Column(db.Integer)  # Quantity of item purchased
+    total_price = db.Column(db.Integer)  # Total price of the sale (quantity * item.price) in cents
     item_name = db.Column(db.String, db.ForeignKey(Item.__tablename__ + '.name'))  # Add a link to the item name
     item = db.relationship(Item,  # Add a column to the item table which links to the sales for that item
                            backref=__tablename__,  # Link back to the sales from the item table
@@ -194,6 +135,11 @@ class Sale(db.Model):
                            backref=__tablename__,  # Link back to the sales from the user table
                            lazy=True)  # Data is only loaded as necessary
 
+    api_id = db.Column(db.Integer)  # Congressus ID
+    # TODO: Change local_id and id to work with DBBase class (probably use self.id for both Congressus and internal id
+    #  and dropping self.local_id)
+    status = db.Column(db.String)
+    created = db.Column(db.DateTime)  # Created date
     error_msg = db.Column(db.String)
 
     def __init__(self, user: User, item: Item, quantity: int):
@@ -207,11 +153,12 @@ class Sale(db.Model):
         self.user = user
         self.item = item
         self.quantity = quantity
+        self.total_price = quantity * self.item.price  # The total price is set
         self.api_id = None  # The congressus id for this sale
         self.created = None  # The datetime this sale was created and posted
         self.status = None  # The status of the API response  # TODO: add a payment type in the future
 
-    def post_sale(self, timeout: float = TIMEOUT):
+    def post_sale(self, timeout: float = TIMEOUT) -> dict:
         """
         POST the sale to Congressus.
 
@@ -221,7 +168,9 @@ class Sale(db.Model):
         product_id = self.item.id
         try:
             response = api.post_sale(user_id, product_id, self.quantity, timeout=timeout)
-            self.api_id = response['id']
+            for item in response['items']: # Adds prices of multiple items. Usually there will only be one item per sale
+                self.total_price += int(item['total_price'])  # Synchronize the total prize with API response
+            self.api_id = int(response['id'])
             self.created = datetime.fromisoformat(response['created'])
             self.status = 'OK'
             return response

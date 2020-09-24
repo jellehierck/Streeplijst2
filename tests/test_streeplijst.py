@@ -2,8 +2,8 @@ import pytest
 from requests.exceptions import HTTPError, Timeout
 
 from streeplijst2.config import TEST_ITEM, TEST_USER, TEST_USER_NO_SDD, TEST_FOLDER_ID
-from streeplijst2.database import LocalDBController as db_controller
-from streeplijst2.streeplijst import Sale
+from streeplijst2.streeplijst.database import StreeplijstDBController as db_controller
+from streeplijst2.streeplijst.models import Sale
 from streeplijst2.api import UserNotSignedException
 
 

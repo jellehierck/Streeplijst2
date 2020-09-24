@@ -11,9 +11,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="description" content="">
-    <meta name="author" content="Tom B">
-
-    <!-- Bootstrap stylesheets -->
+    <meta name="author" content="Jelle H">
 
     <!-- Custom stylesheets -->
     <!-- OLD FILE <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> -->
@@ -27,10 +25,11 @@
     <!-- Template scripts -->
     <script type="text/javascript" src="{{ url_for('static', filename='/vendor/jquery/jquery.min.js') }}"></script>
     <script type="text/javascript"
-            src="{{ url_for('static', filename='/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-    <script type="text/javascript"
             src="{{ url_for('static', filename='/vendor/jquery-easing/jquery.easing.min.js') }}"></script>
 
+    <!-- Bootstrap stylesheets -->
+    <script type="text/javascript"
+            src="{{ url_for('static', filename='/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='/js/sb-admin-2.js') }}"></script>
 
     {% endblock head %}
@@ -43,113 +42,133 @@
 
     <!-- Sidebar -->
     {% block sidebar %}
-    <ul id="accordion-sidebar" class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion toggled">
+    <ul id="sidebar" class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion">
         <!-- Sidebar - Brand -->
-        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/">
-            <img class="img rounded" src="{{ url_for('static', filename='media/icons/ICON_paradoks.jpg') }}"
-                 style="width:60px;">
-            <div class="sidebar-brand-text mx-3">Streeplijst <sup>V2.0</sup></div>
-        </a>
-
-        <!-- Nav Item - Dashboard -->
-        <li class="nav-item active">
-            <a class="nav-link" href="/">
-                <i class="fas fa-fw fa-tachometer-alt"></i>
-                <span>Streeplijst</span></a>
-        </li>
-
-        <!-- Divider -->
-        <hr class="sidebar-divider">
-
-        <!-- Heading -->
-        <div class="sidebar-heading">
-            Evenementen
-        </div>
-
-        <!-- Nav Item - Pages Collapse Menu -->
-        <li class="nav-item">
-            <a class="nav-link" href="/evenementen">
-                <i class="fas fa-fw fa-dice"></i>
-                <span class="font-weight-bold">Inschrijven</span>
+        <li>
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/">
+                <img class="img rounded" src="{{ url_for('static', filename='media/icons/ICON_paradoks.jpg') }}"
+                     style="width:60px;">
+                <div class="sidebar-brand-text mx-3">Streeplijst <sup>V2.0</sup></div>
             </a>
         </li>
 
-        <!-- Divider -->
-        <hr class="sidebar-divider">
+        {% block sidebar_contents %}
 
-        <!-- Sidebar Toggler (Sidebar) -->
-        <div class="text-center d-none d-md-inline">
-            <button class="rounded-circle border-0" id="sidebarToggle"></button>
-        </div>
-    </ul> <!-- #accordion-sidebar -->
+        <!-- Applications -->
+        <li>
+            <div class="sidebar-heading">Applicaties</div>
+        </li>
+        {% block sidebar_applications %}
+        <li class="nav-item active">
+            <a class="nav-link py-1" href="{{ url_for('streeplijst.index') }}">
+                <span>Streeplijst</span>
+            </a>
+        </li>
+        {% endblock sidebar_applications %}
+        <hr class="sidebar-divider pb-4">
+
+        <!-- User -->
+        <li>
+            <div class="sidebar-heading">Gebruiker</div>
+        </li>
+        {% block sidebar_user %}
+
+        {% if session['user_id'] %}
+        <li class="nav-item">
+            <div class="nav-link py-1">
+                <span>
+                    Welkom {{ session['user_first_name'] }}
+                </span>
+            </div>
+        </li>
+        {% block sidebar_user_logged_in %}
+        <li class="nav-item active">
+            <!-- TODO: Add user statistics url here -->
+            <a class="nav-link py-1" href="#">
+                <span>Statistieken</span>
+            </a>
+        </li>
+        {% endblock sidebar_user_logged_in %}
+        {% else %}
+        <li class="nav-item">
+            <div class="nav-link py-1">
+                <span>
+                    Niet ingelogd
+                </span>
+            </div>
+        </li>
+        <li class="nav-item active">
+            <!-- TODO: Add user statistics url here -->
+            <a class="nav-link py-1" href="{{ url_for('home.login') }}">
+                <span>Inloggen</span>
+            </a>
+        </li>
+        {% endif %}
+        {% endblock sidebar_user %}
+        <hr class="sidebar-divider pb-4">
+
+        <!-- Breadcrumbs -->
+        <li class="sidebar-heading">Breadcrumbs
+        </li>
+        {% block sidebar_breadcrumbs %}
+        <li class="nav-item active">
+            <!-- TODO: Add application overview url instead of home.index -->
+            <a class="nav-link py-1" href="{{ url_for('home.index') }}">
+                <span>Applicatie overzicht</span>
+            </a>
+        </li>
+        {% endblock sidebar_breadcrumbs %}
+        <hr class="sidebar-divider pb-4">
+
+        {% endblock sidebar_contents %}
+
+        <!-- Sidebar Toggler -->
+        <!-- DISABLED
+        <li>
+            <div class="text-center d-none d-md-inline">
+                <button class="rounded-circle border-0" id="sidebarToggle"><</button>
+            </div>
+        </li>
+        -->
+
+    </ul> <!-- #sidebar -->
     {% endblock sidebar %}
 
     <!-- Content Wrapper -->
     <div id="regular-content-wrapper" class="container-fluid d-flex flex-column">
         <!-- Actual content -->
         <div id="regular-content" class="container-fluid">
-            <!-- Top bar -->
-            {% block top_bar %}
-            <nav id="top-bar" class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-                <!-- Top bar items -->
-                <div class="navbar-collapse collapse justify-content-between align-items-center w-100">
-                    <!-- Left section -->
-                    <div class="navbar-nav">
-                        {% block top_bar_left_section %}
-                        <!-- Top bar text -->
-                        <div class="navbar-brand">
-                            {% block top_bar_text %}
-                            Streeplijst 2.0
-                            {% endblock top_bar_text %}
-                        </div>
-                        {% endblock top_bar_left_section %}
-                    </div>
 
-                    <!-- Middle section is reserved for messages -->
-                    <ul class="navbar-nav align-items-center">
-                        {% with msgs = get_flashed_messages(category_filter=["message"]) %}
-                        {% if msgs %}
-                        {%- for msg in msgs %}
-                        <li class="nav-item mx-1">
-                            <div class="alert alert-dark my-lg-0" role="alert">
-                                {{ msg }}
-                            </div>
-                        </li>
-                        {% endfor -%}
-                        {% endif %}
-                        {% endwith %}
-                    </ul>
-
-                    <!-- Right section -->
-                    <div class="navbar-nav">
-                        {% block top_bar_right_section %}
-                        <a class="btn btn-primary" href="{{ url_for('home.logout') }}">Log uit</a>
-                        {% endblock top_bar_right_section %}
-                    </div>
+            <!-- Message container -->
+            <div class="container pt-2">
+                <!-- Regular messages -->
+                {% with msgs = get_flashed_messages(category_filter=["message"]) %}
+                {% if msgs %}
+                {%- for msg in msgs %}
+                <div class="alert alert-dark alert-dismissible fade show" role="alert">
+                    <h4>{{ msg }}</h4>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
-            </nav><!-- /#top-bar -->
+                {% endfor -%}
+                {% endif %}
+                {% endwith %}
 
-            {% endblock top_bar %}
-
-            <!-- Error messages -->
-            <!-- These will appear as an alert below the main navigation bar -->
-            {% with errors = get_flashed_messages(category_filter=["error"]) %}
-            {% if errors %}
-            {%- for msg in errors %}
-            <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                <h4><strong>Oh jeetje!</strong> {{ msg }}</h4>
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <!-- Error messages -->
+                {% with errors = get_flashed_messages(category_filter=["error"]) %}
+                {% if errors %}
+                {%- for msg in errors %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <h4><strong>Oh jeetje!</strong> {{ msg }}</h4>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {% endfor -%}
+                {% endif %}
+                {% endwith %}
             </div>
-            {% endfor -%}
-            {% endif %}
-            {% endwith %}
-
-
-            {% block regular_content_top %}
-            <!-- Content in the top section goes here -->
-            {% endblock regular_content_top %}
 
             {% block regular_content %}
             <!-- Content in the main section goes here -->

@@ -1,0 +1,121 @@
+{% extends "streeplijst_base.jinja2" %}
+
+{% block title %}Checkout{% endblock title %}
+
+{% block head %}
+
+{{ super() }}
+<script type="text/javascript" src="{{ url_for('static', filename='/js/jquery.progressBarTimer.min.js') }}"></script>
+
+{% endblock head %}
+
+
+{% block sidebar_breadcrumbs %}
+
+{{ super() }}
+<li class="nav-item active">
+    <a class="nav-link py-1" href="#">
+        <span>Checkout</span>
+    </a>
+</li>
+
+{% endblock sidebar_breadcrumbs %}
+
+
+{% block regular_content %}
+
+{{ super() }}
+
+<div class="container-fluid m-2">
+
+    <!-- Message display -->
+    <h1 class="display-4">Gelukt!</h1>
+
+    {# 'logout_delay|default(10)' sets the logout to 10 seconds, unless another parameter is provided on page load #}
+    <p class="lead">Je hebt de producten hieronder gekocht. Je wordt binnen {{ logout_delay|default(10) }}
+                    seconden automatisch uitgelogd.</p>
+
+    <!-- Debug button TODO: Remove this -->
+    <button id="stop-timer" class="btn btn-primary" type="button">Stop Timer</button>
+
+    <!-- Log out timer -->
+    {# This timer is activated and controlled by the scripts below #}
+    <div id="logout-timer"></div>
+
+    <!-- Line -->
+    <hr class="my-4">
+</div>
+
+<!-- Item card holder -->
+<div id="item-card-deck" class="row justify-content-center">
+    <div class="col-lg-3 col-md-4">
+        <div class="card m-1">
+            <!-- Image image & title -->
+            <div class="container p-1" style="position:relative; height: 15vh;">
+                <img class="card-img-top" src="{{ item.media }}" style="object-fit: contain; height: 100%" alt=" ">
+                <div class="text-center h5 m-0" style="position: absolute; bottom: 0; max-width: 95%">
+                    <span class="badge badge-light opacity-75 text-truncate w-100">{{ item.name|e }}</span>
+                </div>
+            </div>
+
+            <div class="text-center px-1">
+                <!-- Quantity and per-item cost -->
+                <div class="input-group my-1">
+                    <div class="input-group-prepend w-50">
+                        <span class="input-group-text w-100">{{ sale.quantity }} x</span>
+                    </div>
+                    <div class="input-group-append w-50">
+                        <span class="input-group-text w-100">€{{ "%0.2f"|format(item.price|float / 100) }}</span>
+                    </div>
+                </div>
+
+                <!-- Total cost -->
+                <div class="input-group my-1">
+                    <div class="input-group-prepend w-50">
+                        <span class="input-group-text w-100">Tot.</span>
+                    </div>
+                    <div class="input-group-append w-50">
+                        <span class="input-group-text w-100">€{{ "%0.2f"|format(sale.total_price|float / 100) }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock regular_content %}
+
+{% block script %}
+
+{{ super() }}
+
+<script type=text/javascript>
+    {# Set the logout endpoint. This is necessary in the javascript below (url_for is not possible in <script> tags) #}
+    $LOGOUT_ENDPOINT = {{ url_for('home.logout')|tojson|safe }};
+
+    {# Set the default logout delay to 10 seconds, unless another value is passed when loading the page #}
+    $LOGOUT_DELAY = {{ logout_delay|default(10) }}
+</script>
+
+<script>
+    {# This timer uses the jquery.progressBarTimer.js files #}
+    {# https://github.com/imalliar/jquery.progressBarTimer #}
+    $("#logout-timer").progressBarTimer({
+        timeLimit: $LOGOUT_DELAY,
+        autoStart: true,
+        smooth: false,
+        baseStyle: 'bg-secondary',
+        warningStyle: 'bg-secondary',
+        completeStyle: 'bg-secondary',
+        label: {show: true, type: 'seconds'},
+        onFinish: function() {
+            window.location.href = $LOGOUT_ENDPOINT;
+        }
+    });
+
+    $('#stop-timer').click(function() {
+        $('#logout-timer').progressBarTimer().stop();
+    });
+</script>
+
+{% endblock script %}

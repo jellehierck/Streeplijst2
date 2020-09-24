@@ -4,8 +4,7 @@ Contains all Flask logic to connect this Python backend to the HTML frontend.
 import os
 from flask import Flask
 
-from streeplijst2.streeplijst import User, Folder
-from credentials import DEV_KEY  # TODO: Remove this line and replace with decent call to config file
+from streeplijst2.config import DEV_KEY  # TODO: Remove this line and replace with decent call to config file
 
 
 def create_app(config=None):
@@ -40,17 +39,20 @@ def create_app(config=None):
 
     # Set up the database
     from streeplijst2.extensions import db  # Import the database module
-    db.init_app(app)  # Define the database tables and models
+    db.init_app(app)  # Intialize the Flask_SQLAlchemy database
+    import streeplijst2.models  # Import all models (needed to create SQL tables)
+    import streeplijst2.streeplijst.models  # Import all models (needed to create SQL tables)
     with app.app_context():
-        db.create_all()
+        db.create_all()  # Create tables in this app from all models imported before
 
     # Set up caching
     from streeplijst2.extensions import cache
     cache.init_app(app)
 
     # Register all routes
-    from streeplijst2.routes import home, streeplijst
-    app.register_blueprint(home)
-    app.register_blueprint(streeplijst)
+    from streeplijst2.routes import bp_home
+    app.register_blueprint(bp_home)
+    from streeplijst2.streeplijst.routes import bp_streeplijst
+    app.register_blueprint(bp_streeplijst)
 
     return app

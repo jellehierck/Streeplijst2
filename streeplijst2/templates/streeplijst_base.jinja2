@@ -1,0 +1,39 @@
+{% extends "base.jinja2" %}
+
+{% block title %}Streeplijst Base{% endblock title %}
+
+{% block sidebar_breadcrumbs %}
+
+{{ super() }}
+<li class="nav-item active">
+    <a class="nav-link py-1" href="{{ url_for('streeplijst.index') }}">
+        <span>Streeplijst</span>
+    </a>
+</li>
+
+{% endblock sidebar_breadcrumbs %}
+
+{% block regular_content %}
+
+{% block regular_content_top %}
+
+<!-- Folder overview -->
+<div id="folder-overview" class="row">
+
+    {% for folder in meta_folders.values() %}
+    <!-- Single folder -->
+    <div class="col-lg-2 col-md-3 mb-3">
+        <a class="card bg-light text-white shadow" href="{{ url_for('streeplijst.folder', folder_id = folder['id']) }}">
+            <div class="container p-1" style="position:relative; height: 10vh">
+                <img class="card-img-top" src="{{ folder['media'] }}" style="object-fit: contain; height: 100%" alt=" ">
+                <div class="text-center h5 m-0" style="position: absolute; bottom: 0; max-width: 95%">
+                    <span class="badge badge-light opacity-75 text-truncate w-100">{{ folder['name'] }}</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+
+</div> <!-- /#folder-overview -->{% endblock regular_content_top %}
+
+{% endblock regular_content %}
