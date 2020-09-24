@@ -38,7 +38,7 @@ def sale():
     item = db_controller.get_or_create_folder(1998, sync=True, force_sync=True, auto_commit=True)
 
     sale = db_controller.create_sale(item_id=item_id, user_id=user_id, quantity=quantity, auto_commit=True)
-    sale.post_sale()
+    #   sale.post_sale()
     db_controller.commit()
 
     meta_folders = FOLDERS  # The folder metas for all folders are loaded to display at top of the screen

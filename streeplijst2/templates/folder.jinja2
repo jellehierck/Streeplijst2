@@ -2,8 +2,11 @@
 
 {% block title %}Folder Contents{% endblock title %}
 
-{% block regular_content %}<!-- Item card holder -->
+{% block regular_content %}
+
 {{ super() }}
+
+<!-- Item card holder -->
 <div id="item-card-deck" class="row">
 
     {% for item in folder_items %} {# populate the cards in this folder #}
@@ -12,7 +15,7 @@
             <!-- hidden field to store the item-id when the item is loaded. Needed to post the sale -->
             <input name="item-id" type="hidden" value="{{ item.id|e }}">
 
-            <!-- Item image -->
+            <!-- Item image & title -->
             <div class="container p-1" style="position:relative; height: 15vh;">
                 <img class="card-img-top" src="{{ item.media }}" style="object-fit: contain; height: 100%" alt=" ">
                 <div class="text-center h5 m-0" style="position: absolute; bottom: 0; max-width: 95%">
