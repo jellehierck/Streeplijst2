@@ -39,9 +39,11 @@ def create_app(config=None):
 
     # Set up the database
     from streeplijst2.extensions import db  # Import the database module
-    db.init_app(app)  # Define the database tables and models
+    db.init_app(app)  # Intialize the Flask_SQLAlchemy database
+    import streeplijst2.models  # Import all models (needed to create SQL tables)
+    import streeplijst2.streeplijst.models  # Import all models (needed to create SQL tables)
     with app.app_context():
-        db.create_all()
+        db.create_all()  # Create tables in this app from all models imported before
 
     # Set up caching
     from streeplijst2.extensions import cache

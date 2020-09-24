@@ -1,4 +1,4 @@
-from streeplijst2.streeplijst.models import User
+from streeplijst2.models import User
 from streeplijst2.extensions import db
 import streeplijst2.api as api
 from streeplijst2.config import TIMEOUT
