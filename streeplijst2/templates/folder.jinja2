@@ -25,42 +25,6 @@
 
 {% block regular_content %}<!-- Item card holder -->
 <div id="item-card-deck" class="row">
-    <!-- TEST CARD
-    <div class="col-lg-3 col-md-4">
-        <form action="{{ url_for('streeplijst.sale') }}" method="post" class="card m-2">
-            <img class="card-img-top" src="/static/media/backgrounds/BG_Food_1.jpg" alt="Card Image"
-                 style="max-height: 10rem">
-            <div class="card-img-overlay text-center">
-                <h4><span class="badge badge-light opacity-75">Food Item #1</span></h4>
-            </div>
-            <input name="item-id" type="hidden" value="999">
-
-            <div class="text-center px-2">
-                <div class="btn-group btn-group-toggle d-flex my-2" data-toggle="buttons">
-                    <label class="btn btn-secondary active">
-                        <input type="radio" name="quantity" value="1" autocomplete="off" checked> 1
-                    </label>
-                    <label class="btn btn-secondary">
-                        <input type="radio" name="quantity" value="2" autocomplete="off"> 2
-                    </label>
-                    <label class="btn btn-secondary">
-                        <input type="radio" name="quantity" value="3" autocomplete="off"> 3
-                    </label>
-                    <label class="btn btn-secondary">
-                        <input type="radio" name="quantity" value="4" autocomplete="off"> 4
-                    </label>
-                </div>
-                <div class="input-group my-2">
-                    <div class="input-group-prepend w-50">
-                        <span class="input-group-text w-100">€0.69</span>
-                    </div>
-                    <div class="input-group-append w-50">
-                        <button type="submit" class="btn btn-primary w-100">Streep</button>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </div> -->
 
     {% for item in folder_items %} {# populate the cards in this folder #}
     <div class="col-lg-3 col-md-4">
@@ -70,7 +34,7 @@
             <div class="card-img-overlay text-center">
                 <h4><span class="badge badge-light opacity-75">{{ item.name|e }}</span></h4>
             </div>
-            <input name="item-id" id="item-id" type="hidden" value="{{ item.id|e }}">
+            <input name="item-id" type="hidden" value="{{ item.id|e }}">
 
             <div class="text-center px-2">
                 <div class="btn-group btn-group-toggle d-flex my-2" data-toggle="buttons">
