@@ -123,12 +123,8 @@ class Sale(db.Model):
 
     # Table columns
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # Store sales with a local ID
-    api_id = db.Column(db.Integer)  # Congressus ID
-    # TODO: Change local_id and id to work with DBBase class (probably use self.id for both Congressus and internal id
-    #  and dropping self.local_id)
-    status = db.Column(db.String)
-    created = db.Column(db.DateTime)  # Created date
     quantity = db.Column(db.Integer)  # Quantity of item purchased
+    total_price = db.Column(db.Integer)  # Total price of the sale (quantity * item.price) in cents
     item_name = db.Column(db.String, db.ForeignKey(Item.__tablename__ + '.name'))  # Add a link to the item name
     item = db.relationship(Item,  # Add a column to the item table which links to the sales for that item
                            backref=__tablename__,  # Link back to the sales from the item table
@@ -139,6 +135,11 @@ class Sale(db.Model):
                            backref=__tablename__,  # Link back to the sales from the user table
                            lazy=True)  # Data is only loaded as necessary
 
+    api_id = db.Column(db.Integer)  # Congressus ID
+    # TODO: Change local_id and id to work with DBBase class (probably use self.id for both Congressus and internal id
+    #  and dropping self.local_id)
+    status = db.Column(db.String)
+    created = db.Column(db.DateTime)  # Created date
     error_msg = db.Column(db.String)
 
     def __init__(self, user: User, item: Item, quantity: int):
@@ -152,11 +153,12 @@ class Sale(db.Model):
         self.user = user
         self.item = item
         self.quantity = quantity
+        self.total_price = quantity * self.item.price  # The total price is set
         self.api_id = None  # The congressus id for this sale
         self.created = None  # The datetime this sale was created and posted
         self.status = None  # The status of the API response  # TODO: add a payment type in the future
 
-    def post_sale(self, timeout: float = TIMEOUT):
+    def post_sale(self, timeout: float = TIMEOUT) -> dict:
         """
         POST the sale to Congressus.
 
@@ -166,7 +168,9 @@ class Sale(db.Model):
         product_id = self.item.id
         try:
             response = api.post_sale(user_id, product_id, self.quantity, timeout=timeout)
-            self.api_id = response['id']
+            for item in response['items']: # Adds prices of multiple items. Usually there will only be one item per sale
+                self.total_price += int(item['total_price'])  # Synchronize the total prize with API response
+            self.api_id = int(response['id'])
             self.created = datetime.fromisoformat(response['created'])
             self.status = 'OK'
             return response

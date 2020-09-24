@@ -70,6 +70,8 @@ class StreeplijstDBController(DBController):
         cls.add(sale, auto_commit=auto_commit)  # Add the sale to the database
         return sale  # Return the sale
 
+    # TODO: Add a post_sale method which also updates the database
+
     @staticmethod
     def get_item(item_id: int) -> Item:
         """
