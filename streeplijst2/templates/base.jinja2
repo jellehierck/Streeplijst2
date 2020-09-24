@@ -60,32 +60,65 @@
         </li>
         {% block sidebar_applications %}
         <li class="nav-item active">
-            <a class="nav-link py-2" href="{{ url_for('streeplijst.index') }}"><span>Streeplijst</span></a>
+            <a class="nav-link py-1" href="{{ url_for('streeplijst.index') }}">
+                <span>Streeplijst</span>
+            </a>
         </li>
         {% endblock sidebar_applications %}
-        <hr class="sidebar-divider">
+        <hr class="sidebar-divider pb-4">
 
         <!-- User -->
         <li>
             <div class="sidebar-heading">Gebruiker</div>
         </li>
         {% block sidebar_user %}
-        <li class="nav-item active">
-            <a class="nav-link py-2" href="{{ url_for('home.index') }}"><span>Statistieken</span></a>
+
+        {% if session['user_id'] %}
+        <li class="nav-item">
+            <div class="nav-link py-1">
+                <span>
+                    Welkom {{ session['user_first_name'] }}
+                </span>
+            </div>
         </li>
+        {% block sidebar_user_logged_in %}
+        <li class="nav-item active">
+            <!-- TODO: Add user statistics url here -->
+            <a class="nav-link py-1" href="#">
+                <span>Statistieken</span>
+            </a>
+        </li>
+        {% endblock sidebar_user_logged_in %}
+        {% else %}
+        <li class="nav-item">
+            <div class="nav-link py-1">
+                <span>
+                    Niet ingelogd
+                </span>
+            </div>
+        </li>
+        <li class="nav-item active">
+            <!-- TODO: Add user statistics url here -->
+            <a class="nav-link py-1" href="{{ url_for('home.login') }}">
+                <span>Inloggen</span>
+            </a>
+        </li>
+        {% endif %}
         {% endblock sidebar_user %}
-        <hr class="sidebar-divider">
+        <hr class="sidebar-divider pb-4">
 
         <!-- Breadcrumbs -->
-        <li>
-            <div class="sidebar-heading">Breadcrumbs</div>
+        <li class="sidebar-heading">Breadcrumbs
         </li>
         {% block sidebar_breadcrumbs %}
         <li class="nav-item active">
-            <a class="nav-link py-2" href="{{ url_for('home.index') }}"><span>Applicaties</span></a>
+            <!-- TODO: Add application overview url here -->
+            <a class="nav-link py-1" href="#">
+                <span>Applicatie overzicht</span>
+            </a>
         </li>
         {% endblock sidebar_breadcrumbs %}
-        <hr class="sidebar-divider">
+        <hr class="sidebar-divider pb-4">
 
         {% endblock sidebar_contents %}
 
