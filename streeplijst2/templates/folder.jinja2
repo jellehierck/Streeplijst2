@@ -8,11 +8,13 @@
     {% for folder in meta_folders.values() %}
     <!-- Single folder -->
     <div class="col-lg-2 col-md-3 mb-3">
-        <a class="card bg-hover bg-dark text-white shadow"
-           href="{{ url_for('streeplijst.folder', folder_id = folder['id']) }}">
-            <div class="card-body text-center p-3">
-                <img class="bg-hover-img img-profile rounded-circle" style="height:4rem" src="{{ folder['media'] }}">
-                <h4 class="align-middle">{{ folder['name'] }}</h4>
+        <a class="card bg-light text-white shadow" href="{{ url_for('streeplijst.folder', folder_id = folder['id']) }}">
+
+            <div class="container mx-auto" style="position:relative; height: 10vh">
+                <img class="card-img-top" src="{{ folder['media'] }}" style="object-fit: contain; height: 100%" alt=" ">
+                <div class="text-center text-truncate" style="position: absolute; bottom: 0">
+                    <h5><span class="badge badge-light opacity-75">{{ folder['name'] }}</span></h5>
+                </div>
             </div>
         </a>
     </div>
@@ -33,10 +35,10 @@
             <input name="item-id" type="hidden" value="{{ item.id|e }}">
 
             <!-- Item image -->
-            <div class="container mx-auto" style="position:relative; height: 15vh">
+            <div class="container p-1" style="position:relative; height: 15vh;">
                 <img class="card-img-top" src="{{ item.media }}" style="object-fit: contain; height: 100%" alt=" ">
-                <div class="text-center text-truncate" style="position: absolute; bottom: 0">
-                    <h5><span class="badge badge-light opacity-75">{{ item.name|e }}</span></h5>
+                <div class="text-center h5 m-0" style="position: absolute; bottom: 0; max-width: 95%">
+                    <span class="badge badge-light opacity-75 text-truncate w-100">{{ item.name|e }}</span>
                 </div>
             </div>
 
