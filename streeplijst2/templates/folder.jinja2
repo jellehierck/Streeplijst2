@@ -2,6 +2,21 @@
 
 {% block title %}Folder Contents{% endblock title %}
 
+
+{% block sidebar_breadcrumbs %}
+
+{{ super() }}
+<li class="nav-item active">
+    <a class="nav-link py-1" href="{{ url_for('streeplijst.folder', folder_id=folder.id) }}">
+        <span class="d-inline-block text-truncate" style="max-width: 100%">
+            Folder: {{ folder.name }}
+        </span>
+    </a>
+</li>
+
+{% endblock sidebar_breadcrumbs %}
+
+
 {% block regular_content %}
 
 {{ super() }}
@@ -9,7 +24,7 @@
 <!-- Item card holder -->
 <div id="item-card-deck" class="row">
 
-    {% for item in folder_items %} {# populate the cards in this folder #}
+    {% for item in folder.items %} {# populate the cards in this folder #}
     <div class="col-lg-3 col-md-4">
         <form class="card m-1" action="{{ url_for('streeplijst.sale') }}" method="post">
             <!-- hidden field to store the item-id when the item is loaded. Needed to post the sale -->

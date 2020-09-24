@@ -9,6 +9,19 @@
 
 {% endblock head %}
 
+
+{% block sidebar_breadcrumbs %}
+
+{{ super() }}
+<li class="nav-item active">
+    <a class="nav-link py-1" href="#">
+        <span>Checkout</span>
+    </a>
+</li>
+
+{% endblock sidebar_breadcrumbs %}
+
+
 {% block regular_content %}
 
 {{ super() }}

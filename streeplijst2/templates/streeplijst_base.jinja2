@@ -2,6 +2,17 @@
 
 {% block title %}Streeplijst Base{% endblock title %}
 
+{% block sidebar_breadcrumbs %}
+
+{{ super() }}
+<li class="nav-item active">
+    <a class="nav-link py-1" href="{{ url_for('streeplijst.index') }}">
+        <span>Streeplijst</span>
+    </a>
+</li>
+
+{% endblock sidebar_breadcrumbs %}
+
 {% block regular_content %}
 
 {% block regular_content_top %}

@@ -24,7 +24,7 @@ def folder(folder_id=1998):  # TODO: Change default folder to a more useful fold
     if 'user_id' in session:
         folder = db_controller.get_or_create_folder(folder_id=folder_id, sync=True, force_sync=False, auto_commit=True)
         meta_folders = FOLDERS  # The folder metas for all folders are loaded to display at top of the screen
-        return render_template('folder.jinja2', meta_folders=meta_folders, folder_items=folder.items)
+        return render_template('folder.jinja2', meta_folders=meta_folders, folder=folder)
     else:
         flash('Log eerst in.', 'message')
         return redirect(url_for('home.login'))

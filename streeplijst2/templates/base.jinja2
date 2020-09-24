@@ -112,8 +112,8 @@
         </li>
         {% block sidebar_breadcrumbs %}
         <li class="nav-item active">
-            <!-- TODO: Add application overview url here -->
-            <a class="nav-link py-1" href="#">
+            <!-- TODO: Add application overview url instead of home.index -->
+            <a class="nav-link py-1" href="{{ url_for('home.index') }}">
                 <span>Applicatie overzicht</span>
             </a>
         </li>
