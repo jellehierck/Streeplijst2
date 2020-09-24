@@ -17,10 +17,12 @@
 
     <!-- Message display -->
     <h1 class="display-4">Gelukt!</h1>
+
     {# 'logout_delay|default(10)' sets the logout to 10 seconds, unless another parameter is provided on page load #}
     <p class="lead">Je hebt de producten hieronder gekocht. Je wordt binnen {{ logout_delay|default(10) }}
                     seconden automatisch uitgelogd.</p>
 
+    <!-- Debug button TODO: Remove this -->
     <button id="stop-timer" class="btn btn-primary" type="button">Stop Timer</button>
 
     <!-- Log out timer -->

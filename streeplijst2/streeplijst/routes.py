@@ -12,6 +12,12 @@ bp_streeplijst = Blueprint('streeplijst', __name__, url_prefix='/streeplijst')
 
 # Default page and folder contents
 @bp_streeplijst.route('/')  # This is the default page of /streeplijst
+@bp_streeplijst.route('/index')  # This is the default page of /streeplijst
+@bp_streeplijst.route('/home')  # This is the default page of /streeplijst
+def index():
+    return redirect(url_for('streeplijst.folder'))
+
+
 @bp_streeplijst.route('/folder')  # If no folder_id is specified, the default folder is loaded
 @bp_streeplijst.route('/folder/<int:folder_id>')  # When a folder is specified it is loaded
 def folder(folder_id=1998):  # TODO: Change default folder to a more useful folder.

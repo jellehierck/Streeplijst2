@@ -21,6 +21,7 @@ def hello():
 # Landing page
 @bp_home.route('/')
 @bp_home.route('/home')
+@bp_home.route('/index')
 def index():
     return redirect(url_for('home.login'))
 

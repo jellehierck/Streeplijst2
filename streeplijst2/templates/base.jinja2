@@ -42,45 +42,63 @@
 
     <!-- Sidebar -->
     {% block sidebar %}
-    <ul id="accordion-sidebar" class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion toggled">
+    <ul id="sidebar" class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion">
         <!-- Sidebar - Brand -->
-        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/">
-            <img class="img rounded" src="{{ url_for('static', filename='media/icons/ICON_paradoks.jpg') }}"
-                 style="width:60px;">
-            <div class="sidebar-brand-text mx-3">Streeplijst <sup>V2.0</sup></div>
-        </a>
-
-        <!-- Nav Item - Dashboard -->
-        <li class="nav-item active">
-            <a class="nav-link" href="/">
-                <i class="fas fa-fw fa-tachometer-alt"></i>
-                <span>Streeplijst</span></a>
-        </li>
-
-        <!-- Divider -->
-        <hr class="sidebar-divider">
-
-        <!-- Heading -->
-        <div class="sidebar-heading">
-            Evenementen
-        </div>
-
-        <!-- Nav Item - Pages Collapse Menu -->
-        <li class="nav-item">
-            <a class="nav-link" href="/evenementen">
-                <i class="fas fa-fw fa-dice"></i>
-                <span class="font-weight-bold">Inschrijven</span>
+        <li>
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/">
+                <img class="img rounded" src="{{ url_for('static', filename='media/icons/ICON_paradoks.jpg') }}"
+                     style="width:60px;">
+                <div class="sidebar-brand-text mx-3">Streeplijst <sup>V2.0</sup></div>
             </a>
         </li>
 
-        <!-- Divider -->
+        {% block sidebar_contents %}
+
+        <!-- Applications -->
+        <li>
+            <div class="sidebar-heading">Applicaties</div>
+        </li>
+        {% block sidebar_applications %}
+        <li class="nav-item active">
+            <a class="nav-link py-2" href="{{ url_for('streeplijst.index') }}"><span>Streeplijst</span></a>
+        </li>
+        {% endblock sidebar_applications %}
         <hr class="sidebar-divider">
 
-        <!-- Sidebar Toggler (Sidebar) -->
-        <div class="text-center d-none d-md-inline">
-            <button class="rounded-circle border-0" id="sidebarToggle"></button>
-        </div>
-    </ul> <!-- #accordion-sidebar -->
+        <!-- User -->
+        <li>
+            <div class="sidebar-heading">Gebruiker</div>
+        </li>
+        {% block sidebar_user %}
+        <li class="nav-item active">
+            <a class="nav-link py-2" href="{{ url_for('home.index') }}"><span>Statistieken</span></a>
+        </li>
+        {% endblock sidebar_user %}
+        <hr class="sidebar-divider">
+
+        <!-- Breadcrumbs -->
+        <li>
+            <div class="sidebar-heading">Breadcrumbs</div>
+        </li>
+        {% block sidebar_breadcrumbs %}
+        <li class="nav-item active">
+            <a class="nav-link py-2" href="{{ url_for('home.index') }}"><span>Applicaties</span></a>
+        </li>
+        {% endblock sidebar_breadcrumbs %}
+        <hr class="sidebar-divider">
+
+        {% endblock sidebar_contents %}
+
+        <!-- Sidebar Toggler -->
+        <!-- DISABLED
+        <li>
+            <div class="text-center d-none d-md-inline">
+                <button class="rounded-circle border-0" id="sidebarToggle"><</button>
+            </div>
+        </li>
+        -->
+
+    </ul> <!-- #sidebar -->
     {% endblock sidebar %}
 
     <!-- Content Wrapper -->
