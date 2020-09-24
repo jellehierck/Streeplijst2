@@ -37,7 +37,7 @@ class Folder(db.Model):
         self.id = id
         self.media = media
         self.items = []  # There are no items in the non-synchronized folder
-        self.last_synchronized = datetime.min  # The folder has not been synchronized upon initialization
+        self.last_synchronized = datetime.min  # Set date very far in the past
 
     def get_item(self, item_id):
         """
@@ -62,7 +62,6 @@ class Folder(db.Model):
         self.name = kwargs.get('name', self.name)
         self.media = kwargs.get('media', self.media)
         # self.items = kwargs.get('items', self.items)  # The items cannot be updated, they need to be synced with API
-        self.last_synchronized = kwargs.get('last_synchronized', self.last_synchronized)
 
 
 class Item(db.Model):
