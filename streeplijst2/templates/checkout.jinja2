@@ -2,12 +2,30 @@
 
 {% block title %}Checkout{% endblock title %}
 
+{% block head %}
+
+{{ super() }}
+<script type="text/javascript" src="{{ url_for('static', filename='/js/jquery.progressBarTimer.min.js') }}"></script>
+
+{% endblock head %}
+
 {% block regular_content %}
 
 {{ super() }}
 
 <div class="container-fluid m-2">
-    <!-- Here some more user-specific information will go -->
+
+    <!-- Message display -->
+    <h1 class="display-4">Gelukt!</h1>
+    {# 'logout_delay|default(10)' sets the logout to 10 seconds, unless another parameter is provided on page load #}
+    <p class="lead">Je hebt de producten hieronder gekocht. Je wordt binnen {{ logout_delay|default(10) }}
+                    seconden automatisch uitgelogd.</p>
+
+    <!-- Log out timer -->
+    {# This timer is activated and controlled by the scripts below #}
+    <div id="logout-timer"></div>
+
+    <hr class="my-4">
 </div>
 
 <!-- Item card holder -->
@@ -43,11 +61,39 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
-
 </div>
 
-
 {% endblock regular_content %}
+
+{% block script %}
+
+{{ super() }}
+
+<script type=text/javascript>
+    {# Set the logout endpoint. This is necessary in the javascript below (url_for is not possible in <script> tags) #}
+    $LOGOUT_ENDPOINT = {{ url_for('home.logout')|tojson|safe }};
+
+    {# Set the default logout delay to 10 seconds, unless another value is passed when loading the page #}
+    $LOGOUT_DELAY = {{ logout_delay|default(10) }}
+</script>
+
+<script>
+    {# This timer uses the jquery.progressBarTimer.js files #}
+    {# https://github.com/imalliar/jquery.progressBarTimer #}
+    $("#logout-timer").progressBarTimer({
+        timeLimit: 10,
+        autoStart: true,
+        smooth: false,
+        label: {
+            show: true,
+            type: 'seconds',
+        },
+        onFinish: function() {
+            window.location.href = $LOGOUT_ENDPOINT;
+        }
+    });
+</script>
+
+{% endblock script %}
