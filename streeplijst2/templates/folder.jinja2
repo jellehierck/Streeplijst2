@@ -28,16 +28,22 @@
 
     {% for item in folder_items %} {# populate the cards in this folder #}
     <div class="col-lg-3 col-md-4">
-        <form action="{{ url_for('streeplijst.sale') }}" method="post" class="card m-2">
-            <img class="card-img-top" src="{{ item.media }}" alt="Card Image" style="max-height: 15rem">
-            <!-- TODO: Change the max-height to have a more responsive image -->
-            <div class="card-img-overlay text-center">
-                <h4><span class="badge badge-light opacity-75">{{ item.name|e }}</span></h4>
-            </div>
+        <form class="card m-1" action="{{ url_for('streeplijst.sale') }}" method="post">
+            <!-- hidden field to store the item-id when the item is loaded. Needed to post the sale -->
             <input name="item-id" type="hidden" value="{{ item.id|e }}">
 
-            <div class="text-center px-2">
-                <div class="btn-group btn-group-toggle d-flex my-2" data-toggle="buttons">
+            <!-- Item image -->
+            <div class="container mx-auto" style="position:relative; height: 15vh">
+                <img class="card-img-top" src="{{ item.media }}" style="object-fit: contain; height: 100%" alt=" ">
+                <div class="text-center text-truncate" style="position: absolute; bottom: 0">
+                    <h5><span class="badge badge-light opacity-75">{{ item.name|e }}</span></h5>
+                </div>
+            </div>
+
+            <!-- Card body -->
+            <div class="text-center px-1">
+                <!-- Quantity buttons -->
+                <div class="btn-group btn-group-toggle d-flex my-1" data-toggle="buttons">
                     <label class="btn btn-secondary active">
                         <input type="radio" name="quantity" value="1" autocomplete="off" checked> 1
                     </label>
@@ -51,11 +57,11 @@
                         <input type="radio" name="quantity" value="4" autocomplete="off"> 4
                     </label>
                 </div>
-                <div class="input-group my-2">
+
+                <!-- Price display & submit button -->
+                <div class="input-group my-1">
                     <div class="input-group-prepend w-50">
-                                    <span class="input-group-text w-100">
-                                        €{{ "%0.2f"|format(item.price|float / 100) }}
-                                    </span>
+                        <span class="input-group-text w-100">€{{ "%0.2f"|format(item.price|float / 100) }}</span>
                     </div>
                     <div class="input-group-append w-50">
                         <button type="submit" class="btn btn-primary w-100">Streep</button>
