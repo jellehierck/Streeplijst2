@@ -21,10 +21,13 @@
     <p class="lead">Je hebt de producten hieronder gekocht. Je wordt binnen {{ logout_delay|default(10) }}
                     seconden automatisch uitgelogd.</p>
 
+    <button id="stop-timer" class="btn btn-primary" type="button">Stop Timer</button>
+
     <!-- Log out timer -->
     {# This timer is activated and controlled by the scripts below #}
     <div id="logout-timer"></div>
 
+    <!-- Line -->
     <hr class="my-4">
 </div>
 
@@ -83,16 +86,20 @@
     {# This timer uses the jquery.progressBarTimer.js files #}
     {# https://github.com/imalliar/jquery.progressBarTimer #}
     $("#logout-timer").progressBarTimer({
-        timeLimit: 10,
+        timeLimit: $LOGOUT_DELAY,
         autoStart: true,
         smooth: false,
-        label: {
-            show: true,
-            type: 'seconds',
-        },
+        baseStyle: 'bg-secondary',
+        warningStyle: 'bg-secondary',
+        completeStyle: 'bg-secondary',
+        label: {show: true, type: 'seconds'},
         onFinish: function() {
             window.location.href = $LOGOUT_ENDPOINT;
         }
+    });
+
+    $('#stop-timer').click(function() {
+        $('#logout-timer').progressBarTimer().stop();
     });
 </script>
 
