@@ -38,6 +38,7 @@ def sale():
     # quantity = request.form['quantity']
     # user_id = session['user_id']
 
+    # TODO: remove the following test parameters and uncomment the block above
     item_id = 13591
     quantity = 1
     user_id = 347980
@@ -46,9 +47,8 @@ def sale():
     item = db_controller.get_or_create_folder(1998, sync=True, force_sync=True, auto_commit=True)
 
     sale = db_controller.create_sale(item_id=item_id, user_id=user_id, quantity=quantity, auto_commit=True)
-    #   sale.post_sale()
+    #   sale.post_sale()  # TODO: Uncomment this line to post the sale
     db_controller.commit()
 
     meta_folders = FOLDERS  # The folder metas for all folders are loaded to display at top of the screen
     return render_template('checkout.jinja2', meta_folders=meta_folders, sale=sale, item=sale.item, user=sale.user)
-    # return jsonify({'response': 'success, but sale is not posted because of testing.'})
