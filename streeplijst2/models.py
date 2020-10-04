@@ -16,6 +16,8 @@ class User(db.Model):
     date_of_birth = db.Column(db.DateTime)
     has_sdd_mandate = db.Column(db.Boolean)
     profile_picture = db.Column(db.String)
+    created = db.Column(db.DateTime)
+    last_updated = db.Column(db.DateTime)
 
     def __init__(self, s_number: str, id: int, date_of_birth: datetime, first_name: str, last_name: str,
                  last_name_prefix: str = '', has_sdd_mandate: bool = False, profile_picture: dict = ''):
@@ -39,6 +41,8 @@ class User(db.Model):
         self.date_of_birth = date_of_birth
         self.has_sdd_mandate = has_sdd_mandate
         self.profile_picture = profile_picture
+        self.created = datetime.now()
+        self.last_updated = datetime.now()
 
     def update(self, **kwargs):
         """
@@ -46,6 +50,8 @@ class User(db.Model):
 
         :param kwargs: The fields are updated with keyword arguments.
         """
+        self.last_updated = datetime.now()
+
         # If no kwarg is given for an attribute, set it to the already stored attribute
         self.s_number = kwargs.get('s_number', self.s_number)
         self.id = kwargs.get('id', self.id)

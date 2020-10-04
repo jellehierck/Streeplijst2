@@ -7,23 +7,14 @@ from streeplijst2.extensions import db
 import streeplijst2.api as api
 
 
-# class DBBase(db.Model):
-#     # TODO: add a base class here
-#     id = None
-#     last_updated = None
-#     created = None
-#
-#     def update(self):
-#         pass
-
-
 class Folder(db.Model):
     # Class attributes for SQLAlchemy
     __tablename__ = 'folder'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
     media = db.Column(db.String)
-    last_synchronized = db.Column(db.DateTime)  # The folder has not been updated upon initialization
+    created = db.Column(db.DateTime)
+    last_synchronized = db.Column(db.DateTime)
 
     def __init__(self, name: str, id: int, media: str = ''):
         """
@@ -37,6 +28,8 @@ class Folder(db.Model):
         self.id = id
         self.media = media
         self.items = []  # There are no items in the non-synchronized folder
+
+        self.created = datetime.now()
         self.last_synchronized = datetime.min  # Set date very far in the past
 
     def get_item(self, item_id):
@@ -79,6 +72,8 @@ class Item(db.Model):
                              backref=__tablename__,  # Link back to the items from the folders table
                              lazy=True,  # Data is only loaded as necessary
                              )
+    created = db.Column(db.DateTime)
+    last_updated = db.Column(db.DateTime)
 
     def __init__(self, name: str, id: int, price: int, folder: Folder, folder_id: int, published: bool, media: str):
         """
@@ -99,6 +94,8 @@ class Item(db.Model):
         self.folder_id = folder_id
         self.published = published
         self.media = media
+        self.created = datetime.now()
+        self.last_updated = datetime.now()
 
     def update(self, **kwargs):
         """
@@ -106,6 +103,8 @@ class Item(db.Model):
 
         :param kwargs: The fields are updated with keyword arguments.
         """
+        self.last_updated = datetime.now()
+
         # If no kwarg is given for an attribute, set it to the already stored attribute
         self.name = kwargs.get('name', self.name)
         self.id = kwargs.get('id', self.id)
@@ -134,11 +133,12 @@ class Sale(db.Model):
                            backref=__tablename__,  # Link back to the sales from the user table
                            lazy=True)  # Data is only loaded as necessary
 
+    created = db.Column(db.DateTime)
+    last_updated = db.Column(db.DateTime)
+
     api_id = db.Column(db.Integer)  # Congressus ID
-    # TODO: Change local_id and id to work with DBBase class (probably use self.id for both Congressus and internal id
-    #  and dropping self.local_id)
+    api_created = db.Column(db.DateTime)  # Created according to the API
     status = db.Column(db.String)
-    created = db.Column(db.DateTime)  # Created date
     error_msg = db.Column(db.String)
 
     def __init__(self, user: User, item: Item, quantity: int):
@@ -153,8 +153,10 @@ class Sale(db.Model):
         self.item = item
         self.quantity = quantity
         self.total_price = quantity * self.item.price  # The total price is set
+        self.created = datetime.now()
+        self.last_updated = datetime.now()
         self.api_id = None  # The congressus id for this sale
-        self.created = None  # The datetime this sale was created and posted
+        self.api_created = None  # The datetime this sale was created and posted
         self.status = None  # The status of the API response  # TODO: add a payment type in the future
 
     def post_sale(self, timeout: float = TIMEOUT) -> dict:
@@ -165,6 +167,9 @@ class Sale(db.Model):
         """
         user_id = self.user.id
         product_id = self.item.id
+
+        self.last_updated = datetime.now()
+
         try:
             response = api.post_sale(user_id, product_id, self.quantity, timeout=timeout)
             for item in response['items']: # Adds prices of multiple items. Usually there will only be one item per sale
