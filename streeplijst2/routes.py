@@ -1,9 +1,28 @@
-from flask import redirect, url_for, render_template, request, flash, session, jsonify, Blueprint
+from flask import redirect, url_for, render_template, request, flash, session, Blueprint
 
 from requests.exceptions import HTTPError
+from functools import wraps  # Used in the login_required decorator function
 
 from streeplijst2.database import DBController as db_controller
 from streeplijst2.api import UserNotFoundException
+
+
+def login_required(func):
+    """
+    Decorator function: Redirects the user to the login page if they are not logged in. Based on
+    https://realpython.com/primer-on-python-decorators/#is-the-user-logged-in.
+
+    :param func: Function to be decorated
+    :return: A redirect to home.login if there is no user currently logged in.
+    """
+    @wraps(func)  # functools wrapper used to preserve function information between calls (best practise for decorators)
+    def wrapper_login_required(*args, **kwargs):
+        if 'user_id' not in session:  # If there is no user logged in, redirect them to the login page
+            return redirect(url_for("home.login"))
+        return func(*args, **kwargs)  # If a user is logged in, execute the function normally
+
+    return wrapper_login_required
+
 
 ##################
 # Home blueprint #
@@ -16,6 +35,13 @@ bp_home = Blueprint('home', __name__)
 @bp_home.route('/hello')
 def hello():
     return "Hello, World!"
+
+
+# Hello world response as test message for logged in users
+@bp_home.route('/secret_hello')
+@login_required
+def secret_hello():
+    return "Hello, Secret World!"
 
 
 # Landing page

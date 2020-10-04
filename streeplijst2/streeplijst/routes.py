@@ -1,6 +1,7 @@
-from flask import redirect, url_for, render_template, request, flash, session, jsonify, Blueprint
+from flask import redirect, url_for, render_template, flash, session, Blueprint
 
 from streeplijst2.config import FOLDERS
+from streeplijst2.routes import login_required
 from streeplijst2.streeplijst.database import StreeplijstDBController as db_controller
 
 ##################################
@@ -14,6 +15,7 @@ bp_streeplijst = Blueprint('streeplijst', __name__, url_prefix='/streeplijst')
 @bp_streeplijst.route('/')  # This is the default page of /streeplijst
 @bp_streeplijst.route('/index')  # This is the default page of /streeplijst
 @bp_streeplijst.route('/home')  # This is the default page of /streeplijst
+@login_required  # First check if the user is logged in.
 def index():
     return redirect(url_for('streeplijst.folder'))
 
