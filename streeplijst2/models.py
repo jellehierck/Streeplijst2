@@ -22,7 +22,8 @@ class User(db.Model):
 
     def __init__(self, **kwargs) -> None:
         """
-        Create a new user.
+        Instantiates a User object.
+
         :param id: Congressus user id.
         :param s_number: Student or Employee number (Congressus user name)
         :param first_name: First name.

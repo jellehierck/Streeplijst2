@@ -9,27 +9,29 @@ import streeplijst2.api as api
 
 class Folder(db.Model):
     # Class attributes for SQLAlchemy
-    __tablename__ = 'folder'
+    __tablename__ = 'folders'
+
+    # Table columns
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
-    media = db.Column(db.String)
-    created = db.Column(db.DateTime)
-    last_synchronized = db.Column(db.DateTime)
+    media = db.Column(db.String, nullable=True)
+    synchronized = db.Column(db.DateTime)  # When was this folder last synchronized with the API
 
-    def __init__(self, name: str, id: int, media: str = ''):
+    created = db.Column(db.DateTime)
+    updated = db.Column(db.DateTime)
+
+    def __init__(self, **kwargs):
         """
         Instantiates a Folder object.
 
-        :param name: Folder name
-        :param id: Folder id
-        :param media: (optional) Image URL
+        :param name: Folder name.
+        :param id: Folder id.
+        :param media: (optional) Image URL.
         """
-        self.name = name
-        self.id = id
-        self.media = media
-        self.items = []  # There are no items in the non-synchronized folder
+        super().__init__(**kwargs)
 
         self.created = datetime.now()
+        self.updated = datetime.now()
         self.last_synchronized = datetime.min  # Set date very far in the past
 
     def get_item(self, item_id):

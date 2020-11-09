@@ -104,6 +104,84 @@ class ItemController:
         return Item.query.filter_by(folder_id=folder_id).all()
 
 
+class FolderController:
+
+    @classmethod
+    def create(cls, id: int, name: str, media: str = None) -> Folder:
+        """
+        Instantiate a Folder object and store it in the database.
+
+        :param name: Folder name.
+        :param id: Folder id.
+        :param media: (optional) Image URL.
+        :return: The folder.
+        """
+        if cls.get(id=id) is not None:  # Check if the item already exists, if so, update and return it
+            return cls.update(id=id, name=name, media=media)
+
+        # If the item does not exist yet, create it
+        new_folder = Folder(id=id, name=name, media=media)
+        db.session.add(new_folder)
+        db.session.commit()
+        return new_folder
+
+    @classmethod
+    def update(cls, id: int, **kwargs) -> Folder:
+        """
+        Update this folder's data fields.
+
+        :param id: The item ID of the folder to update.
+        :param kwargs: The fields are updated with keyword arguments.
+        :return: The updated folder.
+        """
+        modified_folder = Item.query.get(id=id)
+
+        # If no kwarg is given for an attribute, set it to the already stored attribute
+        modified_folder.name = kwargs.get('name', modified_folder.name)
+        modified_folder.id = kwargs.get('id', modified_folder.id)
+        modified_folder.media = kwargs.get('media', modified_folder.media)
+
+        modified_folder.last_updated = datetime.now()
+        db.session.commit()
+
+        return modified_folder
+
+    @classmethod
+    def delete(cls, id: int) -> Folder:
+        """
+        Delete a folder.
+
+        :param id: ID of the folder to delete.
+        :return: The deleted folder.
+        """
+        deleted_folder = Folder.query.get(id=id)
+        db.session.delete(deleted_folder)
+        db.session.commit()
+
+        return deleted_folder
+
+    @classmethod
+    def list_all(cls) -> list:
+        """
+        List all folders sorted by id.
+
+        :return: A List of all folders.
+        """
+        # TODO: Add a way to sort result differently
+        return Folder.query.order_by(asc(id=Folder.id)).all()
+
+    @classmethod
+    def get(cls, id: int) -> Folder:
+        """
+        Return the folder with that id.
+
+        :param id: The id to get the folder by.
+        :return: The folder.
+        """
+        return Folder.query.get(id=id)
+
+
+
 # class StreeplijstDBController(DBController):
 #
 #     @classmethod
