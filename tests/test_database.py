@@ -2,7 +2,7 @@ import pytest
 
 from streeplijst2.database import UserController
 
-from datetime import date
+from datetime import datetime
 
 TEST_USER = dict({
     'id': 1,
@@ -10,7 +10,7 @@ TEST_USER = dict({
     'first_name': 'Test',
     'last_name_prefix': 'the',
     'last_name': 'Testuser',
-    'date_of_birth': date.fromisocalendar(2000, 1, 1),
+    'date_of_birth': datetime.fromisocalendar(2000, 1, 1),
     'has_sdd_mandate': True,
     'profile_picture': None
 })
@@ -21,7 +21,7 @@ TEST_USER_DUP = dict({
     'first_name': 'Test',
     'last_name_prefix': 'the',
     'last_name': 'Testuser',
-    'date_of_birth': date.fromisocalendar(2000, 1, 1),
+    'date_of_birth': datetime.fromisocalendar(2000, 1, 1),
     'has_sdd_mandate': True,
     'profile_picture': None
 })
@@ -32,7 +32,7 @@ TEST_USER_EXTRA_FIELDS = dict({
     'first_name': 'Test',
     'last_name_prefix': 'the',
     'last_name': 'Testuser',
-    'date_of_birth': date.fromisocalendar(2000, 1, 1),
+    'date_of_birth': datetime.fromisocalendar(2000, 1, 1),
     'has_sdd_mandate': True,
     'profile_picture': None,
     'email': 'hello@world.com'
@@ -43,7 +43,7 @@ TEST_USER_UPDATED = dict({
     'first_name': 'Test2',
     'last_name_prefix': 'the',
     'last_name': 'Testuser2',
-    'date_of_birth': date.fromisocalendar(2001, 2, 2),
+    'date_of_birth': datetime.fromisocalendar(2001, 2, 2),
     'has_sdd_mandate': False,
 })
 
@@ -53,7 +53,7 @@ TEST_USER_2 = dict({
     'first_name': 'Test2',
     'last_name_prefix': 'the',
     'last_name': 'Testuser2',
-    'date_of_birth': date.fromisocalendar(2000, 1, 1),
+    'date_of_birth': datetime.fromisocalendar(2000, 1, 1),
     'has_sdd_mandate': True,
     'profile_picture': None
 })

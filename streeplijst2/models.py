@@ -14,7 +14,7 @@ class User(db.Model):
     first_name = db.Column(db.String)
     last_name_prefix = db.Column(db.String, nullable=True)
     last_name = db.Column(db.String)
-    date_of_birth = db.Column(db.Date)
+    date_of_birth = db.Column(db.DateTime)
     has_sdd_mandate = db.Column(db.Boolean)
     profile_picture = db.Column(db.String, nullable=True)
 
