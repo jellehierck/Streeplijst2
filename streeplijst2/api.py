@@ -115,9 +115,15 @@ def get_user(s_number: str, timeout: float = TIMEOUT):
 
     user_list = json.loads(res.text)  # Convert response to a list of dicts. Congressus always sends a list of objects
     result = user_list[0]  # There will only be one user in this list, so we select the first user
+
+    # Normalize the result fields
     result['date_of_birth'] = datetime.fromisoformat(result['date_of_birth'])
+    result['s_number'] = result.pop('username', None)  # Rename the username field to s_number
+    result['last_name'] = result.pop('primary_last_name_main', None)  # Rename to last_name
+    result['last_name_prefix'] = result.pop('primary_last_name_prefix', None)  # Rename to last_name_prefix
     _normalize_profile_picture(result)
-    return result  # We return the first dict in the list since there should be only one object in the list.
+
+    return result
 
 
 def post_sale(user_id: int, product_id: int, quantity: int, timeout: float = TIMEOUT):

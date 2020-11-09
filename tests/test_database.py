@@ -26,6 +26,18 @@ TEST_USER_DUP = dict({
     'profile_picture': None
 })
 
+TEST_USER_EXTRA_FIELDS = dict({
+    'id': 1,
+    's_number': 's9999999',
+    'first_name': 'Test',
+    'last_name_prefix': 'the',
+    'last_name': 'Testuser',
+    'date_of_birth': date.fromisocalendar(2000, 1, 1),
+    'has_sdd_mandate': True,
+    'profile_picture': None,
+    'email': 'hello@world.com'
+})
+
 TEST_USER_UPDATED = dict({
     's_number': 's9999990',
     'first_name': 'Test2',
@@ -52,6 +64,15 @@ def test_create_user(test_app):
         user = UserController.create(**TEST_USER)
         for (key, value) in TEST_USER.items():  # Make sure all fields are stored correctly
             assert user.__getattribute__(key) == value
+
+
+def test_create_user_extra_fields(test_app):
+    with test_app.app_context():
+        user = UserController.create(**TEST_USER_EXTRA_FIELDS)  # Create a user with fields which are not needed
+        required_fields = ((key, value) for (key, value) in TEST_USER_EXTRA_FIELDS.items() if key != 'email')
+        for (key, value) in required_fields:  # Make sure all fields are stored correctly
+            assert user.__getattribute__(key) == value
+        assert hasattr(user, 'email') is False
 
 
 def test_create_user_duplicate(test_app):

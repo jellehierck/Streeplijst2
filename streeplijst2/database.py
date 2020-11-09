@@ -12,7 +12,7 @@ class UserController:
 
     @classmethod
     def create(cls, id: int, s_number: str, first_name: str, last_name: str, date_of_birth: date,
-               last_name_prefix: str = None, has_sdd_mandate: bool = False, profile_picture: str = None):
+               last_name_prefix: str = None, has_sdd_mandate: bool = False, profile_picture: str = None, **kwargs):
         """
         Create a new user and store it in the database.
         :param id: Congressus user id.
