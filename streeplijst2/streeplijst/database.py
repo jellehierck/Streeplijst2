@@ -43,7 +43,7 @@ class ItemController:
         :param kwargs: The fields are updated with keyword arguments.
         :return: The updated item.
         """
-        modified_item = Item.query.get(id=id)
+        modified_item = Item.query.get(id)
 
         # If no kwarg is given for an attribute, set it to the already stored attribute
         modified_item.name = kwargs.get('name', modified_item.name)
@@ -67,7 +67,7 @@ class ItemController:
         :param id: ID of the item to delete.
         :return: The deleted item.
         """
-        deleted_item = Item.query.get(id=id)
+        deleted_item = Item.query.get(id)
         db.session.delete(deleted_item)
         db.session.commit()
 
@@ -81,7 +81,7 @@ class ItemController:
         :return: A List of all items.
         """
         # TODO: Add a way to sort result differently
-        return Item.query.order_by(asc(id=Item.id)).all()
+        return Item.query.order_by(asc(Item.id)).all()
 
     @classmethod
     def get(cls, id: int) -> Item:
@@ -91,7 +91,7 @@ class ItemController:
         :param id: The id to get the item by.
         :return: The item.
         """
-        return Item.query.get(id=id)
+        return Item.query.get(id)
 
     @classmethod
     def get_by_folder_id(cls, folder_id: int) -> list:
@@ -134,7 +134,7 @@ class FolderController:
         :param kwargs: The fields are updated with keyword arguments.
         :return: The updated folder.
         """
-        modified_folder = Item.query.get(id=id)
+        modified_folder = Item.query.get(id)
 
         # If no kwarg is given for an attribute, set it to the already stored attribute
         modified_folder.name = kwargs.get('name', modified_folder.name)
@@ -154,7 +154,7 @@ class FolderController:
         :param id: ID of the folder to delete.
         :return: The deleted folder.
         """
-        deleted_folder = Folder.query.get(id=id)
+        deleted_folder = Folder.query.get(id)
         db.session.delete(deleted_folder)
         db.session.commit()
 
@@ -168,7 +168,7 @@ class FolderController:
         :return: A List of all folders.
         """
         # TODO: Add a way to sort result differently
-        return Folder.query.order_by(asc(id=Folder.id)).all()
+        return Folder.query.order_by(asc(Folder.id)).all()
 
     @classmethod
     def get(cls, id: int) -> Folder:
@@ -178,7 +178,7 @@ class FolderController:
         :param id: The id to get the folder by.
         :return: The folder.
         """
-        return Folder.query.get(id=id)
+        return Folder.query.get(id)
 
 
 class SaleController:
@@ -213,7 +213,7 @@ class SaleController:
         :param kwargs: The fields are updated with keyword arguments.
         :return: The updated sale.
         """
-        modified_sale = Sale.query.get(id=id)
+        modified_sale = Sale.query.get(id)
 
         # If no kwarg is given for an attribute, set it to the already stored attribute
         modified_sale.id = kwargs.get('id', modified_sale.id)
@@ -241,7 +241,7 @@ class SaleController:
         :param id: ID of the sale to delete.
         :return: The deleted sale.
         """
-        deleted_sale = Sale.query.get(id=id)
+        deleted_sale = Sale.query.get(id)
         db.session.delete(deleted_sale)
         db.session.commit()
 
@@ -255,7 +255,7 @@ class SaleController:
         :return: A List of all sales.
         """
         # TODO: Add a way to sort result differently
-        return Sale.query.order_by(asc(id=Sale.id)).all()
+        return Sale.query.order_by(asc(Sale.id)).all()
 
     @classmethod
     def get(cls, id: int) -> Sale:
@@ -265,7 +265,7 @@ class SaleController:
         :param id: The id to get the sale by.
         :return: The sale.
         """
-        return Sale.query.get(id=id)
+        return Sale.query.get(id)
 
     @classmethod
     def get_by_user_id(cls, user_id: int) -> list:

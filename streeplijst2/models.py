@@ -9,7 +9,7 @@ class User(db.Model):
 
     # Table columns
     id = db.Column(db.Integer, primary_key=True)
-    s_number = db.Column(db.String)
+    s_number = db.Column(db.String, unique=True)
     first_name = db.Column(db.String)
     last_name_prefix = db.Column(db.String, nullable=True)
     last_name = db.Column(db.String)

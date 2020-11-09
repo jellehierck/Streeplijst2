@@ -46,7 +46,7 @@ class UserController:
         :param kwargs: The fields are updated with keyword arguments.
         :return: The updated user.
         """
-        modified_user = User.query.get(id=id)
+        modified_user = User.query.get(id)
 
         # If no kwarg is given for an attribute, set it to the already stored attribute
         modified_user.s_number = kwargs.get('s_number', modified_user.s_number)
@@ -71,7 +71,7 @@ class UserController:
         :param id: ID of the user to delete.
         :return: The deleted user.
         """
-        deleted_person = User.query.get(id=id)
+        deleted_person = User.query.get(id)
         db.session.delete(deleted_person)
         db.session.commit()
 
@@ -85,7 +85,7 @@ class UserController:
         :return: A List of all users.
         """
         # TODO: Add a way to sort result differently
-        return User.query.order_by(asc(id=User.id)).all()
+        return User.query.order_by(asc(User.id)).all()
 
     @classmethod
     def get(cls, id: int) -> User:
@@ -95,7 +95,7 @@ class UserController:
         :param id: The id to get the user by.
         :return: The user.
         """
-        return User.query.get(id=id)
+        return User.query.get(id)
 
     @classmethod
     def get_by_s_number(cls, s_number: str) -> User:

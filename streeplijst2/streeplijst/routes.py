@@ -2,7 +2,7 @@ from flask import redirect, url_for, render_template, flash, session, Blueprint
 
 from streeplijst2.config import FOLDERS
 from streeplijst2.routes import login_required
-from streeplijst2.streeplijst.database import StreeplijstDBController as db_controller
+# from streeplijst2.streeplijst.database import StreeplijstDBController as db_controller
 
 ##################################
 # Streeplijst specific blueprint #

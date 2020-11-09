@@ -33,6 +33,10 @@ class Folder(db.Model):
         self.updated = datetime.now()
         self.synchronized = datetime.min  # Set initial synchronized date very far in the past to force synchronization
 
+    def __repr__(self):
+        return '<Folder %d>' % self.name
+
+
 
 class Item(db.Model):
     # Class attributes for SQLAlchemy
@@ -65,6 +69,10 @@ class Item(db.Model):
         super().__init__(**kwargs)
         self.created = datetime.now()
         self.updated = datetime.now()
+
+    def __repr__(self):
+        return '<Item %s>' % self.name
+
 
 
 class Sale(db.Model):
@@ -111,6 +119,9 @@ class Sale(db.Model):
 
         self.created = datetime.now()
         self.last_updated = datetime.now()
+
+    def __repr__(self):
+        return '<Sale %d>' % self.id
 
     # def post_sale(self, timeout: float = TIMEOUT) -> dict:
     #     """
