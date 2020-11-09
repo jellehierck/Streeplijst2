@@ -1,10 +1,7 @@
 from datetime import datetime
-from requests.exceptions import HTTPError, Timeout
 
-from streeplijst2.config import TIMEOUT
 from streeplijst2.models import User
 from streeplijst2.extensions import db
-import streeplijst2.api as api
 
 
 class Folder(db.Model):

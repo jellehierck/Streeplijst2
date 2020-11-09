@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import datetime
 
 from streeplijst2.extensions import db
 
