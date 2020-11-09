@@ -92,6 +92,11 @@ def get_products_in_folder(folder_id: int, timeout: float = TIMEOUT):
     result = json.loads(res.text)  # Select the relevant data and convert to a list of dicts
     for item in result:
         _normalize_media(item)
+
+    # Normalise the field results
+    result['folder_name'] = result.pop('folder', None)  # Rename the folder field to folder_name
+    result['price'] = int(result['price'])  # Convert the price from str to int
+
     return result
 
 
