@@ -29,34 +29,9 @@ class Folder(db.Model):
         :param media: (optional) Image URL.
         """
         super().__init__(**kwargs)
-
         self.created = datetime.now()
         self.updated = datetime.now()
-        self.last_synchronized = datetime.min  # Set date very far in the past
-
-    def get_item(self, item_id):
-        """
-        Get an item instance in this folder.
-
-        :param item_id: The item ID to retrieve.
-        :return: An Item instance.
-        """
-        for item in self.items:
-            if item.id == item_id:
-                return item
-        return None
-
-    def update(self, **kwargs):
-        """
-        Update this folder's meta fields.
-
-        :param kwargs: The fields are updated with keyword arguments.
-        """
-        # If no kwarg is given for an attribute, set it to the already stored attribute
-        self.id = kwargs.get('id', self.id)
-        self.name = kwargs.get('name', self.name)
-        self.media = kwargs.get('media', self.media)
-        # self.items = kwargs.get('items', self.items)  # The items cannot be updated, they need to be synced with API
+        self.synchronized = datetime.min  # Set initial synchronized date very far in the past to force synchronization
 
 
 class Item(db.Model):
@@ -89,24 +64,7 @@ class Item(db.Model):
         """
         super().__init__(**kwargs)
         self.created = datetime.now()
-        self.last_updated = datetime.now()
-
-    def update(self, **kwargs):
-        """
-        Update this item's data fields.
-
-        :param kwargs: The fields are updated with keyword arguments.
-        """
-        self.last_updated = datetime.now()
-
-        # If no kwarg is given for an attribute, set it to the already stored attribute
-        self.name = kwargs.get('name', self.name)
-        self.id = kwargs.get('id', self.id)
-        self.price = kwargs.get('price', self.price)
-        self.folder = kwargs.get('folder', self.folder)
-        self.folder_id = kwargs.get('folder_id', self.folder_id)
-        self.published = kwargs.get('published', self.published)
-        self.media = kwargs.get('media', self.media)
+        self.updated = datetime.now()
 
 
 class Sale(db.Model):

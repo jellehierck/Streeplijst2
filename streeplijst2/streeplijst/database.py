@@ -54,7 +54,7 @@ class ItemController:
         modified_item.published = kwargs.get('published', modified_item.published)
         modified_item.media = kwargs.get('media', modified_item.media)
 
-        modified_item.last_updated = datetime.now()
+        modified_item.updated = datetime.now()
         db.session.commit()
 
         return modified_item
@@ -141,7 +141,7 @@ class FolderController:
         modified_folder.id = kwargs.get('id', modified_folder.id)
         modified_folder.media = kwargs.get('media', modified_folder.media)
 
-        modified_folder.last_updated = datetime.now()
+        modified_folder.updated = datetime.now()
         db.session.commit()
 
         return modified_folder
