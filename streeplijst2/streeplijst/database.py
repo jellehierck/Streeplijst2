@@ -116,10 +116,10 @@ class FolderController:
         :param media: (optional) Image URL.
         :return: The folder.
         """
-        if cls.get(id=id) is not None:  # Check if the item already exists, if so, update and return it
+        if cls.get(id=id) is not None:  # Check if the folder already exists, if so, update and return it
             return cls.update(id=id, name=name, media=media)
 
-        # If the item does not exist yet, create it
+        # If the folder does not exist yet, create it
         new_folder = Folder(id=id, name=name, media=media)
         db.session.add(new_folder)
         db.session.commit()
@@ -181,6 +181,111 @@ class FolderController:
         return Folder.query.get(id=id)
 
 
+class SaleController:
+
+    @classmethod
+    def create(cls, quantity: int, total_price: int, item_id: int, item_name: str, user_id: int,
+               user_s_number: str) -> Sale:
+        """
+        Instantiate a Sale object and store it in the database.
+
+        :param quantity: Amount of the item to buy.
+        :param total_price: Total price (quantity * item.price).
+        :param item_id: Item ID.
+        :param item_name: Item name.
+        :param user_id: User ID.
+        :param user_s_number: User s_number.
+        :return: The sale.
+        """
+        # Create a new sale
+        new_sale = Folder(quantity=quantity, total_price=total_price, item_id=item_id, item_name=item_name,
+                          user_id=user_id, user_s_number=user_s_number)
+        db.session.add(new_sale)
+        db.session.commit()
+        return new_sale
+
+    @classmethod
+    def update(cls, id: int, **kwargs) -> Sale:
+        """
+        Update this sale's data fields.
+
+        :param id: The item ID of the sale to update.
+        :param kwargs: The fields are updated with keyword arguments.
+        :return: The updated sale.
+        """
+        modified_sale = Sale.query.get(id=id)
+
+        # If no kwarg is given for an attribute, set it to the already stored attribute
+        modified_sale.id = kwargs.get('id', modified_sale.id)
+        modified_sale.quantity = kwargs.get('quantity', modified_sale.quantity)
+        modified_sale.total_price = kwargs.get('total_price', modified_sale.total_price)
+        modified_sale.item_id = kwargs.get('item_id', modified_sale.item_id)
+        modified_sale.item_name = kwargs.get('item_name', modified_sale.item_name)
+        modified_sale.user_id = kwargs.get('user_id', modified_sale.user_id)
+        modified_sale.user_s_number = kwargs.get('user_s_number', modified_sale.user_s_number)
+        modified_sale.api_id = kwargs.get('api_id', modified_sale.api_id)
+        modified_sale.api_created = kwargs.get('api_created', modified_sale.api_created)
+        modified_sale.status = kwargs.get('status', modified_sale.status)
+        modified_sale.error_msg = kwargs.get('error_msg', modified_sale.error_msg)
+
+        modified_sale.updated = datetime.now()
+        db.session.commit()
+
+        return modified_sale
+
+    @classmethod
+    def delete(cls, id: int) -> Sale:
+        """
+        Delete a sale.
+
+        :param id: ID of the sale to delete.
+        :return: The deleted sale.
+        """
+        deleted_sale = Sale.query.get(id=id)
+        db.session.delete(deleted_sale)
+        db.session.commit()
+
+        return deleted_sale
+
+    @classmethod
+    def list_all(cls) -> list:
+        """
+        List all sales sorted by id.
+
+        :return: A List of all sales.
+        """
+        # TODO: Add a way to sort result differently
+        return Sale.query.order_by(asc(id=Sale.id)).all()
+
+    @classmethod
+    def get(cls, id: int) -> Sale:
+        """
+        Return the sale with that id.
+
+        :param id: The id to get the sale by.
+        :return: The sale.
+        """
+        return Sale.query.get(id=id)
+
+    @classmethod
+    def get_by_user_id(cls, user_id: int) -> list:
+        """
+        List all sales by this user.
+
+        :return: A List of all sales by the yser.
+        """
+        # TODO: Add a way to sort result differently
+        return Sale.query.filter_by(user_id=user_id).all()
+
+    @classmethod
+    def get_by_item_id(cls, item_id: int) -> list:
+        """
+        List all sales of this item.
+
+        :return: A List of all sales by the item.
+        """
+        # TODO: Add a way to sort result differently
+        return Sale.query.filter_by(item_id=item_id).all()
 
 # class StreeplijstDBController(DBController):
 #
