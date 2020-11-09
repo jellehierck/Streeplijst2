@@ -66,34 +66,26 @@ class Item(db.Model):
     name = db.Column(db.String)
     price = db.Column(db.Integer)
     published = db.Column(db.Boolean)
-    media = db.Column(db.String)
+    media = db.Column(db.String, nullable=True)
     folder_id = db.Column(db.Integer, db.ForeignKey(Folder.__tablename__ + '.id'))  # Add a link to the folder id
-    folder = db.relationship(Folder,  # Add a column to the folder table which links to the items in that folder
-                             backref=__tablename__,  # Link back to the items from the folders table
-                             lazy=True,  # Data is only loaded as necessary
-                             )
+    folder_name = db.Column(db.String, db.ForeignKey(Folder.__tablename__ + '.name'))  # Add a link to the folder name
+
     created = db.Column(db.DateTime)
-    last_updated = db.Column(db.DateTime)
+    updated = db.Column(db.DateTime)
 
-    def __init__(self, name: str, id: int, price: int, folder: Folder, folder_id: int, published: bool, media: str):
+    def __init__(self, **kwargs):
         """
-        Instantiate an Item object. This Item contains all relevant information provided by the API response.
+        Instantiate an Item object. This Item contains only relevant information provided by the API response.
 
-        :param name: Item name
-        :param id: Item id
-        :param price: Item price in cents
-        :param folder: Folder instance
-        :param folder_id: Folder id
-        :param published: True if the item is published, false otherwise
-        :param media: (optional) Image URL
+        :param name: Item name.
+        :param id: Item id.
+        :param price: Item price in cents.
+        :param folder_id: Folder id.
+        :param folder_name: Folder name.
+        :param published: True if the item is published, False otherwise.
+        :param media: (optional) Image URL.
         """
-        self.name = name
-        self.id = id
-        self.price = int(price)
-        self.folder = folder
-        self.folder_id = folder_id
-        self.published = published
-        self.media = media
+        super().__init__(**kwargs)
         self.created = datetime.now()
         self.last_updated = datetime.now()
 
@@ -172,7 +164,8 @@ class Sale(db.Model):
 
         try:
             response = api.post_sale(user_id, product_id, self.quantity, timeout=timeout)
-            for item in response['items']: # Adds prices of multiple items. Usually there will only be one item per sale
+            for item in response[
+                'items']:  # Adds prices of multiple items. Usually there will only be one item per sale
                 self.total_price += int(item['total_price'])  # Synchronize the total prize with API response
             self.api_id = int(response['id'])
             self.created = datetime.fromisoformat(response['created'])
