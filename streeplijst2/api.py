@@ -42,7 +42,7 @@ def _normalize_profile_picture(user_dict):
     Flatten the JSON dict for the profile picture, if the user has any.
     :param user_dict: JSON dict to flatten.
     """
-    if user_dict['profile_picture'] is not None:
+    if user_dict['profile_picture'] is not None:  # TODO: Make this a try-except block like _normalize_media
         profile_picture = user_dict['profile_picture']['url']
         user_dict['profile_picture'] = profile_picture
     else:
