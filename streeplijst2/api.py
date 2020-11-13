@@ -73,7 +73,7 @@ def get_product(item_id: int, timeout: float = TIMEOUT):
     return result
 
 
-def get_products_in_folder(folder_id: int, timeout: float = TIMEOUT):
+def get_products_in_folder(folder_id: int, timeout: float = TIMEOUT) -> list:
     """
     GET all products inside a single folder from Congressus API. This is a blocking call.
 

@@ -105,7 +105,7 @@ class TestUser:
             assert user2 == user_list[1]  # Also make sure the order is correct (ascending id)
 
 
-class TestUserFromAPI:
+class TestUserAPI:
     """
     Integration tests between the database and api.
     """

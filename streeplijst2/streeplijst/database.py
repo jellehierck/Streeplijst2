@@ -6,11 +6,11 @@ from streeplijst2.streeplijst.models import Folder, Sale, Item
 from streeplijst2.extensions import db
 
 
-class ItemController:
+class ItemDB:
 
     @classmethod
     def create(cls, id: int, name: str, price: int, published: bool, folder_id: int, folder_name: int,
-               media: str = None) -> Item:
+               media: str = None, **kwargs) -> Item:
         """
         Instantiate an Item object and store it in the database. This Item contains only relevant information provided
         by the API response.
@@ -104,7 +104,7 @@ class ItemController:
         return Item.query.filter_by(folder_id=folder_id).all()
 
 
-class FolderController:
+class FolderDB:
 
     @classmethod
     def create(cls, id: int, name: str, media: str = None) -> Folder:
@@ -140,6 +140,7 @@ class FolderController:
         modified_folder.name = kwargs.get('name', modified_folder.name)
         modified_folder.id = kwargs.get('id', modified_folder.id)
         modified_folder.media = kwargs.get('media', modified_folder.media)
+        modified_folder.synchronized = kwargs.get('synchronized', modified_folder.synchronized)
 
         modified_folder.updated = datetime.now()
         db.session.commit()
@@ -188,10 +189,10 @@ class FolderController:
         :param id: Folder id to get items for.
         :return: A list of all items in that folder.
         """
-        return ItemController.get_by_folder_id(id)
+        return ItemDB.get_by_folder_id(id)
 
 
-class SaleController:
+class SaleDB:
 
     @classmethod
     def create(cls, quantity: int, total_price: int, item_id: int, item_name: str, user_id: int,
