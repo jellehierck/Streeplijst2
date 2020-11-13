@@ -45,3 +45,9 @@ def test_list_all_users(test_app):
         else:  # id of user2 is lower so it must appear first in the list
             assert user2 == user_list[0]
             assert user1 == user_list[1]
+
+################
+# Folder tests #
+################
+
+

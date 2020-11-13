@@ -134,7 +134,7 @@ class FolderController:
         :param kwargs: The fields are updated with keyword arguments.
         :return: The updated folder.
         """
-        modified_folder = Item.query.get(id)
+        modified_folder = Folder.query.get(id)
 
         # If no kwarg is given for an attribute, set it to the already stored attribute
         modified_folder.name = kwargs.get('name', modified_folder.name)
@@ -179,6 +179,16 @@ class FolderController:
         :return: The folder.
         """
         return Folder.query.get(id)
+
+    @classmethod
+    def get_items_in_folder(cls, id: int) -> list:
+        """
+        Get all items in a specific folder. This is synonymous to ItemController.get_by_folder_id().
+
+        :param id: Folder id to get items for.
+        :return: A list of all items in that folder.
+        """
+        return ItemController.get_by_folder_id(id)
 
 
 class SaleController:

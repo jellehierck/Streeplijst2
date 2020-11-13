@@ -1,13 +1,81 @@
-# import pytest
 # from requests.exceptions import Timeout
 #
 # from streeplijst2.api import FolderNotFoundException, UserNotFoundException
 # from streeplijst2.streeplijst.database import StreeplijstDBController as db_controller
-# from streeplijst2.config import TEST_USER, FOLDERS, TEST_ITEM, TEST_FOLDER_ID
-#
-# test_folder = FOLDERS[TEST_FOLDER_ID]  # Declare test folder configuration
-#
-#
+from streeplijst2.config import TEST_FOLDER
+from streeplijst2.streeplijst.database import FolderController
+
+TEST_FOLDER_NO_MEDIA = TEST_FOLDER
+TEST_FOLDER_NO_MEDIA.pop('media', None)  # Remove the media field
+
+TEST_FOLDER_UPDATED = dict({
+    'name': 'New Folder Name',
+    'media': 'www.media.url'
+})
+
+TEST_FOLDER_2 = dict({
+    'id': 1,
+    'name': 'test folder 2',
+    'media': ''
+})
+
+
+def test_create_folder(test_app):
+    with test_app.app_context():
+        folder = FolderController.create(**TEST_FOLDER)
+        for (key, value) in TEST_FOLDER.items():  # Make sure all fields are stored correctly
+            assert folder.__getattribute__(key) == value
+
+
+def test_create_folder_no_media(test_app):
+    with test_app.app_context():
+        folder = FolderController.create(**TEST_FOLDER_NO_MEDIA)
+        for (key, value) in TEST_FOLDER_NO_MEDIA.items():  # Make sure all fields are stored correctly
+            assert folder.__getattribute__(key) == value
+        assert folder.__getattribute__('media') is None
+
+
+def test_get_folder(test_app):
+    with test_app.app_context():
+        folder = FolderController.create(**TEST_FOLDER)
+        other_folder = FolderController.get(TEST_FOLDER['id'])
+        assert folder is other_folder
+
+
+def test_update_folder(test_app):
+    with test_app.app_context():
+        folder = FolderController.create(**TEST_FOLDER)
+        updated_folder = FolderController.update(TEST_FOLDER['id'], **TEST_FOLDER_UPDATED)
+        for (key, value) in TEST_FOLDER_UPDATED.items():  # Make sure all values are updated as expected
+            assert updated_folder.__getattribute__(key) == value
+            assert folder.__getattribute__(key) == updated_folder.__getattribute__(key)
+
+
+def test_delete_folder(test_app):
+    with test_app.app_context():
+        folder = FolderController.create(**TEST_FOLDER)
+        get_folder = FolderController.get(TEST_FOLDER['id'])
+        assert get_folder is not None  # Make sure the user is retrieved
+
+        deleted_folder = FolderController.delete(TEST_FOLDER['id'])
+        assert folder is deleted_folder  # Make sure the same object is referenced
+
+        get_folder = FolderController.get(TEST_FOLDER['id'])
+        assert get_folder is None  # Make sure the user is not retrieved
+
+
+def test_list_all_folders(test_app):
+    with test_app.app_context():
+        folder1 = FolderController.create(**TEST_FOLDER)
+        folder2 = FolderController.create(**TEST_FOLDER_2)
+        folder_list = FolderController.list_all()
+        assert len(folder_list) == 2
+        assert folder2 == folder_list[0]  # folder2 has lower id so be first in the list
+        assert folder1 == folder_list[1]
+
+
+
+
 # def test_create_folder_folder_id(test_app):
 #     """
 #     Test that the folder can be initialized from config.py and produces the correct results.
