@@ -79,7 +79,7 @@ def test_create_user_duplicate(test_app):
     with test_app.app_context():
         user = UserController.create(**TEST_USER)
         duplicate_user = UserController.create(**TEST_USER_DUP)
-        assert user is duplicate_user  # Make sure the same user is refereced in case of a duplicate
+        assert user is duplicate_user  # Make sure the same user is referenced in case of a duplicate
 
 
 def test_get_user(test_app):
