@@ -3,12 +3,16 @@ TEST_USER:
   id: 347980
   s_number: "s9999999"
   first_name: "Test"
+  last_name_prefix: "het"
+  last_name: "Testaccount"
 
 # This user has not signed their SDD mandate
 TEST_USER_NO_SDD:
   id: 485567
   s_number: "s9999998"
   first_name: "TestTwee"
+  last_name_prefix: "de"
+  last_name: "Tweede"
 
 # Folder ID for the folder which contains the test
 TEST_FOLDER_ID: 1998
