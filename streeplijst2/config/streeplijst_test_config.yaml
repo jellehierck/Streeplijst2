@@ -5,6 +5,8 @@ TEST_USER:
   first_name: "Test"
   last_name_prefix: "het"
   last_name: "Testaccount"
+  date_of_birth: "26-09-1940"
+  has_sdd_mandate: true
 
 # This user has not signed their SDD mandate
 TEST_USER_NO_SDD:
@@ -13,6 +15,8 @@ TEST_USER_NO_SDD:
   first_name: "TestTwee"
   last_name_prefix: "de"
   last_name: "Tweede"
+  date_of_birth: "26-09-1940"
+  has_sdd_mandate: false
 
 # Folder ID for the folder which contains the test
 TEST_FOLDER_ID: 1998

@@ -4,7 +4,7 @@ from requests.exceptions import HTTPError
 from functools import wraps  # Used in the login_required decorator function
 
 # from streeplijst2.database import DBController as db_controller
-from streeplijst2.database import UserController
+from streeplijst2.database import UserDB
 import streeplijst2.api as api
 
 
@@ -70,7 +70,7 @@ def login():
             return render_template('login.jinja2')
 
         # Add user to the database
-        user = UserController.create(**user_dict)
+        user = UserDB.create(**user_dict)
 
         # Add session variables to identify the user
         session['user_id'] = user.id

@@ -8,7 +8,8 @@ from datetime import datetime, timedelta
 import time
 
 from streeplijst2.config import TEST_FOLDER, TEST_USER, TEST_ITEM, TEST_USER_NO_SDD, TEST_ITEM_2
-from streeplijst2.streeplijst.database import FolderDB, ItemDB, FolderNotInDatabaseException, SaleDB, Sale
+from streeplijst2.database import UserDB
+from streeplijst2.streeplijst.database import FolderDB, ItemDB, NotInDatabaseException, SaleDB, Sale
 import streeplijst2.api as api
 
 TEST_FOLDER_NO_MEDIA = copy.deepcopy(TEST_FOLDER)
@@ -145,7 +146,7 @@ class TestFolderAPI:
 
     def test_load_folder_not_in_db(self, test_app):
         with test_app.app_context():
-            with pytest.raises(FolderNotInDatabaseException):
+            with pytest.raises(NotInDatabaseException):
                 folder = FolderDB.load_folder(TEST_FOLDER['id'])
 
 
@@ -177,6 +178,17 @@ class TestSale:
     def test_create_sale(self, test_app):
         with test_app.app_context():
             sale = SaleDB.create(**TEST_SALE)
+            for (key, value) in TEST_SALE.items():  # Make sure all fields are stored correctly
+                assert sale.__getattribute__(key) == value
+            assert sale.id == 1  # The ID autoincrements, starting at 1
+            assert sale.status == Sale.STATUS_NOT_POSTED  # Test the status
+            assert sale.api_id is None and sale.api_created is None and sale.error_msg is None  # Test None fields
+
+    def test_create_quick_sale(self, test_app):
+        with test_app.app_context():
+            item = ItemDB.create(**TEST_ITEM)
+            user = UserDB.create(**TEST_USER)
+            sale = SaleDB.create_quick(quantity=1, item_id=item.id, user_id=user.id)
             for (key, value) in TEST_SALE.items():  # Make sure all fields are stored correctly
                 assert sale.__getattribute__(key) == value
             assert sale.id == 1  # The ID autoincrements, starting at 1

@@ -1,12 +1,14 @@
 import yaml
 from pathlib import Path
+from datetime import datetime
 
 ###########################
 # Sensitive configuration #
 ###########################
 
 # TODO: Check if this can also be done using .env files
-credential_file_path = Path(__file__).resolve().parent.parent.parent / 'instance/credentials.yaml'  # Load the credential file
+credential_file_path = Path(
+    __file__).resolve().parent.parent.parent / 'instance/credentials.yaml'  # Load the credential file
 with open(credential_file_path) as file:
     creds = yaml.safe_load(file)
 
@@ -40,12 +42,16 @@ FOLDERS = sl_cfg['FOLDERS']
 # Streeplijst test configuration #
 ##################################
 
-streeplijst_test_config_path =config_path = Path(__file__).resolve().parent / 'streeplijst_test_config.yaml'
+streeplijst_test_config_path = config_path = Path(__file__).resolve().parent / 'streeplijst_test_config.yaml'
 with open(streeplijst_test_config_path) as file:
     cfg = yaml.safe_load(file)
 
 TEST_USER = cfg['TEST_USER']
+TEST_USER['date_of_birth'] = datetime.strptime(TEST_USER['date_of_birth'], '%d-%m-%Y')
+
 TEST_USER_NO_SDD = cfg['TEST_USER_NO_SDD']
+TEST_USER_NO_SDD['date_of_birth'] = datetime.strptime(TEST_USER_NO_SDD['date_of_birth'], '%d-%m-%Y')
+
 TEST_ITEM = cfg['TEST_ITEM']
 TEST_ITEM_2 = cfg['TEST_ITEM_2']
 TEST_FOLDER_ID = cfg['TEST_FOLDER_ID']

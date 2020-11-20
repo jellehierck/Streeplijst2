@@ -6,7 +6,7 @@ from sqlalchemy import asc
 from datetime import datetime
 
 
-class UserController:
+class UserDB:
 
     @classmethod
     def create(cls, id: int, s_number: str, first_name: str, last_name: str, date_of_birth: datetime,
