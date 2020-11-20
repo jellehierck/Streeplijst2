@@ -47,4 +47,6 @@ with open(streeplijst_test_config_path) as file:
 TEST_USER = cfg['TEST_USER']
 TEST_USER_NO_SDD = cfg['TEST_USER_NO_SDD']
 TEST_ITEM = cfg['TEST_ITEM']
+TEST_ITEM_2 = cfg['TEST_ITEM_2']
 TEST_FOLDER_ID = cfg['TEST_FOLDER_ID']
+TEST_FOLDER = FOLDERS[TEST_FOLDER_ID]

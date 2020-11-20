@@ -1,0 +1,11 @@
+[run]
+source =
+    streeplijst2
+
+[paths]
+source =
+    streeplijst2
+
+[report]
+omit =
+    tests

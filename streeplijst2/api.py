@@ -1,4 +1,5 @@
 import requests  # library used for making calls to Congressus API
+from requests import Timeout, HTTPError
 import json
 from datetime import datetime
 
@@ -68,10 +69,12 @@ def get_product(item_id: int, timeout: float = TIMEOUT):
     res.raise_for_status()  # Raise any other response errors
     result = json.loads(res.text)  # Select the relevant data and convert to a list of dicts
     _normalize_media(result)
+    result['folder_name'] = result.pop('folder', None)  # Rename the folder field to folder_name
+    result['price'] = int(result['price'])  # Convert the price from str to int
     return result
 
 
-def get_products_in_folder(folder_id: int, timeout: float = TIMEOUT):
+def get_products_in_folder(folder_id: int, timeout: float = TIMEOUT) -> list:
     """
     GET all products inside a single folder from Congressus API. This is a blocking call.
 
@@ -92,6 +95,10 @@ def get_products_in_folder(folder_id: int, timeout: float = TIMEOUT):
     result = json.loads(res.text)  # Select the relevant data and convert to a list of dicts
     for item in result:
         _normalize_media(item)
+        # Normalise the field results
+        item['folder_name'] = item.pop('folder', None)  # Rename the folder field to folder_name
+        item['price'] = int(item['price'])  # Convert the price from str to int
+
     return result
 
 
@@ -115,9 +122,15 @@ def get_user(s_number: str, timeout: float = TIMEOUT):
 
     user_list = json.loads(res.text)  # Convert response to a list of dicts. Congressus always sends a list of objects
     result = user_list[0]  # There will only be one user in this list, so we select the first user
+
+    # Normalize the result fields
     result['date_of_birth'] = datetime.fromisoformat(result['date_of_birth'])
+    result['s_number'] = result.pop('username', None)  # Rename the username field to s_number
+    result['last_name'] = result.pop('primary_last_name_main', None)  # Rename to last_name
+    result['last_name_prefix'] = result.pop('primary_last_name_prefix', None)  # Rename to last_name_prefix
     _normalize_profile_picture(result)
-    return result  # We return the first dict in the list since there should be only one object in the list.
+
+    return result
 
 
 def post_sale(user_id: int, product_id: int, quantity: int, timeout: float = TIMEOUT):
@@ -156,4 +169,12 @@ def post_sale(user_id: int, product_id: int, quantity: int, timeout: float = TIM
 
     res.raise_for_status()  # Raise any other HTTP errors which occurred when making the request
     result = json.loads(res.text)  # Convert the entire response text to a python object
+
+    for item in result['items']:  # Normalise the field results
+        item['price'] = int(item['price'])  # Convert the price from str to int
+        item['total_price'] = int(item['total_price'])  # Convert the total_price from str to int
+
+    result['created'] = datetime.fromisoformat(result['created'])
+    # result['modified'] = datetime.fromisoformat(result['modified'])  # TODO: This string might be empty, handle that
+
     return result

@@ -3,8 +3,9 @@ from flask import redirect, url_for, render_template, request, flash, session, B
 from requests.exceptions import HTTPError
 from functools import wraps  # Used in the login_required decorator function
 
-from streeplijst2.database import DBController as db_controller
-from streeplijst2.api import UserNotFoundException
+# from streeplijst2.database import DBController as db_controller
+from streeplijst2.database import UserController
+import streeplijst2.api as api
 
 
 def login_required(func):
@@ -15,6 +16,7 @@ def login_required(func):
     :param func: Function to be decorated
     :return: A redirect to home.login if there is no user currently logged in.
     """
+
     @wraps(func)  # functools wrapper used to preserve function information between calls (best practise for decorators)
     def wrapper_login_required(*args, **kwargs):
         if 'user_id' not in session:  # If there is no user logged in, redirect them to the login page
@@ -46,8 +48,6 @@ def secret_hello():
 
 # Landing page
 @bp_home.route('/')
-@bp_home.route('/home')
-@bp_home.route('/index')
 def index():
     return redirect(url_for('home.login'))
 
@@ -61,13 +61,16 @@ def login():
     elif request.method == 'POST':  # Attempt to login the user
         s_number = request.form['s-number']  # Load the student number from the push form
         try:  # Attempt to find the user from Congressus
-            user = db_controller.get_or_create_user(s_number=s_number)  # Create a User
-        except UserNotFoundException as err:  # The user was not found
-            flash('Gebruiker ' + s_number + ' is niet gevonden. Probeer het opnieuw.', 'error')
+            user_dict = api.get_user(s_number=s_number)  # Create a User
+        except api.UserNotFoundException as err:  # The user was not found
+            flash('User ' + s_number + ' not found, try again.', 'error')
             return render_template('login.jinja2')
         except HTTPError as err:  # There was a connection error
             flash(str(err), 'error')
             return render_template('login.jinja2')
+
+        # Add user to the database
+        user = UserController.create(**user_dict)
 
         # Add session variables to identify the user
         session['user_id'] = user.id
@@ -81,5 +84,5 @@ def login():
 def logout():
     for key in list(session.keys()):
         session.pop(key, None)  # Remove all items from the session (user data)
-    flash('Uitgelogd.')  # TODO: Add temporary messages which disappear after a time.
+    flash('Logged out.')  # TODO: Add temporary messages which disappear after a time.
     return redirect(url_for('home.login'))

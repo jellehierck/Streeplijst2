@@ -3,22 +3,38 @@ TEST_USER:
   id: 347980
   s_number: "s9999999"
   first_name: "Test"
+  last_name_prefix: "het"
+  last_name: "Testaccount"
 
 # This user has not signed their SDD mandate
 TEST_USER_NO_SDD:
   id: 485567
   s_number: "s9999998"
   first_name: "TestTwee"
+  last_name_prefix: "de"
+  last_name: "Tweede"
 
 # Folder ID for the folder which contains the test
 TEST_FOLDER_ID: 1998
 
-# This item is required for the unit tests to work. Change the parameters according to your own test item
+# These items are required for the unit tests to work. Change the parameters according to your own test item
 TEST_ITEM:
   id: 13591
-  folder_id: 1998
   name: "Testproduct"
+  price: 0
+  published: true
+  folder_id: 1998
+  folder_name: "Speciaal"
+  media: null
 
+TEST_ITEM_2:
+  id: 21151
+  name: "Testproduct2"
+  price: 0
+  published: false
+  folder_id: 1998
+  folder_name: "Speciaal"
+  media: null
 
 
 

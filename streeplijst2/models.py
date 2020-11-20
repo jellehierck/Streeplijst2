@@ -1,34 +1,44 @@
-from datetime import datetime, date
+from datetime import datetime
 
 from streeplijst2.extensions import db
 
 
 class User(db.Model):
-
     # Class attributes for SQLAlchemy
     __tablename__ = 'users'
 
     # Table columns
     id = db.Column(db.Integer, primary_key=True)
-    s_number = db.Column(db.String)
+    s_number = db.Column(db.String, unique=True)
     first_name = db.Column(db.String)
     last_name_prefix = db.Column(db.String, nullable=True)
     last_name = db.Column(db.String)
-    date_of_birth = db.Column(db.Date)
+    date_of_birth = db.Column(db.DateTime)
     has_sdd_mandate = db.Column(db.Boolean)
     profile_picture = db.Column(db.String, nullable=True)
 
     created = db.Column(db.DateTime)
     updated = db.Column(db.DateTime)
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
+        """
+        Instantiates a User object.
+
+        :param id: Congressus user id.
+        :param s_number: Student or Employee number (Congressus user name)
+        :param first_name: First name.
+        :param last_name: Last name.
+        :param date_of_birth: Date of birth.
+        :param last_name_prefix: Last name prefix (e.g. 'van der').
+        :param has_sdd_mandate: Flag whether this user has signed their SDD mandate (required for making any purchase).
+        :param profile_picture: URL to profile picture.
+        """
         super().__init__(**kwargs)
         self.created = datetime.now()
         self.updated = datetime.now()
 
     def __repr__(self):
         return '<User %s>' % self.s_number
-
 
 # class User(db.Model):
 #     # Class attributes for SQLAlchemy
