@@ -31,8 +31,7 @@ class Folder(db.Model):
         self.synchronized = datetime.min  # Set initial synchronized date very far in the past to force synchronization
 
     def __repr__(self):
-        return '<Folder %d>' % self.name
-
+        return '<Folder %s>' % self.name
 
 
 class Item(db.Model):
@@ -71,11 +70,13 @@ class Item(db.Model):
         return '<Item %s>' % self.name
 
 
-
 class Sale(db.Model):
     # Supported status messages
     STATUS_NOT_POSTED = 'not_posted'
+    STATUS_TOTAL_PRICE_MISMATCH = 'ok_total_price_mismatch'
     STATUS_TIMEOUT = 'timeout'
+    STATUS_HTTP_ERROR = 'http_error'
+    STATUS_SDD_NOT_SIGNED = 'sdd_not_signed'
     STATUS_UNKNOWN_ERROR = 'unknown_error'
     STATUS_OK = 'ok'
 
@@ -92,6 +93,7 @@ class Sale(db.Model):
     user_s_number = db.Column(db.String, db.ForeignKey(User.__tablename__ + '.s_number'))  # Add a link to the s_number
 
     api_id = db.Column(db.Integer, nullable=True)  # Congressus ID
+    api_reference = db.Column(db.String, nullable=True)  # Congressus sale reference
     api_created = db.Column(db.DateTime, nullable=True)  # Created according to the API
     status = db.Column(db.String)
     error_msg = db.Column(db.String, nullable=True)
@@ -119,38 +121,3 @@ class Sale(db.Model):
 
     def __repr__(self):
         return '<Sale %d>' % self.id
-
-    # def post_sale(self, timeout: float = TIMEOUT) -> dict:
-    #     """
-    #     POST the sale to Congressus.
-    #
-    #     :param timeout: Timeout for the post request. Defaults to config.py TIMEOUT.
-    #     """
-    #     user_id = self.user.id
-    #     product_id = self.item.id
-    #
-    #     self.last_updated = datetime.now()
-    #
-    #     try:
-    #         response = api.post_sale(user_id, product_id, self.quantity, timeout=timeout)
-    #         for item in response[
-    #             'items']:  # Adds prices of multiple items. Usually there will only be one item per sale
-    #             self.total_price += int(item['total_price'])  # Synchronize the total prize with API response
-    #         self.api_id = int(response['id'])
-    #         self.created = datetime.fromisoformat(response['created'])
-    #         self.status = 'OK'
-    #         return response
-    #
-    #     except Timeout as err:  # If an Timeout error occurred
-    #         self.api_id = 0  # Set the congressus ID to 0 to indicate a failed sale
-    #         self.status = 'TIMEOUT'  # Store the reason the request failed
-    #         self.created = datetime.now()  # Store the current time
-    #         self.error_msg = str(err)  # Save the entire error message
-    #         raise
-    #
-    #     except HTTPError as err:  # If an HTTPError occurred, the request was bad
-    #         self.api_id = 0  # Set the congressus ID to 0 to indicate a bad sale
-    #         self.status = err.response.reason  # Store the reason the request failed
-    #         self.created = datetime.now()  # Store the current time
-    #         self.error_msg = str(err)  # Save the entire error message
-    #         raise

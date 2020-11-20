@@ -50,7 +50,6 @@ class UserController:
 
         # If no kwarg is given for an attribute, set it to the already stored attribute
         modified_user.s_number = kwargs.get('s_number', modified_user.s_number)
-        modified_user.id = kwargs.get('id', modified_user.id)
         modified_user.first_name = kwargs.get('first_name', modified_user.first_name)
         modified_user.last_name_prefix = kwargs.get('last_name_prefix', modified_user.last_name_prefix)
         modified_user.last_name = kwargs.get('last_name', modified_user.last_name)

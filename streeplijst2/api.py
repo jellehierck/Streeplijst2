@@ -1,4 +1,5 @@
 import requests  # library used for making calls to Congressus API
+from requests import Timeout, HTTPError
 import json
 from datetime import datetime
 
@@ -168,4 +169,12 @@ def post_sale(user_id: int, product_id: int, quantity: int, timeout: float = TIM
 
     res.raise_for_status()  # Raise any other HTTP errors which occurred when making the request
     result = json.loads(res.text)  # Convert the entire response text to a python object
+
+    for item in result['items']:  # Normalise the field results
+        item['price'] = int(item['price'])  # Convert the price from str to int
+        item['total_price'] = int(item['total_price'])  # Convert the total_price from str to int
+
+    result['created'] = datetime.fromisoformat(result['created'])
+    # result['modified'] = datetime.fromisoformat(result['modified'])  # TODO: This string might be empty, handle that
+
     return result

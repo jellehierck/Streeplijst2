@@ -1,9 +1,21 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from sqlalchemy import asc
 
 from streeplijst2.streeplijst.models import Folder, Sale, Item
 from streeplijst2.extensions import db
+import streeplijst2.api as api
+
+UPDATE_INTERVAL = 60 * 60 * 4  # Nr of seconds between automatic updates (default 4 hours)  # TODO: Add this to config
+
+
+class FolderNotInDatabaseException(Exception):  # TODO: Add a streeplijst base exception module
+    """Error when a folder could not be loaded from the database."""
+
+
+class TotalPriceMismatchWarning(UserWarning):  # TODO: Add a streeplijst base warning module
+    """Warning when the total price of the sale does not match between the locally stored value and the value returned
+    by the API."""
 
 
 class ItemDB:
@@ -47,12 +59,11 @@ class ItemDB:
 
         # If no kwarg is given for an attribute, set it to the already stored attribute
         modified_item.name = kwargs.get('name', modified_item.name)
-        modified_item.id = kwargs.get('id', modified_item.id)
         modified_item.price = kwargs.get('price', modified_item.price)
-        modified_item.folder = kwargs.get('folder', modified_item.folder)
-        modified_item.folder_id = kwargs.get('folder_id', modified_item.folder_id)
         modified_item.published = kwargs.get('published', modified_item.published)
         modified_item.media = kwargs.get('media', modified_item.media)
+        modified_item.folder_id = kwargs.get('folder_id', modified_item.folder_id)
+        modified_item.folder_name = kwargs.get('folder_name', modified_item.folder_name)
 
         modified_item.updated = datetime.now()
         db.session.commit()
@@ -107,6 +118,33 @@ class ItemDB:
 class FolderDB:
 
     @classmethod
+    def load_folder(cls, folder_id: int, force_sync: bool = False,
+                    auto_sync_interval: float = UPDATE_INTERVAL, timeout: float = api.TIMEOUT) -> Folder:
+        """
+        Load a folder from the database or from the API. The database loads much faster but may be out of sync with the
+        API.
+
+        :param folder_id: Folder ID to retrieve.
+        :param force_sync: When set to True, the folder will sync its contents with the API.
+        :param auto_sync_interval: Alternative sync interval in seconds (defaults to cls.UPDATE_INTERVAL).
+        :param timeout: Timeout for the API request in seconds (defautls to api.TIMEOUT).
+        :return: The Folder instance.
+        """
+        folder = cls.get(folder_id)
+        if folder is None:  # The folder was not in the database
+            raise FolderNotInDatabaseException("Folder not in local database. Add it using FolderDB.create()")
+
+        # Check if the folder contents should be updated.
+        update_threshold = datetime.now() - timedelta(seconds=auto_sync_interval)
+        if force_sync is True or folder.synchronized < update_threshold:  # The folder should sync with the API
+            items = api.get_products_in_folder(folder.id, timeout=timeout)  # Make the api call
+            for item_dict in items:  # Update existing items or create a new item if it did not exist in db before
+                ItemDB.create(**item_dict)
+            FolderDB.update(folder.id, synchronized=datetime.now())  # Update the timed folder fields.
+
+        return folder
+
+    @classmethod
     def create(cls, id: int, name: str, media: str = None) -> Folder:
         """
         Instantiate a Folder object and store it in the database.
@@ -138,7 +176,6 @@ class FolderDB:
 
         # If no kwarg is given for an attribute, set it to the already stored attribute
         modified_folder.name = kwargs.get('name', modified_folder.name)
-        modified_folder.id = kwargs.get('id', modified_folder.id)
         modified_folder.media = kwargs.get('media', modified_folder.media)
         modified_folder.synchronized = kwargs.get('synchronized', modified_folder.synchronized)
 
@@ -195,6 +232,67 @@ class FolderDB:
 class SaleDB:
 
     @classmethod
+    def post_sale(cls, id: int, timeout: float = api.TIMEOUT) -> Sale:
+        """
+        POST the sale to the API.
+
+        :param id: The ID of the sale to post.
+        :param timeout: Timeout for the API request in seconds (defautls to api.TIMEOUT).
+        """
+        sale = SaleDB.get(id)
+
+        try:
+            response = api.post_sale(user_id=sale.user_id, product_id=sale.item_id, quantity=sale.quantity,
+                                     timeout=timeout)
+            updated_sale = SaleDB.update(id=sale.id,
+                                         api_id=response['id'],
+                                         api_reference=response['reference'],
+                                         api_created=response['created'],
+                                         status=Sale.STATUS_OK)
+
+            # Check the prices
+            api_total_price = 0
+            for item in response['items']:  # Adds prices of all items in sale to check
+                api_total_price += item['total_price']  # Synchronize the total prize with API response
+
+            if api_total_price != sale.total_price:  # Check if the total price matches
+                raise TotalPriceMismatchWarning(
+                    "total_price does not match. Local total_price: %d   API total_price: %d" % (
+                        sale.total_price, api_total_price))
+
+            return updated_sale
+
+        except TotalPriceMismatchWarning as warn:  # If warning is raised, add message to the sale but continue normally
+            updated_sale = SaleDB.update(id=sale.id,
+                                         status=sale.STATUS_TOTAL_PRICE_MISMATCH,  # Store the warnning
+                                         error_msg=str(warn))  # Store the warning message
+            return updated_sale  # Return the sale
+
+        except api.UserNotSignedException as err:  # The user needs to sign their SDD before posting sales
+            SaleDB.update(id=sale.id,
+                          status=Sale.STATUS_SDD_NOT_SIGNED,  # Store the reason the request failed
+                          error_msg=str(err))  # Save the entire error message
+            raise err
+
+        except api.Timeout as err:  # If a Timeout error occurred
+            SaleDB.update(id=sale.id,
+                          status=Sale.STATUS_TIMEOUT,  # Store the reason the request failed
+                          error_msg=str(err))  # Save the entire error message
+            raise err
+
+        except api.HTTPError as err:  # If an HTTPError occurred, the request was bad
+            SaleDB.update(id=sale.id,
+                          status=Sale.STATUS_HTTP_ERROR,  # Store the reason the request failed
+                          error_msg=str(err))  # Save the entire error message
+            raise err
+
+        except Exception as err:  # If another error occurred, something else went wrong
+            SaleDB.update(id=sale.id,
+                          status=Sale.STATUS_UNKNOWN_ERROR,  # Store the reason the request failed
+                          error_msg=str(err))  # Save the entire error message
+            raise err
+
+    @classmethod
     def create(cls, quantity: int, total_price: int, item_id: int, item_name: str, user_id: int,
                user_s_number: str) -> Sale:
         """
@@ -209,8 +307,8 @@ class SaleDB:
         :return: The sale.
         """
         # Create a new sale
-        new_sale = Folder(quantity=quantity, total_price=total_price, item_id=item_id, item_name=item_name,
-                          user_id=user_id, user_s_number=user_s_number)
+        new_sale = Sale(quantity=quantity, total_price=total_price, item_id=item_id, item_name=item_name,
+                        user_id=user_id, user_s_number=user_s_number)
         db.session.add(new_sale)
         db.session.commit()
         return new_sale
@@ -220,21 +318,22 @@ class SaleDB:
         """
         Update this sale's data fields.
 
-        :param id: The item ID of the sale to update.
+        :param id: The ID of the sale to update.
         :param kwargs: The fields are updated with keyword arguments.
         :return: The updated sale.
         """
         modified_sale = Sale.query.get(id)
 
         # If no kwarg is given for an attribute, set it to the already stored attribute
-        modified_sale.id = kwargs.get('id', modified_sale.id)
         modified_sale.quantity = kwargs.get('quantity', modified_sale.quantity)
         modified_sale.total_price = kwargs.get('total_price', modified_sale.total_price)
         modified_sale.item_id = kwargs.get('item_id', modified_sale.item_id)
         modified_sale.item_name = kwargs.get('item_name', modified_sale.item_name)
         modified_sale.user_id = kwargs.get('user_id', modified_sale.user_id)
         modified_sale.user_s_number = kwargs.get('user_s_number', modified_sale.user_s_number)
+
         modified_sale.api_id = kwargs.get('api_id', modified_sale.api_id)
+        modified_sale.api_reference = kwargs.get('api_reference', modified_sale.api_reference)
         modified_sale.api_created = kwargs.get('api_created', modified_sale.api_created)
         modified_sale.status = kwargs.get('status', modified_sale.status)
         modified_sale.error_msg = kwargs.get('error_msg', modified_sale.error_msg)
@@ -283,7 +382,7 @@ class SaleDB:
         """
         List all sales by this user.
 
-        :return: A List of all sales by the yser.
+        :return: A List of all sales by the user.
         """
         # TODO: Add a way to sort result differently
         return Sale.query.filter_by(user_id=user_id).all()
