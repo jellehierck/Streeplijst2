@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from sqlalchemy import asc
 
 from streeplijst2.streeplijst.models import Folder, Sale, Item
-from streeplijst2.exceptions import NotInDatabaseException, TotalPriceMismatchWarning
+from streeplijst2.exceptions import NotInDatabaseException, TotalPriceMismatchWarning, HTTPError, Timeout
 from streeplijst2.extensions import db
 from streeplijst2.database import UserDB
 import streeplijst2.api as api
@@ -267,13 +267,13 @@ class SaleDB:
                           error_msg=str(err))  # Save the entire error message
             raise err
 
-        except api.Timeout as err:  # If a Timeout error occurred
+        except Timeout as err:  # If a Timeout error occurred
             SaleDB.update(id=sale.id,
                           status=Sale.STATUS_TIMEOUT,  # Store the reason the request failed
                           error_msg=str(err))  # Save the entire error message
             raise err
 
-        except api.HTTPError as err:  # If an HTTPError occurred, the request was bad
+        except HTTPError as err:  # If an HTTPError occurred, the request was bad
             SaleDB.update(id=sale.id,
                           status=Sale.STATUS_HTTP_ERROR,  # Store the reason the request failed
                           error_msg=str(err))  # Save the entire error message

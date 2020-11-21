@@ -1,29 +1,10 @@
 import requests  # library used for making calls to Congressus API
-from requests import Timeout, HTTPError
 import json
 from datetime import datetime
 
 from streeplijst2.config import BASE_URL, BASE_HEADER, TIMEOUT
-
-
-class NotFoundException(requests.exceptions.HTTPError):
-    """Error when something is not found."""
-
-
-class ItemNotFoundException(NotFoundException):
-    """Error when the item is not found."""
-
-
-class FolderNotFoundException(NotFoundException):
-    """Error when the folder is not found."""
-
-
-class UserNotFoundException(NotFoundException):
-    """Error when the user is not found."""
-
-
-class UserNotSignedException(requests.exceptions.HTTPError):
-    """Error when the user has no signed SDD mandate."""
+from streeplijst2.exceptions import ItemNotFoundException, FolderNotFoundException, UserNotFoundException, \
+    UserNotSignedException
 
 
 def _normalize_media(item_dict):

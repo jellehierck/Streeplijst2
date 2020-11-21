@@ -9,7 +9,8 @@ import time
 
 from streeplijst2.config import TEST_FOLDER, TEST_USER, TEST_ITEM, TEST_USER_NO_SDD, TEST_ITEM_2
 from streeplijst2.database import UserDB
-from streeplijst2.streeplijst.database import FolderDB, ItemDB, NotInDatabaseException, SaleDB, Sale
+from streeplijst2.streeplijst.database import FolderDB, ItemDB, SaleDB, Sale
+from streeplijst2.exceptions import HTTPError, Timeout, TotalPriceMismatchWarning, NotInDatabaseException
 import streeplijst2.api as api
 
 TEST_FOLDER_NO_MEDIA = copy.deepcopy(TEST_FOLDER)
@@ -263,7 +264,7 @@ class TestSaleAPI:
         with test_app.app_context():
             sale = SaleDB.create(**TEST_SALE)
             SaleDB.update(id=sale.id, user_id=0)  # Set to nonexistent user id
-            with pytest.raises(api.HTTPError) as err:
+            with pytest.raises(HTTPError) as err:
                 SaleDB.post_sale(sale.id)
             assert '404' in str(err.value)
             assert sale.status == Sale.STATUS_HTTP_ERROR
@@ -273,7 +274,7 @@ class TestSaleAPI:
         with test_app.app_context():
             sale = SaleDB.create(**TEST_SALE)
             SaleDB.update(id=sale.id, item_id=1)  # Set to nonexistent item id
-            with pytest.raises(api.HTTPError) as err:
+            with pytest.raises(HTTPError) as err:
                 SaleDB.post_sale(sale.id)
             assert '404' in str(err.value)
             assert sale.status == Sale.STATUS_HTTP_ERROR
@@ -293,7 +294,7 @@ class TestSaleAPI:
         with test_app.app_context():
             with test_app.app_context():
                 sale = SaleDB.create(**TEST_SALE)
-                with pytest.raises(api.Timeout) as err:
+                with pytest.raises(Timeout) as err:
                     SaleDB.post_sale(sale.id, timeout=0.001)
                 assert sale.status == Sale.STATUS_TIMEOUT
                 assert str(err.value) == sale.error_msg
