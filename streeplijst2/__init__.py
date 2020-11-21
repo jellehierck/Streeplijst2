@@ -45,9 +45,13 @@ def create_app(config=None):
     with app.app_context():
         db.create_all()  # Create tables in this app from all models imported before
 
-    # Set up caching
-    from streeplijst2.extensions import cache
-    cache.init_app(app)
+    from streeplijst2.streeplijst.database import init_database
+    with app.app_context():
+        init_database()  # Load all folders into the database if needed
+
+    # # Set up caching
+    # from streeplijst2.extensions import cache
+    # cache.init_app(app)
 
     # Register all routes
     from streeplijst2.routes import bp_home

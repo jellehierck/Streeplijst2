@@ -1,8 +1,9 @@
 from flask import redirect, url_for, render_template, flash, session, Blueprint
 
-from streeplijst2.config import FOLDERS
+from streeplijst2.config import FOLDERS, TEST_FOLDER_ID
 from streeplijst2.routes import login_required
-# from streeplijst2.streeplijst.database import StreeplijstDBController as db_controller
+from streeplijst2.streeplijst.database import FolderDB, SaleDB, ItemDB, UserDB
+from streeplijst2.exceptions import Streeplijst2Warning, Streeplijst2Exception
 
 ##################################
 # Streeplijst specific blueprint #
@@ -22,33 +23,35 @@ def index():
 
 @bp_streeplijst.route('/folder')  # If no folder_id is specified, the default folder is loaded
 @bp_streeplijst.route('/folder/<int:folder_id>')  # When a folder is specified it is loaded
-def folder(folder_id=1998):  # TODO: Change default folder to a more useful folder.
+def folder(folder_id=TEST_FOLDER_ID):  # TODO: Change default folder to a more useful folder.
     if 'user_id' in session:
-        folder = db_controller.get_or_create_folder(folder_id=folder_id, sync=True, force_sync=False, auto_commit=True)
+        loaded_folder = FolderDB.load_folder(folder_id=folder_id)
         meta_folders = FOLDERS  # The folder metas for all folders are loaded to display at top of the screen
-        return render_template('folder.jinja2', meta_folders=meta_folders, folder=folder)
+        return render_template('folder.jinja2', meta_folders=meta_folders, folder=loaded_folder)
     else:
-        flash('Log eerst in.', 'message')
+        flash('Log in first.', 'message')
         return redirect(url_for('home.login'))
 
 
-@bp_streeplijst.route('/sale', methods=['POST', 'GET'])
+@bp_streeplijst.route('/sale', methods=['POST'])
 def sale():
-    # item_id = request.form['item-id']
     # quantity = request.form['quantity']
+    # item_id = request.form['item-id']
     # user_id = session['user_id']
 
     # TODO: remove the following test parameters and uncomment the block above
-    item_id = 13591
     quantity = 1
+    item_id = 13591
     user_id = 347980
 
-    user = db_controller.get_or_create_user("s9999999", auto_commit=True)
-    item = db_controller.get_or_create_folder(1998, sync=True, force_sync=True, auto_commit=True)
+    item = ItemDB.get(item_id)
+    user = UserDB.get(user_id)
+    sale = SaleDB.create_quick(quantity=quantity, item_id=item_id, user_id=user_id)
 
-    sale = db_controller.create_sale(item_id=item_id, user_id=user_id, quantity=quantity, auto_commit=True)
-    #   sale.post_sale()  # TODO: Uncomment this line to post the sale
-    db_controller.commit()
+    try:
+        sale = SaleDB.post_sale(sale.id)
+    except Streeplijst2Warning as err:
+        flash(str(err))
 
     meta_folders = FOLDERS  # The folder metas for all folders are loaded to display at top of the screen
-    return render_template('checkout.jinja2', meta_folders=meta_folders, sale=sale, item=sale.item, user=sale.user)
+    return render_template('checkout.jinja2', meta_folders=meta_folders, sale=sale, item=item, user=user)

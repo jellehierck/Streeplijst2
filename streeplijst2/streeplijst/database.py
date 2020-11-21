@@ -3,19 +3,22 @@ from datetime import datetime, timedelta
 from sqlalchemy import asc
 
 from streeplijst2.streeplijst.models import Folder, Sale, Item
+from streeplijst2.exceptions import NotInDatabaseException, TotalPriceMismatchWarning, HTTPError, Timeout
 from streeplijst2.extensions import db
+from streeplijst2.database import UserDB
+from streeplijst2.config import FOLDERS, UPDATE_INTERVAL
 import streeplijst2.api as api
 
-UPDATE_INTERVAL = 60 * 60 * 4  # Nr of seconds between automatic updates (default 4 hours)  # TODO: Add this to config
 
+def init_database(config=None) -> None:
+    """
+    Initialize any custom models for the streeplijst database.
 
-class FolderNotInDatabaseException(Exception):  # TODO: Add a streeplijst base exception module
-    """Error when a folder could not be loaded from the database."""
-
-
-class TotalPriceMismatchWarning(UserWarning):  # TODO: Add a streeplijst base warning module
-    """Warning when the total price of the sale does not match between the locally stored value and the value returned
-    by the API."""
+    :param config: If provided, use this config.
+    """
+    for (folder_id, folder_dict) in FOLDERS.items():
+        FolderDB.create(**folder_dict)
+        FolderDB.load_folder(folder_id)
 
 
 class ItemDB:
@@ -132,7 +135,7 @@ class FolderDB:
         """
         folder = cls.get(folder_id)
         if folder is None:  # The folder was not in the database
-            raise FolderNotInDatabaseException("Folder not in local database. Add it using FolderDB.create()")
+            raise NotInDatabaseException("Folder not in local database. Add it using FolderDB.create()")
 
         # Check if the folder contents should be updated.
         update_threshold = datetime.now() - timedelta(seconds=auto_sync_interval)
@@ -257,7 +260,7 @@ class SaleDB:
 
             if api_total_price != sale.total_price:  # Check if the total price matches
                 raise TotalPriceMismatchWarning(
-                    "total_price does not match. Local total_price: %d   API total_price: %d" % (
+                    "total_price does not match (local total_price) %d != %d (API total_price)" % (
                         sale.total_price, api_total_price))
 
             return updated_sale
@@ -274,13 +277,13 @@ class SaleDB:
                           error_msg=str(err))  # Save the entire error message
             raise err
 
-        except api.Timeout as err:  # If a Timeout error occurred
+        except Timeout as err:  # If a Timeout error occurred
             SaleDB.update(id=sale.id,
                           status=Sale.STATUS_TIMEOUT,  # Store the reason the request failed
                           error_msg=str(err))  # Save the entire error message
             raise err
 
-        except api.HTTPError as err:  # If an HTTPError occurred, the request was bad
+        except HTTPError as err:  # If an HTTPError occurred, the request was bad
             SaleDB.update(id=sale.id,
                           status=Sale.STATUS_HTTP_ERROR,  # Store the reason the request failed
                           error_msg=str(err))  # Save the entire error message
@@ -291,6 +294,30 @@ class SaleDB:
                           status=Sale.STATUS_UNKNOWN_ERROR,  # Store the reason the request failed
                           error_msg=str(err))  # Save the entire error message
             raise err
+
+    @classmethod
+    def create_quick(cls, quantity: int, item_id: int, user_id: int):
+        """
+        Instantiate a Sale object with parameters from the database and store it in the database.
+
+        :param quantity: Amount of the item to buy.
+        :param item_id: Item ID.
+        :param user_id: User ID.
+        :return: The sale.
+        """
+        item = ItemDB.get(item_id)
+        user = UserDB.get(user_id)
+
+        # Check if it is possible to create the sale correctly
+        if item is None:
+            raise NotInDatabaseException("Item with id %d does not exist in database." % item_id)
+        elif user is None:
+            raise NotInDatabaseException("User with id %d does not exist in database." % user_id)
+
+        # Calculate total price and create and return the sale
+        total_price = quantity * item.price
+        return cls.create(quantity=quantity, total_price=total_price, item_id=item_id, item_name=item.name,
+                          user_id=user_id, user_s_number=user.s_number)
 
     @classmethod
     def create(cls, quantity: int, total_price: int, item_id: int, item_name: str, user_id: int,
@@ -306,7 +333,6 @@ class SaleDB:
         :param user_s_number: User s_number.
         :return: The sale.
         """
-        # Create a new sale
         new_sale = Sale(quantity=quantity, total_price=total_price, item_id=item_id, item_name=item_name,
                         user_id=user_id, user_s_number=user_s_number)
         db.session.add(new_sale)
