@@ -3,20 +3,12 @@ from datetime import datetime, timedelta
 from sqlalchemy import asc
 
 from streeplijst2.streeplijst.models import Folder, Sale, Item
+from streeplijst2.exceptions import NotInDatabaseException, TotalPriceMismatchWarning
 from streeplijst2.extensions import db
 from streeplijst2.database import UserDB
 import streeplijst2.api as api
 
 UPDATE_INTERVAL = 60 * 60 * 4  # Nr of seconds between automatic updates (default 4 hours)  # TODO: Add this to config
-
-
-class NotInDatabaseException(Exception):  # TODO: Add a streeplijst base exception module
-    """Error when an object could not be loaded from the database and it is insufficient to return None."""
-
-
-class TotalPriceMismatchWarning(UserWarning):  # TODO: Add a streeplijst base warning module
-    """Warning when the total price of the sale does not match between the locally stored value and the value returned
-    by the API."""
 
 
 class ItemDB:
@@ -258,7 +250,7 @@ class SaleDB:
 
             if api_total_price != sale.total_price:  # Check if the total price matches
                 raise TotalPriceMismatchWarning(
-                    "total_price does not match. Local total_price: %d   API total_price: %d" % (
+                    "total_price does not match (local total_price) %d != %d (API total_price)" % (
                         sale.total_price, api_total_price))
 
             return updated_sale
