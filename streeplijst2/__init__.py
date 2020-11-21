@@ -4,7 +4,8 @@ Contains all Flask logic to connect this Python backend to the HTML frontend.
 import os
 from flask import Flask
 
-from streeplijst2.config import INSTANCE_FOLDER, DEV_KEY  # TODO: Remove this and replace with decent call to config
+from streeplijst2.config import INSTANCE_FOLDER, DEV_KEY, \
+    SECRET_KEY  # TODO: Remove this and replace with decent call to config
 
 
 def create_app(config: dict = None):
@@ -16,30 +17,31 @@ def create_app(config: dict = None):
     """
     app = Flask(__name__, instance_relative_config=True, instance_path=str(INSTANCE_FOLDER))  # Create app
 
-    # ensure the instance folder exists
+    # Ensure the instance folder exists
     try:
         os.makedirs(app.instance_path)
     except OSError:
         pass
 
-    app.config.from_mapping(  # TODO: Change this so that it imports from a config file
-        SECRET_KEY=DEV_KEY,  # TODO: change this key
+    # Set the default settings
+    app.config.from_mapping(
+        SECRET_KEY=DEV_KEY,  # Load the dev key as a default configuration
         SQLALCHEMY_DATABASE_URI='sqlite:///' + app.instance_path + '/database.sqlite',  # Database in instance folder
         SQLALCHEMY_TRACK_MODIFICATIONS=False  # Reduces the overhead of track_modifications
     )
 
     # Load configuration
-    if config is None:
-        # load the instance config, if it exists, when not testing
-        # app.config.from_pyfile('config.py', silent=True) # TODO: Actually import from a config file
-        pass
-    else:
-        # load the test config if passed in
+    if config is None:  # load the default config
+        app.config.from_mapping(
+            SECRET_KEY=SECRET_KEY  # Load the secret key from the config package.
+        )
+    else:  # load a config if passed in
         app.config.from_mapping(config)
 
     # Set up the database
     from streeplijst2.extensions import db  # Import the database module
     db.init_app(app)  # Intialize the Flask_SQLAlchemy database
+
     import streeplijst2.models  # Import all models (needed to create SQL tables)
     import streeplijst2.streeplijst.models  # Import all models (needed to create SQL tables)
     with app.app_context():
@@ -50,13 +52,10 @@ def create_app(config: dict = None):
         with app.app_context():
             init_database()  # Load all folders into the database if needed
 
-    # # Set up caching
-    # from streeplijst2.extensions import cache
-    # cache.init_app(app)
-
     # Register all routes
     from streeplijst2.routes import bp_home
     app.register_blueprint(bp_home)
+
     from streeplijst2.streeplijst.routes import bp_streeplijst
     app.register_blueprint(bp_streeplijst)
 

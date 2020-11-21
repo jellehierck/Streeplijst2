@@ -13,6 +13,7 @@ config_path = CONFIG_FOLDER / 'config.yaml'
 with open(config_path) as file:
     global_cfg = yaml.safe_load(file)
 
+PORT = global_cfg['PORT']
 UPDATE_INTERVAL = global_cfg['UPDATE_INTERVAL']
 TIMEOUT = global_cfg['TIMEOUT']
 BASE_URL = global_cfg['BASE_URL']
@@ -21,14 +22,15 @@ BASE_HEADER = global_cfg['BASE_HEADER']
 ###########################
 # Sensitive configuration #
 ###########################
-# TODO: Check if this can also be done using .env files
+
+# NOTE: These configurations are located in the .yaml file below. !! Never share the contents of this file !!
 credential_file_path = INSTANCE_FOLDER / 'credentials.yaml'  # Load the credential file
 with open(credential_file_path) as file:
     secret_credentials = yaml.safe_load(file)
 
-TOKEN = secret_credentials['TOKEN']
-DEV_KEY = secret_credentials['DEV_KEY']
-SECRET_KEY = secret_credentials['SECRET_KEY']
+DEV_KEY = secret_credentials['DEV_KEY']  # Development key (not sensitive)
+SECRET_KEY = secret_credentials['SECRET_KEY']  # Secret key for Flask app (sensitive if this app is accessed remotely)
+TOKEN = secret_credentials['TOKEN']  # Token used to make API calls to Congressus
 BASE_HEADER['Authorization'] += TOKEN
 
 #############################
