@@ -4,17 +4,17 @@ Contains all Flask logic to connect this Python backend to the HTML frontend.
 import os
 from flask import Flask
 
-from streeplijst2.config import DEV_KEY  # TODO: Remove this line and replace with decent call to config file
+from streeplijst2.config import INSTANCE_FOLDER, DEV_KEY  # TODO: Remove this and replace with decent call to config
 
 
-def create_app(config=None):
+def create_app(config: dict = None):
     """
     Flask app factory function.
 
     :param config: The configuration to load
     :return: Flask app instance
     """
-    app = Flask(__name__, instance_relative_config=True)  # Create the app
+    app = Flask(__name__, instance_relative_config=True, instance_path=str(INSTANCE_FOLDER))  # Create app
 
     # ensure the instance folder exists
     try:
@@ -45,9 +45,10 @@ def create_app(config=None):
     with app.app_context():
         db.create_all()  # Create tables in this app from all models imported before
 
-    from streeplijst2.streeplijst.database import init_database
-    with app.app_context():
-        init_database()  # Load all folders into the database if needed
+    if app.testing is not True:  # Only load the folders if we are not testing
+        from streeplijst2.streeplijst.database import init_database
+        with app.app_context():
+            init_database()  # Load all folders into the database if needed
 
     # # Set up caching
     # from streeplijst2.extensions import cache
