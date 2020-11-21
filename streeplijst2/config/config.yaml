@@ -1,4 +1,5 @@
 TIMEOUT: 10  # Default timeout (in seconds) for server responses.
+UPDATE_INTERVAL: 21600  # Nr of seconds between automatic synchronization of folders & items in streeplijst (default 6 hours)
 BASE_URL: "https://api.congressus.nl/v20"
 BASE_HEADER: # Base authorization header. The secret API token should be included as a string using Python
   Authorization: "Bearer:" # + Token

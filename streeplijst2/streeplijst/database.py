@@ -6,9 +6,19 @@ from streeplijst2.streeplijst.models import Folder, Sale, Item
 from streeplijst2.exceptions import NotInDatabaseException, TotalPriceMismatchWarning, HTTPError, Timeout
 from streeplijst2.extensions import db
 from streeplijst2.database import UserDB
+from streeplijst2.config import FOLDERS, UPDATE_INTERVAL
 import streeplijst2.api as api
 
-UPDATE_INTERVAL = 60 * 60 * 4  # Nr of seconds between automatic updates (default 4 hours)  # TODO: Add this to config
+
+def init_database(config=None) -> None:
+    """
+    Initialize any custom models for the streeplijst database.
+
+    :param config: If provided, use this config.
+    """
+    for (folder_id, folder_dict) in FOLDERS.items():
+        FolderDB.create(**folder_dict)
+        FolderDB.load_folder(folder_id)
 
 
 class ItemDB:
