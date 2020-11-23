@@ -14,6 +14,8 @@
         <meta name="author" content="Jelle H">
 
         <!-- Custom stylesheets -->
+        <link rel="stylesheet" id="sb-admin-2-stripped-css" href="{{ url_for('static', filename='css/sb-admin-2-stripped.css') }}"
+              type="text/css" media="all">
         <link rel="stylesheet" id="custom-css" href="{{ url_for('static', filename='css/custom-style.css') }}"
               type="text/css" media="all">
 
@@ -51,18 +53,6 @@
             {% block sidebar_contents %}
 
                 <hr class="sidebar-divider pb-4">
-            <!-- Applications -->
-                <li>
-                    <div class="lead sidebar-heading">Applicaties</div>
-                </li>
-                {% block sidebar_applications %}
-                    <li class="nav-item active">
-                        <a class="nav-link py-1" href="{{ url_for('streeplijst.index') }}">
-                            <span>Streeplijst</span>
-                        </a>
-                    </li>
-                {% endblock sidebar_applications %}
-                <hr class="sidebar-divider pb-4">
 
             <!-- User -->
                 <li>
@@ -82,6 +72,12 @@
                                     <span>Statistieken</span>
                                 </a>
                             </li>
+                            <li class="nav-item active">
+                                <!-- TODO: Add user statistics url here -->
+                                <a class="nav-link py-1" href="{{ url_for('home.logout') }}">
+                                    <span>Uitloggen</span>
+                                </a>
+                            </li>
 
                         {% else %}  {# No user is logged in #}
                             <li class="nav-item active">
@@ -94,6 +90,19 @@
                     {% endblock sidebar_user_logged_in %}
 
                 {% endblock sidebar_user %}
+                <hr class="sidebar-divider pb-4">
+
+            <!-- Applications -->
+                <li>
+                    <div class="lead sidebar-heading">Applicaties</div>
+                </li>
+                {% block sidebar_applications %}
+                    <li class="nav-item active">
+                        <a class="nav-link py-1" href="{{ url_for('streeplijst.index') }}">
+                            <span>Streeplijst</span>
+                        </a>
+                    </li>
+                {% endblock sidebar_applications %}
                 <hr class="sidebar-divider pb-4">
 
             <!-- Breadcrumbs -->
@@ -180,7 +189,7 @@
 
         // Set all regular alerts to fade out after 5000 ms
         window.setTimeout(function () {
-            $(".alert-regular").fadeTo(1000, 0).slideUp(1000, function () {
+            $(".alert-regular").fadeTo(200, 0).slideUp(200, function () {
                 $(this).remove();
             });
         }, 5000);

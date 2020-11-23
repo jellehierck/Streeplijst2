@@ -1,6 +1,6 @@
 from flask import redirect, url_for, render_template, request, flash, session, Blueprint
 
-from requests.exceptions import HTTPError
+from streeplijst2.exceptions import HTTPError, UserNotFoundException
 from functools import wraps  # Used in the login_required decorator function
 
 # from streeplijst2.database import DBController as db_controller
@@ -14,9 +14,8 @@ def login_required(func):
     https://realpython.com/primer-on-python-decorators/#is-the-user-logged-in.
 
     :param func: Function to be decorated
-    :return: A redirect to home.login if there is no user currently logged in.
+    :return: A redirect to home.login if there is no user currently logged in. Otherwise, func executes regularly
     """
-
     @wraps(func)  # functools wrapper used to preserve function information between calls (best practise for decorators)
     def wrapper_login_required(*args, **kwargs):
         if 'user_id' not in session:  # If there is no user logged in, redirect them to the login page
@@ -24,6 +23,13 @@ def login_required(func):
         return func(*args, **kwargs)  # If a user is logged in, execute the function normally
 
     return wrapper_login_required
+
+
+def force_logout():
+    """Log out a user by clearing all session data."""
+    if 'user_id' in session:  # If a user is logged in, remove all keys stored in the session
+        for key in list(session.keys()):
+            session.pop(key, None)  # Remove all items from the session (user data)
 
 
 ##################
@@ -55,14 +61,20 @@ def index():
 # Login page. When called with GET, this loads the login screen. When called with POST, attempts to login user.
 @bp_home.route('/login', methods=('GET', 'POST'))
 def login():
+    """
+    GET request: Displays the login screen in.
+
+    POST request: Attempts to log the user in
+    """
     if request.method == 'GET':  # Load the login page to let users enter their s-number
+        force_logout()  # It makes sense to log out any accidentally logged in user before seeing the login page.
         return render_template('login.jinja2')
 
     elif request.method == 'POST':  # Attempt to login the user
         s_number = request.form['s-number']  # Load the student number from the push form
         try:  # Attempt to find the user from Congressus
             user_dict = api.get_user(s_number=s_number)  # Create a User
-        except api.UserNotFoundException as err:  # The user was not found
+        except UserNotFoundException as err:  # The user was not found
             flash('User ' + s_number + ' not found, try again.', 'error')
             return render_template('login.jinja2')
         except HTTPError as err:  # There was a connection error
@@ -82,7 +94,6 @@ def login():
 
 @bp_home.route('/logout')
 def logout():
-    for key in list(session.keys()):
-        session.pop(key, None)  # Remove all items from the session (user data)
-    flash('Logged out.')  # TODO: Add temporary messages which disappear after a time.
+    force_logout()  # This action logs the user out
+    flash('Logged out.')
     return redirect(url_for('home.login'))
