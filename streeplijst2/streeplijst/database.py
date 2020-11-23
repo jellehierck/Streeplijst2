@@ -6,7 +6,7 @@ from streeplijst2.streeplijst.models import Folder, Sale, Item
 from streeplijst2.exceptions import NotInDatabaseException, TotalPriceMismatchWarning, HTTPError, Timeout
 from streeplijst2.extensions import db
 from streeplijst2.database import UserDB
-from streeplijst2.config import FOLDERS, UPDATE_INTERVAL
+from streeplijst2.config import FOLDERS_META, UPDATE_INTERVAL
 import streeplijst2.api as api
 
 
@@ -16,7 +16,7 @@ def init_database(config=None) -> None:
 
     :param config: If provided, use this config.
     """
-    for (folder_id, folder_dict) in FOLDERS.items():
+    for (folder_id, folder_dict) in FOLDERS_META.items():
         FolderDB.create(**folder_dict)
         FolderDB.load_folder(folder_id)
 
@@ -240,7 +240,7 @@ class SaleDB:
         POST the sale to the API.
 
         :param id: The ID of the sale to post.
-        :param timeout: Timeout for the API request in seconds (defautls to api.TIMEOUT).
+        :param timeout: Timeout for the API request in seconds (defaults to api.TIMEOUT).
         """
         sale = SaleDB.get(id)
 
@@ -438,7 +438,7 @@ class SaleDB:
 #         :return: The Folder object
 #         """
 #         if folder_id is not None:
-#             folder_config = FOLDERS[folder_id]  # Load the folder configuration
+#             folder_config = FOLDERS_META[folder_id]  # Load the folder configuration
 #         elif mapping is not None:
 #             folder_config = {'name': '', 'id': 1, 'media': '', }  # Set a default dict for the folder configuration
 #             folder_config.update(mapping)  # Replace the default dict values with the passed in kwargs

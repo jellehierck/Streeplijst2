@@ -41,7 +41,7 @@ streeplijst_config_path = CONFIG_FOLDER / 'streeplijst_config.yaml'
 with open(streeplijst_config_path) as file:
     streeplijst_cfg = yaml.safe_load(file)
 
-FOLDERS = streeplijst_cfg['FOLDERS']
+FOLDERS_META = streeplijst_cfg['FOLDERS_META']
 
 ##################################
 # Streeplijst test configuration #
@@ -60,4 +60,4 @@ TEST_USER_NO_SDD['date_of_birth'] = datetime.strptime(TEST_USER_NO_SDD['date_of_
 TEST_ITEM = streeplijst_test_cfg['TEST_ITEM']
 TEST_ITEM_2 = streeplijst_test_cfg['TEST_ITEM_2']
 TEST_FOLDER_ID = streeplijst_test_cfg['TEST_FOLDER_ID']
-TEST_FOLDER = FOLDERS[TEST_FOLDER_ID]
+TEST_FOLDER = FOLDERS_META[TEST_FOLDER_ID]

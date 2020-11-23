@@ -1,4 +1,4 @@
-FOLDERS:
+FOLDERS_META:
   1991:
     name: "Chips"  # folder name
     id: 1991  # folder id (determined by Congressus, found in URL of the folder in the manager)

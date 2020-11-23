@@ -20,7 +20,7 @@
 <!-- Folder overview -->
 <div id="folder-overview" class="row">
 
-    {% for folder in meta_folders.values() %}
+    {% for folder in folders_meta.values() %}
     <!-- Single folder -->
     <div class="col-lg-2 col-md-3 mb-3">
         <a class="card bg-light text-white shadow" href="{{ url_for('streeplijst.folder', folder_id = folder['id']) }}">

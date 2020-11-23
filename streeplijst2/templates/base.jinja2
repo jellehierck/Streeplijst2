@@ -50,9 +50,10 @@
 
             {% block sidebar_contents %}
 
+                <hr class="sidebar-divider pb-4">
             <!-- Applications -->
                 <li>
-                    <div class="sidebar-heading">Applicaties</div>
+                    <div class="lead sidebar-heading">Applicaties</div>
                 </li>
                 {% block sidebar_applications %}
                     <li class="nav-item active">
@@ -69,37 +70,35 @@
                 </li>
                 {% block sidebar_user %}
 
-                    {% if session['user_id'] %}
-                        <li class="nav-item">
-                            <div class="nav-link py-1">
-                <span>
-                    Welkom {{ session['user_first_name'] }}
-                </span>
-                            </div>
-                        </li>
-                        {% block sidebar_user_logged_in %}
+                    {% block sidebar_user_logged_in %}
+                        {% if session['user_id'] %}  {# A user is logged in #}
+                            <li class="nav-item">
+                                <div class="nav-link py-1">
+                                    <span>Welkom {{ session['user_first_name'] }}</span>
+                                </div>
+                            </li>
                             <li class="nav-item active">
                                 <!-- TODO: Add user statistics url here -->
                                 <a class="nav-link py-1" href="#">
                                     <span>Statistieken</span>
                                 </a>
                             </li>
-                        {% endblock sidebar_user_logged_in %}
-                    {% else %}
-                        <li class="nav-item">
-                            <div class="nav-link py-1">
-                <span>
-                    Niet ingelogd
-                </span>
-                            </div>
-                        </li>
-                        <li class="nav-item active">
-                            <!-- TODO: Add user statistics url here -->
-                            <a class="nav-link py-1" href="{{ url_for('home.login') }}">
-                                <span>Inloggen</span>
-                            </a>
-                        </li>
-                    {% endif %}
+
+                        {% else %}  {# No user is logged in #}
+                            <li class="nav-item">
+                                <div class="nav-link py-1">
+                                    <span>Niet ingelogd</span>
+                                </div>
+                            </li>
+                            <li class="nav-item active">
+                                <!-- TODO: Add user statistics url here -->
+                                <a class="nav-link py-1" href="{{ url_for('home.login') }}">
+                                    <span>Inloggen</span>
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endblock sidebar_user_logged_in %}
+
                 {% endblock sidebar_user %}
                 <hr class="sidebar-divider pb-4">
 
@@ -107,25 +106,18 @@
                 <li class="sidebar-heading">Breadcrumbs
                 </li>
                 {% block sidebar_breadcrumbs %}
+            <!-- Application home in case of multiple apps. TODO: Add application overview url instead of home.index
                     <li class="nav-item active">
-                        <!-- TODO: Add application overview url instead of home.index -->
+
                         <a class="nav-link py-1" href="{{ url_for('home.index') }}">
                             <span>Applicatie overzicht</span>
                         </a>
                     </li>
+            -->
                 {% endblock sidebar_breadcrumbs %}
                 <hr class="sidebar-divider pb-4">
 
             {% endblock sidebar_contents %}
-
-            <!-- Sidebar Toggler -->
-            <!-- DISABLED
-            <li>
-                <div class="text-center d-none d-md-inline">
-                    <button class="rounded-circle border-0" id="sidebarToggle"><</button>
-                </div>
-            </li>
-            -->
 
         </ul> <!-- #sidebar -->
     {% endblock sidebar %}
@@ -137,12 +129,12 @@
 
             <!-- Message container -->
             <div class="container pt-2">
-                <!-- Regular messages -->
-                {% with msgs = get_flashed_messages(category_filter=["message"]) %}
-                    {% if msgs %}
-                        {%- for msg in msgs %}
-                            <div class="alert alert-dark alert-dismissible fade show" role="alert">
-                                <h4>{{ msg }}</h4>
+                <!-- Error messages -->
+                {% with errors = get_flashed_messages(category_filter=["error"]) %}
+                    {% if errors %}
+                        {%- for msg in errors %}
+                            <div class="alert alert-warning alert-dismissible fade show alert-error" role="alert">
+                                <h4><strong>Oh jeetje!</strong> {{ msg }}</h4>
                                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
@@ -151,12 +143,12 @@
                     {% endif %}
                 {% endwith %}
 
-                <!-- Error messages -->
-                {% with errors = get_flashed_messages(category_filter=["error"]) %}
-                    {% if errors %}
-                        {%- for msg in errors %}
-                            <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                                <h4><strong>Oh jeetje!</strong> {{ msg }}</h4>
+                <!-- Regular messages -->
+                {% with msgs = get_flashed_messages(category_filter=["message"]) %}
+                    {% if msgs %}
+                        {%- for msg in msgs %}
+                            <div class="alert alert-dark alert-dismissible fade show alert-regular" role="alert">
+                                <h4>{{ msg }}</h4>
                                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
@@ -177,7 +169,7 @@
                     <footer class="sticky-footer bg-white">
                         <div class="container my-auto">
                             <div class="copyright text-center my-auto">
-                                <span>&copy; Copyright 2020 by Jelle Hierck and Tom Busink</span>
+                                <span>&copy; Copyright 2020 by Jelle Hierck</span>
                             </div>
                         </div>
                     </footer>
@@ -187,20 +179,22 @@
     </div> <!-- /#regular-content-wrapper -->
 </div> <!-- /#wrapper -->
 
-{% block script %} {# Any extra scripts go here #}
+{% block script %}
 
-<!-- SCRIPT TO OPEN AND CLOSE SIDEBAR -->
     <script type="text/javascript">
-    // Toggle the side navigation
-    $("#sidebarToggle, #sidebarToggleTop").on("click", function (e) {
-        $("body").toggleClass("sidebar-toggled");
-        $(".sidebar").toggleClass("toggled");
-        if ($(".sidebar").hasClass("toggled")) {
-            $(".sidebar .collapse").collapse("hide");
-        }
-        ;
+    $(document).ready(function () {  // Everything in this block is called as soon as the page finishes loading
+
+        // Set all regular alerts to fade out after 5000 ms
+        window.setTimeout(function () {
+            $(".alert-regular").fadeTo(1000, 0).slideUp(1000, function () {
+                $(this).remove();
+            });
+        }, 5000);
     });
-</script>
+    </script>
+
+
+    {# Any extra scripts go here. Always use {% super() %} when adding page-specific scripts #}
 {% endblock script %}
 
 </body>

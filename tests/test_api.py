@@ -2,7 +2,7 @@ import pytest
 from requests.exceptions import HTTPError, Timeout
 
 import streeplijst2.api as api
-from streeplijst2.config import FOLDERS, TEST_FOLDER_ID, TEST_USER, TEST_USER_NO_SDD, TEST_ITEM
+from streeplijst2.config import FOLDERS_META, TEST_FOLDER_ID, TEST_USER, TEST_USER_NO_SDD, TEST_ITEM
 
 """"
 Unit tests for API module.
@@ -22,7 +22,7 @@ You can change the values in the global variables below.
 
 correct_user = TEST_USER
 correct_item = TEST_ITEM
-correct_folder = FOLDERS[TEST_FOLDER_ID]
+correct_folder = FOLDERS_META[TEST_FOLDER_ID]
 
 no_sdd_user = TEST_USER_NO_SDD
 

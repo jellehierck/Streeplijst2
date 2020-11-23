@@ -9210,7 +9210,7 @@ a:focus {
   text-align: center;
   padding: 0 1rem;
   font-weight: 800;
-  font-size: 0.65rem;
+  font-size: 1rem;
 }
 
 @media (min-width: 768px) {
@@ -9336,7 +9336,9 @@ a:focus {
 }
 
 .sidebar-light hr.sidebar-divider {
-  border-top: 1px solid #eaecf4 !important;
+  /*border-top: 1px solid #eaecf4 !important;*/
+  border-top: 0 !important;
+  border-bottom: 1px solid #eaecf4 !important;
 }
 
 .sidebar-light .sidebar-heading {
@@ -9388,11 +9390,13 @@ a:focus {
 }
 
 .sidebar-dark hr.sidebar-divider {
-  border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
+  /*border-top: 1px solid rgba(255, 255, 255, 0.15) !important;*/
+  border-top: 0 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
 }
 
 .sidebar-dark .sidebar-heading {
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .sidebar-dark .nav-item .nav-link {

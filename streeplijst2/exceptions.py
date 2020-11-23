@@ -1,6 +1,5 @@
 from requests import HTTPError, Timeout  # Needed for HTTP request errors
 
-
 ###################
 # Base exceptions #
 ###################
