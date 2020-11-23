@@ -66,17 +66,16 @@
 
             <!-- User -->
                 <li>
-                    <div class="sidebar-heading">Gebruiker</div>
+                    {% if session['user_id'] %}  {# A user is logged in #}
+                        <div class="sidebar-heading">Welkom {{ session['user_first_name'] }}</div>
+                    {% else %}  {# No user is logged in #}
+                        <div class="sidebar-heading">Gebruiker</div>
+                    {% endif %}
                 </li>
                 {% block sidebar_user %}
 
                     {% block sidebar_user_logged_in %}
                         {% if session['user_id'] %}  {# A user is logged in #}
-                            <li class="nav-item">
-                                <div class="nav-link py-1">
-                                    <span>Welkom {{ session['user_first_name'] }}</span>
-                                </div>
-                            </li>
                             <li class="nav-item active">
                                 <!-- TODO: Add user statistics url here -->
                                 <a class="nav-link py-1" href="#">
@@ -85,11 +84,6 @@
                             </li>
 
                         {% else %}  {# No user is logged in #}
-                            <li class="nav-item">
-                                <div class="nav-link py-1">
-                                    <span>Niet ingelogd</span>
-                                </div>
-                            </li>
                             <li class="nav-item active">
                                 <!-- TODO: Add user statistics url here -->
                                 <a class="nav-link py-1" href="{{ url_for('home.login') }}">
