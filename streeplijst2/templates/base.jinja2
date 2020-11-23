@@ -14,7 +14,6 @@
         <meta name="author" content="Jelle H">
 
         <!-- Custom stylesheets -->
-        {#    <!-- OLD FILE <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> -->#}
         <link rel="stylesheet" id="custom-css" href="{{ url_for('static', filename='css/custom-style.css') }}"
               type="text/css" media="all">
 
@@ -24,13 +23,10 @@
 
         <!-- Template scripts -->
         <script type="text/javascript" src="{{ url_for('static', filename='/vendor/jquery/jquery.min.js') }}"></script>
-        {#        <script type="text/javascript"#}
-        {#                src="{{ url_for('static', filename='/vendor/jquery-easing/jquery.easing.min.js') }}"></script>#}
 
         <!-- Bootstrap stylesheets -->
         <script type="text/javascript"
                 src="{{ url_for('static', filename='/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('static', filename='/js/sb-admin-2.js') }}"></script>
 
     {% endblock head %}
 </head>
