@@ -4,8 +4,7 @@ Contains all Flask logic to connect this Python backend to the HTML frontend.
 import os
 from flask import Flask
 
-from streeplijst2.config import INSTANCE_FOLDER, DEV_KEY, \
-    SECRET_KEY  # TODO: Remove this and replace with decent call to config
+from streeplijst2.config import INSTANCE_FOLDER, DEV_KEY
 
 
 def create_app(config: dict = None):
@@ -31,11 +30,7 @@ def create_app(config: dict = None):
     )
 
     # Load configuration
-    if config is None:  # load the default config
-        app.config.from_mapping(
-            SECRET_KEY=SECRET_KEY  # Load the secret key from the config package.
-        )
-    else:  # load a config if passed in
+    if config is not None:  # Load the custom config if passed in
         app.config.from_mapping(config)
 
     # Set up the database

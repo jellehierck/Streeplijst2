@@ -10,7 +10,7 @@ if __name__ == '__main__':
 
     # Hostname argument (e.g. localhost, 127.0.0.1, 123.456.78.90)
     parser.add_argument('host',
-                        nargs='?',
+                        nargs='?',  # This line makes argument optional (if you do not pass a host, the default is used)
                         default='localhost',
                         help='hostname for this app. Default: localhost')
 
