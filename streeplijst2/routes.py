@@ -42,6 +42,7 @@ bp_home = Blueprint('home', __name__)
 # Hello world response as test message
 @bp_home.route('/hello')
 def hello():
+    """Display a message."""
     return "Hello, World!"
 
 
@@ -49,12 +50,14 @@ def hello():
 @bp_home.route('/secret_hello')
 @login_required
 def secret_hello():
+    """Display a message which you should only be able to see if you are logged in."""
     return "Hello, Secret World!"
 
 
 # Landing page
 @bp_home.route('/')
 def index():
+    """Display the home screen (defaults to login for now)."""
     return redirect(url_for('home.login'))
 
 
@@ -73,7 +76,7 @@ def login():
     elif request.method == 'POST':  # Attempt to login the user
         s_number = request.form['s-number']  # Load the student number from the push form
         try:  # Attempt to find the user from Congressus
-            user_dict = api.get_user(s_number=s_number)  # Create a User
+            user_dict = api.get_user(s_number=s_number)  # Try to get a user from the API
         except UserNotFoundException as err:  # The user was not found
             flash('User ' + s_number + ' not found, try again.', 'error')
             return render_template('login.jinja2')
@@ -94,6 +97,7 @@ def login():
 
 @bp_home.route('/logout')
 def logout():
+    """Log out a user and display the home screen."""
     force_logout()  # This action logs the user out
     flash('Logged out.')
     return redirect(url_for('home.login'))
