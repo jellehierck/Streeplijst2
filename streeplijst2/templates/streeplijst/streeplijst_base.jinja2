@@ -18,13 +18,14 @@
 {% block regular_content_top %}
 
 <!-- Folder overview -->
-<div id="folder-overview" class="row">
+<div id="folder-overview" class="row d-flex justify-content-between">
 
     {% for folder in folders_meta.values() %}
     <!-- Single folder -->
-    <div class="col-lg-2 col-md-3 mb-3">
+    <!-- <div class="col-lg-2 col-md-3 mb-3"> -->
+    <div class="mb-3">
         <a class="card bg-light text-white shadow" href="{{ url_for('streeplijst.folder', folder_id = folder['id']) }}">
-            <div class="container p-1" style="position:relative; height: 10vh">
+            <div class="container sq-sm p-1">
                 <img class="card-img-top" src="{{ folder['media'] }}" style="object-fit: contain; height: 100%" alt=" ">
                 <div class="text-center h5 m-0" style="position: absolute; bottom: 0; max-width: 95%">
                     <span class="badge badge-light opacity-75 text-truncate w-100">{{ folder['name'] }}</span>
