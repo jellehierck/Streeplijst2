@@ -33,6 +33,16 @@ SECRET_KEY = secret_credentials['SECRET_KEY']  # Secret key for Flask app (sensi
 TOKEN = secret_credentials['TOKEN']  # Token used to make API calls to Congressus
 BASE_HEADER['Authorization'] += TOKEN
 
+#######################
+# Admin configuration #
+#######################
+
+admin_file_path = CONFIG_FOLDER / 'admin_config.yaml'  # Load the admin default configuration
+with open(admin_file_path) as file:
+    admin_cfg = yaml.safe_load(file)
+
+DEFAULT_ADMIN = admin_cfg['DEFAULT_ADMIN']
+
 #############################
 # Streeplijst configuration #
 #############################

@@ -13,7 +13,7 @@ class Admin(db.Model, UserMixin):
     username = db.Column(db.String, unique=True)  # Login name of this admin, usually student number
     name = db.Column(db.String)  # Name for displaying
     password_hash = db.Column(db.String)  # Hashed password
-    last_accessed = db.Column(db.DateTime, nullable=True)  # Storing when an admin was last logged in
+    last_accessed = db.Column(db.DateTime)  # Storing when an admin was last logged in
     active = db.Column(db.Boolean)  # Store whether the admin is active
 
     created = db.Column(db.DateTime)
@@ -28,9 +28,11 @@ class Admin(db.Model, UserMixin):
         :param password_hash: Hashed password.
         """
         super().__init__(**kwargs)
+        self.last_accessed = datetime.min  # The admin was never accessed before
         self.created = datetime.now()
         self.updated = datetime.now()
 
+    @property
     def is_active(self):
         """Overwritten function of flask-login."""
         return self.active
@@ -40,4 +42,4 @@ class Admin(db.Model, UserMixin):
         return self.id
 
     def __repr__(self):
-        return '<Admin %s>' % self.name
+        return '<Admin %s (%s)>' % (self.name, self.username)

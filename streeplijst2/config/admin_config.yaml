@@ -1,0 +1,6 @@
+# Login credentials for the default admin
+DEFAULT_ADMIN:
+  username: "s0000000"
+  password: "40404040"
+  name: "default_admin"
+  active: true

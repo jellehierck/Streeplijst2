@@ -51,6 +51,12 @@ def create_app(config: dict = None):
     from streeplijst2.extensions import admin_manager
     admin_manager.init_app(app)
 
+    from streeplijst2.admin.database import AdminDB
+
+    @admin_manager.user_loader
+    def load_admin(admin_id):  # Function required for flask_login extension to load admins
+        return AdminDB.get_by_id(int(admin_id))  # admin_id is converted to integer value
+
     # Register all routes
     from streeplijst2.routes import bp_home
     app.register_blueprint(bp_home)

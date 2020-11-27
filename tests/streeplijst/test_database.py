@@ -1,7 +1,3 @@
-# from requests.exceptions import Timeout
-#
-# from streeplijst2.api import FolderNotFoundException, UserNotFoundException
-# from streeplijst2.streeplijst.database import StreeplijstDBController as db_controller
 import pytest
 import copy
 from datetime import datetime, timedelta
@@ -298,3 +294,5 @@ class TestSaleAPI:
                     SaleDB.post_sale(sale.id, timeout=0.001)
                 assert sale.status == Sale.STATUS_TIMEOUT
                 assert str(err.value) == sale.error_msg
+
+    # TODO: Add a TotalPriceMismatch test case
