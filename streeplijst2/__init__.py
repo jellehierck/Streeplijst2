@@ -37,6 +37,7 @@ def create_app(config: dict = None):
     from streeplijst2.extensions import db  # Import the database module
     db.init_app(app)  # Intialize the Flask_SQLAlchemy database
 
+    # TODO: Move streeplijst models to own init_app()
     import streeplijst2.models  # Import all models (needed to create SQL tables)
     import streeplijst2.streeplijst.models  # Import all models (needed to create SQL tables)
     with app.app_context():
@@ -47,20 +48,15 @@ def create_app(config: dict = None):
         with app.app_context():
             init_database()  # Load all folders into the database if needed
 
-    # Set up the admin environment
-    from streeplijst2.extensions import admin_manager
-    admin_manager.init_app(app)
-
-    from streeplijst2.admin.database import AdminDB
-
-    @admin_manager.user_loader
-    def load_admin(admin_id):  # Function required for flask_login extension to load admins
-        return AdminDB.get_by_id(int(admin_id))  # admin_id is converted to integer value
+    # Initialize all admin related functionality and blueprints into the Flask app
+    from streeplijst2.admin import init_app
+    init_app(app, config)
 
     # Register all routes
     from streeplijst2.routes import bp_home
     app.register_blueprint(bp_home)
 
+    # TODO: Move streeplijst routes to own init_app()
     from streeplijst2.streeplijst.routes import bp_streeplijst
     app.register_blueprint(bp_streeplijst)
 
