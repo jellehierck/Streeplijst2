@@ -43,6 +43,36 @@ Author: Jelle H
     height: 10vh !important;
 }
 
+.login-display-sm {
+    width: calc(45vh + 1rem) !important; /* This value is determined by 3 * .btn-sq width + 1rem for margin */
+    height: 8vh !important;
+}
+
 .login-display * {
     font-size: 4vh;
+}
+
+.vertical-input-group .input-group:first-child {
+    padding-bottom: 0;
+}
+.vertical-input-group .input-group:first-child * {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.vertical-input-group .input-group:last-child {
+    padding-top: 0;
+}
+.vertical-input-group .input-group:last-child * {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+.vertical-input-group .input-group:not(:last-child):not(:first-child) {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+.vertical-input-group .input-group:not(:last-child):not(:first-child) * {
+    border-radius: 0;
+}
+.vertical-input-group .input-group:not(:first-child) * {
+    border-top: 0;
 }

@@ -1,0 +1,26 @@
+{% extends "base.jinja2" %}
+
+{% block title %}Admin Base{% endblock title %}
+
+{% block sidebar_breadcrumbs %}
+
+    {{ super() }}
+    <li class="nav-item active">
+        <a class="nav-link py-1" href="{{ url_for('admin.index') }}">
+            <span>Admin</span>
+        </a>
+    </li>
+
+{% endblock sidebar_breadcrumbs %}
+
+{% block regular_content %}
+
+    {% block regular_content_top %}
+
+        <div>
+            <h1>Admin Base</h1>
+        </div>
+
+    {% endblock regular_content_top %}
+
+{% endblock regular_content %}

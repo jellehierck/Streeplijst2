@@ -1,5 +1,6 @@
 from flask import Blueprint, session, redirect, url_for, request, render_template
 from functools import wraps  # Used in decorator function
+from flask_login import login_required as admin_login_required
 
 
 def check_admin_logged_in(func):
@@ -45,8 +46,14 @@ def index():
 def login():
     if request.method == 'GET':
         admin_logout()  # If this page is accessed with GET, no admin must be logged in so clear the current admin
-        return render_template('admin/login.jinja2')
+        return render_template('admin/login_admin.jinja2')
 
     elif request.method == 'POST':
         admin_code = request.form['admin-code']
         # TODO: Add a hasing decoder here
+
+
+@bp_admin.route('/sales')
+@admin_login_required
+def sales_view():
+    return "Sales View"
