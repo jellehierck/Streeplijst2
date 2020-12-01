@@ -5,6 +5,7 @@ import os
 from flask import Flask
 
 from streeplijst2.config import INSTANCE_FOLDER, DEV_KEY
+# from streeplijst2.log import streeplijst_logger
 
 
 def create_app(config: dict = None):
@@ -21,6 +22,10 @@ def create_app(config: dict = None):
         os.makedirs(app.instance_path)
     except OSError:
         pass
+
+    # Set up logging first
+    from streeplijst2.log import init_app
+    init_app(app, config=config)  # Initialize the logging
 
     # Set the default settings
     app.config.from_mapping(
